@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevisFacile Loiret - Devis et factures pour artisans</title>
+<meta name="description" content="Le logiciel simple pour les artisans du bâtiment d'Orléans et du Loiret : devis, factures et relances d'impayés depuis votre téléphone.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;color:#1c2733;line-height:1.55;background:#fff}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{background:#0f3d6e;color:#fff;padding:14px 0}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header strong{font-size:1.2rem}
+header a{color:#fff;text-decoration:none;font-weight:bold}
+.hero{background:linear-gradient(135deg,#0f3d6e,#1a5fa8);color:#fff;padding:64px 0;text-align:center}
+.hero h1{font-size:2.2rem;line-height:1.2;margin-bottom:16px}
+.hero p{font-size:1.15rem;max-width:640px;margin:0 auto 28px;opacity:.95}
+.btn{display:inline-block;background:#f28c1b;color:#fff;padding:16px 32px;border-radius:8px;font-size:1.1rem;font-weight:bold;text-decoration:none;border:0;cursor:pointer}
+.btn:hover{background:#d97a10}
+.small{font-size:.9rem;opacity:.85;margin-top:12px}
+section{padding:56px 0}
+section h2{font-size:1.7rem;margin-bottom:20px;color:#0f3d6e;text-align:center}
+.grey{background:#f3f6fa}
+.problem p{max-width:700px;margin:0 auto;text-align:center;font-size:1.1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:24px}
+.card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.card h3{color:#f28c1b;margin-bottom:8px}
+.price{text-align:center}
+.price .amount{font-size:3rem;font-weight:bold;color:#0f3d6e}
+.price ul{list-style:none;margin:18px auto;max-width:360px;text-align:left}
+.price li:before{content:"✓ ";color:#f28c1b;font-weight:bold}
+.faq details{background:#fff;border-radius:8px;padding:16px 20px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.faq summary{font-weight:bold;cursor:pointer;color:#0f3d6e}
+.faq p{margin-top:10px}
+form{max-width:480px;margin:0 auto;display:grid;gap:12px}
+input,select{padding:14px;border:1px solid #c5d0dc;border-radius:8px;font-size:1rem;width:100%}
+form .btn{width:100%}
+.cta{background:#0f3d6e;color:#fff}
+.cta h2{color:#fff}
+.cta p{text-align:center;margin-bottom:20px}
+footer{background:#0a2a4d;color:#c9d6e6;padding:28px 0;font-size:.9rem;text-align:center}
+footer a{color:#c9d6e6}
+@media(max-width:600px){.hero h1{font-size:1.7rem}.hero{padding:44px 0}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="wrap">
+<strong>DevisFacile Loiret</strong>
+<a href="tel:+33782415970">07 82 41 59 70</a>
+</div>
+</header>
+
+<div class="hero">
+<div class="wrap">
+<h1>Vos devis et vos factures en 5 minutes, depuis votre téléphone.</h1>
+<p>Le logiciel simple pour les artisans du bâtiment d'Orléans et du Loiret. Fini les soirées sur l'administratif, fini les factures impayées qui traînent.</p>
+<a class="btn" href="#contact">Essayer gratuitement pendant 1 mois</a>
+<p class="small">Sans engagement. Installation faite avec vous, chez vous.</p>
+</div>
+</div>
+
+<section class="problem">
+<div class="wrap">
+<h2>Vous êtes plombier, électricien, peintre. Pas secrétaire.</h2>
+<p>Vous finissez le chantier à 18 heures, puis vous passez deux heures sur vos devis. Vos factures partent en retard, et vous n'osez pas toujours relancer ceux qui tardent à payer. Résultat : du temps perdu, et de l'argent qui rentre trop tard.</p>
+</div>
+</section>
+
+<section class="grey">
+<div class="wrap">
+<h2>Trois choses, et rien de plus</h2>
+<div class="cards">
+<div class="card"><h3>1. Un devis en 5 minutes</h3><p>Vos prestations habituelles sont déjà enregistrées. Vous choisissez, vous ajustez, vous envoyez par SMS ou par email, et votre client signe sur son téléphone.</p></div>
+<div class="card"><h3>2. Une facture en un clic</h3><p>Le devis accepté devient facture sans ressaisie.</p></div>
+<div class="card"><h3>3. Les relances se font toutes seules</h3><p>Un message poli part automatiquement à 7, 15 et 30 jours si la facture n'est pas payée. Vous voyez d'un coup d'œil ce qui est encaissé, à encaisser et en retard.</p></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap problem">
+<h2>Un outil local, avec une vraie personne au bout du fil</h2>
+<p>Nous sommes basés à Orléans. Nous venons installer l'outil chez vous, nous vous montrons comment il marche, et vous nous joignez par téléphone en français quand vous avez une question. Pas de robot, pas de ticket.</p>
+</div>
+</section>
+
+<section class="grey price">
+<div class="wrap">
+<h2>Un seul tarif, sans surprise</h2>
+<div class="amount">19 €<span style="font-size:1.1rem;font-weight:normal"> par mois</span></div>
+<p>Premier mois offert. Sans engagement, vous arrêtez quand vous voulez.</p>
+<ul>
+<li>Devis et factures illimités</li>
+<li>Signature électronique</li>
+<li>Relances automatiques</li>
+<li>Assistance par téléphone</li>
+</ul>
+<a class="btn" href="#contact">Je commence</a>
+</div>
+</section>
+
+<section class="faq">
+<div class="wrap">
+<h2>Questions fréquentes</h2>
+<details><summary>Je ne suis pas à l'aise avec l'informatique.</summary><p>Justement : l'outil tient en trois écrans et nous l'installons avec vous.</p></details>
+<details><summary>Et si je veux arrêter ?</summary><p>Vous partez quand vous voulez et vous récupérez toutes vos données.</p></details>
+<details><summary>Où sont stockées mes données ?</summary><p>En Europe, et elles restent les vôtres.</p></details>
+</div>
+</section>
+
+<section class="cta" id="contact">
+<div class="wrap">
+<h2>Récupérez vos soirées</h2>
+<p>Laissez vos coordonnées, nous vous rappelons sous 24 heures pour vous montrer l'outil, sans engagement.</p>
+<form action="https://formsubmit.co/Ponsnolan88@gmail.com" method="POST">
+<input type="hidden" name="_subject" value="Nouvelle demande artisan">
+<input type="text" name="nom" placeholder="Votre nom" required>
+<input type="text" name="entreprise" placeholder="Votre entreprise">
+<select name="metier"><option>Plombier</option><option>Électricien</option><option>Peintre</option><option>Carreleur</option><option>Maçon</option><option>Autre</option></select>
+<input type="tel" name="telephone" placeholder="Votre téléphone" required>
+<button class="btn" type="submit">Je veux être rappelé</button>
+</form>
+</div>
+</section>
+
+<footer>
+<div class="wrap">
+<p>DevisFacile Loiret - Orléans - 07 82 41 59 70</p>
+<p><a href="#">Mentions légales</a> - <a href="#">Politique de confidentialité</a></p>
+</div>
+</footer>
+
+</body>
+</html>
