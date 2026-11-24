@@ -27,8 +27,8 @@ def expressive(x, sr, clauses, pitch=1.0, formant=1.0, k=2.0, energy=1.0, emph=(
         a, b = fr(s), min(len(f0), fr(e))
         if b - a < 3: continue
         u = np.linspace(0, 1, b - a); bell = np.sin(np.pi * u) ** .7
-        out[a:b] = np.where(v[a:b], out[a:b] + 4.5 * ST * bell * max(.6, energy), 0)
-        gain[a:b] *= 1 + .45 * bell; stretch[a:b] = 1.18
+        out[a:b] = np.where(v[a:b], out[a:b] + 3.0 * ST * bell * max(.6, energy), 0)
+        gain[a:b] *= 1 + .3 * bell; stretch[a:b] = 1.08
     f0n = np.where(v, np.clip(np.exp(out) * pitch, 60, 480), 0)
     if formant != 1.0:
         n = sp.shape[1]; src = np.clip(np.arange(n) / formant, 0, n - 1)

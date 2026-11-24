@@ -4,7 +4,7 @@ import json, re, unicodedata, numpy as np, onnxruntime as ort
 from piper import espeakbridge as eb
 import piper.phonemize_espeak as pe
 
-FIX = {"Noé": "No-é", "toise": "touaze"}
+FIX = {"toise": "touaze"}
 PUNCT = r"[,.;:!?…]"
 
 class Voice:

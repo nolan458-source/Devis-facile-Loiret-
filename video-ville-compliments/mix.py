@@ -19,12 +19,13 @@ voice = np.zeros(N, np.float32)
 for l in tl["lines"]: put(voice, read(f"build/audio/{l['id']}.wav"), l["start"])
 write("build/voice.wav", voice)
 # music: 118 bpm, F C Dm Bb, marimba-like plucks + soft bass + light drums; drops out during the "silence" beat
-bpm = 118; beat = 60 / bpm; bar = 4 * beat
+bpm = 97; beat = 60 / bpm; bar = 4 * beat
 midi = lambda m: 440 * 2 ** ((m - 69) / 12)
 chords = [[65, 69, 72], [60, 64, 67], [62, 65, 69], [58, 62, 65]]; roots = [41, 36, 38, 34]
 music = np.zeros(N, np.float32)
-def mar(f, d=.4, g=.16):
-    t = np.arange(int(d * SR)) / SR; return (np.sin(2 * np.pi * f * t) + .35 * np.sin(2 * np.pi * 4 * f * t) * np.exp(-t * 30)) * np.exp(-t * 9) * g
+def mar(f, d=.35, g=.15):  # pizzicato-like pluck
+    t = np.arange(int(d * SR)) / SR; s = sum(np.sin(2 * np.pi * f * h * t) / h ** 1.3 * np.exp(-t * (14 + 6 * h)) for h in range(1, 6))
+    return s * np.minimum(1, t * 400) * g
 def bass(f, d):
     t = np.arange(int(d * SR)) / SR; s = np.sin(2 * np.pi * f * t) * np.minimum(1, t * 60) * np.exp(-t * 2); s[-150:] *= np.linspace(1, 0, 150); return s * .32
 def kick():
@@ -71,6 +72,6 @@ put(sfx, cheer(2.6), S("max") + .8); put(sfx, cheer(1.5, .18), S("c2")); put(sfx
 for i in ["noe", "ecole", "idee", "toise", "fin"]: put(sfx, whoosh(), S(i) - .3)
 write("build/sfx.wav", sfx)
 subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", "build/voice.wav", "-i", "build/music.wav", "-i", "build/sfx.wav", "-filter_complex",
-  "[1:a]volume=0.5[m];[0:a]asplit[v][vk];[m][vk]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=300[md];"
+  "[1:a]volume=0.32[m];[0:a]asplit[v][vk];[m][vk]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=300[md];"
   "[v][md][2:a]amix=inputs=3:normalize=0:weights=1 1 0.7,alimiter=limit=0.95,loudnorm=I=-14:TP=-1[a]", "-map", "[a]", "-ar", "44100", "-ac", "2", "build/mix.wav"], check=True)
 print("mix ok", T)
