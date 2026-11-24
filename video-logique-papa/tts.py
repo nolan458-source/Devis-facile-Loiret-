@@ -1,9 +1,10 @@
 # Generates one WAV per line with Piper, voice-shifted per character, and writes timeline.json
 # (start time, duration, per-word timings, 25 fps loudness envelope for lip-sync).
 import json, subprocess, sys, wave, numpy as np, os
-MODEL = sys.argv[1]; OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
+from tom_tts import Tom
+TTS = Tom(sys.argv[1]); OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
 FPS = 25; SR = 44100
-VOICE = {"N": (1.00, 1.00), "T": (1.10, 0.95), "P": (0.80, 1.05)}  # (pitch factor, length scale)
+VOICE = {"N": (1.00, 0.95), "T": (1.20, 0.92), "P": (0.88, 1.05)}  # (pitch factor, length scale)
 GAP = {"N": 0.35, "T": 0.30, "P": 0.40}
 lines = json.load(open("script.json"))
 def read(p):
@@ -13,8 +14,8 @@ t = 1.2; out = []
 for ln in lines:
     raw, fin = f"{OUT}/{ln['id']}_raw.wav", f"{OUT}/{ln['id']}.wav"
     pitch, ls = VOICE[ln["who"]]
-    subprocess.run([sys.executable, "-m", "piper", "-m", MODEL, "-f", raw, "--length-scale", str(ls),
-                    "--sentence-silence", "0.25"], input=ln["text"].encode(), check=True, capture_output=True)
+    a, sr = TTS.say(ln["text"], ls)
+    with wave.open(raw, "w") as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes((a * 32767).astype(np.int16).tobytes())
     # pitch shift keeping tempo: resample by pitch then atempo back
     af = f"asetrate=22050*{pitch},aresample={SR},atempo={1/pitch:.4f},silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-16:TP=-1.5"
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", raw, "-af", af, "-ar", str(SR), "-ac", "1", fin], check=True)
