@@ -5,16 +5,16 @@ from prosody import expressive
 TTS = Tom(sys.argv[1]) if os.path.isdir(sys.argv[1]) else Voice(sys.argv[1]); OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
 FPS = 25; SR = 44100
 # who: (pitch, length scale, formant, range expansion, energy)
-# male voice "tom" (~125 Hz natural): light processing to stay human
-VOICE = {"N": (1.00, 0.80, 1.00, 1.35, 1.1),  # narrator
-         "F": (1.12, 0.82, 1.04, 1.4, 1.2),   # crowd / passer-by
-         "G": (1.38, 0.95, 1.12, 1.2, 1.0),   # grandma
-         "O": (1.30, 0.82, 1.10, 1.4, 1.2),   # Noé (kid)
-         "B": (1.30, 0.85, 1.10, 1.3, 1.1),   # baker
-         "P": (0.94, 0.88, 0.98, 1.3, 1.1),   # postman
-         "X": (0.90, 0.92, 0.97, 1.2, 0.8)}   # Max
+# siwis voice tuned to the reference video (median ~190 Hz, 8.5 syll/s)
+VOICE = {"N": (0.81, 0.70, 1.00, 1.3, 1.1),  # narrator
+         "F": (0.95, 0.80, 1.00, 1.5, 1.2),  # crowd / passer-by
+         "G": (1.00, 0.95, 0.98, 1.3, 1.0),  # grandma
+         "O": (1.08, 0.80, 1.04, 1.5, 1.2),  # Noé (kid)
+         "B": (0.92, 0.84, 1.00, 1.4, 1.1),  # baker
+         "P": (0.80, 0.88, 0.95, 1.3, 1.1),  # postman
+         "X": (0.76, 0.92, 0.94, 1.2, 0.8)}  # Max
 GAP = 0.12
-EQ = ""  # timbre match to the reference video
+EQ = open("voice_eq.txt").read().strip() + "," if os.path.exists("voice_eq.txt") else ""  # timbre match to the reference video  # timbre match to the reference video
 lines = json.load(open("script.json"))
 def read(p):
     with wave.open(p) as w: return np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
