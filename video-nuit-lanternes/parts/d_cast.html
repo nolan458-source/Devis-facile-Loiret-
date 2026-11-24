@@ -1,0 +1,13 @@
+// cast
+const lina = character('lina', { skin: '#f1c9a5', shirt: '#ffd23f', pants: '#e0533d', shoes: '#e0533d', hair: 'pigtails', hairCol: '#7a3a1a', face: { eyes: 'n', mouth: 'smile', freckles: true, blush: true } });
+const torch = box(.13, .13, .38, '#2a2a33', 0, -.64, .2, .03, lina.arms[1]);
+const torchLens = new THREE.Mesh(new THREE.CircleGeometry(.06, 12), new THREE.MeshBasicMaterial({ color: '#fff6c0' })); torchLens.position.set(0, -.64, .4); lina.arms[1].add(torchLens);
+const mayor = character('mayor', { skin: '#f0c39c', shirt: '#2b3a6b', pants: '#2a2a3a', shoes: '#222', hair: 'bald', hairCol: '#bbbbbb', face: { eyes: 'n', mouth: 'flat', mustache: true, round: true } });
+const woman = character('woman', { skin: '#8d5a3b', shirt: '#4fbf68', pants: '#2a2a3a', hair: 'bun', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'flat', blush: true } });
+const crowd = []; for (let i = 0; i < 18; i++) crowd.push(character('c' + i, {
+  skin: ['#f1c9a5', '#8d5a3b', '#c98a5a', '#f3cfb3', '#6b3f28'][i % 5], shirt: ['#e8473f', '#4fbf68', '#3b6fd8', '#f5c400', '#ff7fb0', '#5de0ff', '#9a6be0', '#ff8a3d'][i % 8],
+  pants: ['#2a2a3a', '#3b4a6b', '#5a4030'][i % 3], hair: ['short', 'spiky', 'pony', 'bun', 'cap'][i % 5], hairCol: ['#2a1c14', '#e8b23a', '#7a4a2c', '#1e1410'][i % 4], capCol: '#2f5fb0',
+  face: { eyes: 'n', mouth: 'smile', blush: i % 3 === 0 } }));
+const warm = new THREE.PointLight('#ffb36b', 0, 30, 1.5); warm.position.set(0, 6, 6); scene.add(warm);
+const fill = new THREE.PointLight('#9fb4ff', 0, 30, 1.5); scene.add(fill);
+

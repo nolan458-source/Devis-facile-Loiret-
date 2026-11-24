@@ -1,0 +1,229 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), s = lerp(1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s);
+  text2(best.w, 0, 0, 66, best.e ? '#ffd23f' : '#ffffff', { lw: 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const CROWD_POS = crowd.map((c, i) => [-5 + (i % 6) * 2 + (Math.floor(i / 6) % 2) * .8, 2.6 + Math.floor(i / 6) * 1.8]);
+const REL = () => WT('regle', /^lâche/);
+const REL2 = () => S('nuit') + .9;
+function linaLPos(t) {  // Lina's lantern during the night release, drifting toward the forest
+  const k = Math.max(0, t - REL2());
+  return [3 + k * k * .35 + k * .6, 2 + k * 1.5 - Math.max(0, k - 3) * .4, 5 - k * .5];
+}
+function shots() {
+  return [
+    [0, [0, 3.4, 21], [0, 3.6, 18.5], [0, 3.8, -2], [0, 4, -2], 55, 1],
+    [WT('regle', /^Tout/) - .1, [1, 4.2, -1.6], [.8, 4.4, -1.4], [0, 1.6, 6], [0, 2.2, 6], 58, 1],
+    [WT('regle', /^Et$/) - .05, [0, 1.6, 12], [0, 1.6, 12], [0, 8, 0], [0, 12, 0], 62, 1],
+    [WT('regle', /^coupe/) - .2, [4.6, 2.7, 1.9], [4.3, 2.65, 1.4], [2.6, 2.5, -1.6], [2.6, 2.5, -1.6], 40, 1],
+    [S('bizarre') - .15, [-6, 2, 9], [-3, 2.4, 9], [30, 14, -4], [40, 13, -4], 55, 1],
+    [WT('bizarre', /^vers/) - .2, [18, 5, 16], [22, 5, 15], [48, 9, -4], [54, 8, -4], 55, 1],
+    [S('lendemain') - .15, [0, 1.6, 13], [0, 1.6, 12.5], [0, 12, -2], [0, 13, -2], 62, 1],
+    [S('adultes') - .15, [-1, 1.9, 9.6], [-1, 1.9, 9], [-1, 1.7, 3], [-1, 1.7, 3], 40, 1],
+    [S('lina') - .15, [-13.2, 1.3, -.2], [-13.4, 1.25, -.9], [-14, 1.2, -3.6], [-14, 1.2, -3.6], 42, 1],
+    [S('plan') - .15, [-13.3, 1.35, -.9], [-13.4, 1.3, -1.3], [-14, 1.1, -3.4], [-14, 1.1, -3.4], 45, 1],
+    [S('nuit') - .15, [0, 2.6, 17], [0, 3, 15], [0, 4.5, 0], [0, 6, 0], 52, 1],
+    [WT('nuit', /^sienne/) - .1, 'follow', null, null, null, 50, 1],
+    [S('suit') - .15, 'walk', null, null, null, 48, 1],
+    [S('foret') - .15, 'forest', null, null, null, 50, 1],
+    [S('chene') - .15, [101, 1.8, 8], [102, 2, 7], [110, 4, -3], [110, 4.4, -3], 52, 1],
+    [S('hibou') - .15, [108, 1, 5.2], [108.5, 1.2, 4.4], [110, 3.8, -2], [110, 4, -2], 55, 1],
+    [WT('hibou', /^centaines/) - .3, [110.6, 2.4, 3], [110.4, 2.3, 2.6], [110, .8, -.8], [110, .8, -.8], 45, 1],
+    [S('peur') - .15, [105, 1.3, 4.4], [105.3, 1.3, 4], [106.6, 1.2, 1.4], [106.6, 1.2, 1.4], 42, 1],
+    [WT('peur', /^Puis/) - .1, [110, 1.4, 2.5], [110, 1.35, 2.2], [110, .9, -.6], [110, .9, -.6], 40, 1],
+    [WT('peur', /^Comme/) - .1, [105.4, 1.3, 3.8], [105.6, 1.3, 3.5], [106.6, 1.2, 1.4], [106.6, 1.2, 1.4], 40, 1],
+    [S('l1') - .15, [107.2, 1.5, 4.2], [107.5, 1.45, 3.8], [109.2, 1, 0], [109.2, 1, 0], 45, 1],
+    [S('village') - .15, [67, 2.2, 8.5], [66, 2.2, 8], [60, 1.6, 2], [61, 1.6, 2], 50, 1],
+    [S('regle2') - .15, [58.6, 2.2, 8.4], [58, 2.2, 7.6], [56, 2.3, 1.2], [56, 2.3, 1.2], 45, 1],
+    [S('fin') - .15, [0, 4.6, 12], [0, 5, 13], [0, 5.6, -2], [0, 6, -2], 58, 1],
+    [WT('fin', /^Lina/) - .2, [0, 2.2, 2.6], [0, 2.2, 2.2], [0, 2.2, -2], [0, 2.2, -2], 48, 1],
+  ];
+}
+let SH;
+const linaWalk = t => 22 + (t - S('suit')) * 2.4, linaForest = t => 70 + (t - S('foret') + .15) * 2.2;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  let pos, look;
+  if (s[1] === 'follow') { const p = linaLPos(t); pos = [p[0] - 5, p[1] - 1.5, p[2] + 9]; look = p; }
+  else if (s[1] === 'walk') { const x = linaWalk(t); pos = [x - .8, 1.5, 8.5]; look = [x + .9, 1.1, 4]; }
+  else if (s[1] === 'forest') { const x = linaForest(t); pos = [x - 3.8, 1.9, 6]; look = [x + 1.5, 1.2, 1.8]; }
+  else { pos = s[1].map((v, j) => lerp(v, s[2][j], k)); look = s[3].map((v, j) => lerp(v, s[4][j], k)); }
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, 18, 12); sun.target.position.set(look[0], 0, 0); sun.target.updateMatrixWorld();
+}
+const hideAll = () => {
+  for (const c of Object.values(CH)) c.root.visible = false;
+  for (const l of [...skyL, ...nestL, ...handL, linaL]) l.visible = false;
+  for (const o of [bigOwl, ...babies]) o.g.visible = false;
+  confetti.forEach(m => m.visible = false); spot.intensity = 0; beam.visible = false; nestLight.intensity = 0; warm.intensity = 0; fill.intensity = 0; torch.visible = false; torchLens.visible = false;
+};
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const sway = (t, i) => Math.sin(t * 1.3 + i) * .25;
+function crowdScene(t, faceStage, lanternRelease, cheer) {
+  crowd.forEach((c, i) => {
+    const [x, z] = CROWD_POS[i];
+    const looking = t > lanternRelease + .3;
+    P(c, { x, z, ry: faceStage ? Math.PI : 0, s: 1, headX: looking ? -.55 : -.05, arms: cheer ? CHEER(t + i) : (t < lanternRelease ? [[.5, -1.2], [.5, -1.2]] : [[2.6, 0], [2.6, 0]]),
+      face: { eyes: cheer ? 'happy' : (looking ? 'wide' : 'happy'), mouth: cheer ? 'open' : (looking ? 'o' : 'smile'), blush: i % 3 === 0 } });
+  });
+}
+function releaseLanterns(t, t0) {
+  skyL.forEach((l, i) => {
+    l.visible = true; const ci = i % crowd.length, [cx, cz] = CROWD_POS[ci];
+    const k = Math.max(0, t - t0 - (i % 7) * .08);
+    l.position.set(cx + (i >= crowd.length ? (rnd(i) - .5) * 3 : 0) + Math.sin(k * 1.2 + i) * .3 * k / 3, 1.25 + k * (1.2 + rnd(i + 4) * .6), cz + (rnd(i + 7) - .5) * (i >= crowd.length ? 4 : 0) - .45);
+    if (i >= crowd.length && k <= 0) l.visible = false;
+  });
+}
+function update(t) {
+  hideAll();
+  const seg = (a, b) => t >= a && t < b;
+  // A: festival (dusk)
+  if (t < S('bizarre') - .15) {
+    setMood('dusk'); warm.intensity = 25;
+    crowdScene(t, true, REL(), false); releaseLanterns(t, REL());
+    P(mayor, { x: -1.6, y: .82, z: -1.8, s: 1, arms: t > S('regle') ? [0, WAVE(t)[1]] : [0, 0], face: { eyes: 'happy', mouth: 'smile', mustache: true, round: true } });
+  }
+  // B: lanterns drift toward the forest (night)
+  else if (t < S('lendemain') - .15) {
+    setMood('night'); const k = t - S('bizarre');
+    skyL.forEach((l, i) => { l.visible = true; const x = -10 + rnd(i) * 20 + k * (6 + rnd(i + 2) * 3) * (1 + k * .12);
+      l.position.set(x, 12 + rnd(i + 1) * 9 - Math.max(0, x - 50) * .35 + Math.sin(t + i) * .3, -6 + rnd(i + 3) * 10); });
+  }
+  // C: next morning, empty sky
+  else if (t < S('adultes') - .15) {
+    setMood('day'); [0, 2, 4, 7, 9, 11].forEach((ci, j) => P(crowd[ci], { x: -3 + j * 1.3, z: 8.5 - (j % 2) * .8, ry: Math.PI * .1, headX: -.6, face: { eyes: 'wide', mouth: 'o' } }));
+  }
+  // D: adults: "c'est le vent"
+  else if (t < S('lina') - .15) {
+    setMood('day');
+    const shrug = t > S('a1') - .1;
+    P(mayor, { x: -2, z: 3, ry: .3, s: 1, talk: talk('A', t), arms: shrug ? [[1.0, -.3], [1.0, -.3]] : [0, 0], headZ: shrug ? .12 : 0, face: { eyes: shrug ? 'closed' : 'n', mouth: 'flat', mustache: true, round: true } });
+    P(woman, { x: .1, z: 3.2, ry: -.3, s: .97, arms: [[.3, -.9], [.3, -.9]], face: { eyes: 'n', mouth: 'flat', blush: true } });
+  }
+  // E/F: Lina at home (dusk)
+  else if (t < S('nuit') - .15) {
+    setMood('dusk');
+    const afraid = t > WT('lina', /^peur/) - .1 && t < S('plan') - .1, plan = t > S('plan') - .15;
+    P(lina, { x: -14 + (afraid ? Math.sin(t * 50) * .02 : 0), z: -3.6, s: .78, arms: plan ? [[.35, -1.25], [.35, -1.25]] : (afraid ? [[.6, -1.3], [.6, -1.3]] : [[.5, -1.1], [.5, -1.1]]),
+      headZ: t < WT('lina', /^Le$/) ? -.12 : 0, face: { eyes: afraid ? 'wide' : (plan ? 'n' : 'n'), mouth: afraid ? 'wavy' : (plan ? 'grin' : 'flat'), brow: afraid ? -1 : (plan ? .6 : .4), freckles: true, blush: true } });
+    if (plan) { linaL.visible = true; linaL.position.set(-14, .72, -3.05); linaL.userData.bell.visible = t > WT('plan', /^clochette/) - .1; linaL.userData.bell.rotation.z = Math.sin(t * 9) * .3; }
+  }
+  // G: night release, Lina's lantern heads for the forest
+  else if (t < S('suit') - .15) {
+    setMood('night'); warm.intensity = 90;
+    crowdScene(t, false, REL2(), false); releaseLanterns(t, REL2());
+    P(lina, { x: 3, z: 5.2, s: .78, ry: 0, headX: t > REL2() ? -.5 : 0, arms: t < REL2() ? [[.4, -1.2], [.4, -1.2]] : [[2.6, 0], [2.6, 0]], face: { eyes: 'n', mouth: 'smile', freckles: true, blush: true } });
+    linaL.visible = true; linaL.userData.bell.visible = true; linaL.userData.bell.rotation.z = Math.sin(t * 9) * .4;
+    if (t < REL2()) linaL.position.set(3, 1.6, 5.6); else linaL.position.set(...linaLPos(t));
+  }
+  // H: Lina follows with her torch
+  else if (t < S('foret') - .15) {
+    setMood('night'); const x = linaWalk(t), on = t > WT('suit', /^allume/) + .1;
+    P(lina, { x, z: 4, s: .78, ry: Math.PI / 2, walk: t * 7, arms: [0, [1.5, 0]], face: { eyes: 'n', mouth: 'flat', brow: .5, freckles: true, blush: true } });
+    torch.visible = torchLens.visible = true;
+    if (on) { spot.intensity = 60; spot.position.set(x + .5, 1.1, 4); spot.target.position.set(x + 8, 0, 4); beam.visible = true; beam.position.set(x + 3.3, 1.05, 4); beam.rotation.set(0, 0, Math.PI / 2); }
+    fill.intensity = 90; fill.position.set(x - 1, 3, 8);
+    linaL.visible = true; linaL.userData.bell.visible = true; linaL.position.set(x + 30, 6, 0);
+  }
+  // I: deep forest
+  else if (t < S('chene') - .15) {
+    setMood('night'); const x = linaForest(t);
+    P(lina, { x, z: 2, s: .78, ry: Math.PI / 2, walk: t * 6, arms: [0, [1.5, 0]], headY: Math.sin(t * 1.5) * .3, face: { eyes: 'wide', mouth: 'wavy', brow: -.6, freckles: true, blush: true } });
+    torch.visible = torchLens.visible = true; spot.intensity = 70; spot.position.set(x + .5, 1.1, 2); spot.target.position.set(x + 8, 0, 2);
+    beam.visible = true; beam.position.set(x + 3.3, 1.05, 2); beam.rotation.set(0, 0, Math.PI / 2); fill.intensity = 140; fill.position.set(x - 1, 3, 6);
+  }
+  // J..M: the oak, the owl and its babies
+  else if (t < S('village') - .15) {
+    setMood('night'); nestLight.intensity = lerp(20, 90, prog(t, S('chene'), S('chene') + 1.2)); fill.intensity = 60; fill.position.set(104, 3, 7);
+    nestL.forEach((l, i) => { l.visible = true; const a = i / nestL.length * Math.PI * 6; const r = .4 + (i % 9) * .17; l.position.set(110 + Math.cos(a) * r * 1.3, .55 + Math.floor(i / 9) * .45, -.8 + Math.sin(a) * r * .9); l.scale.setScalar(.85); });
+    const awake = t > S('hibou') + .2, wingOpen = t > WT('hibou', /^géant/) && t < S('peur');
+    bigOwl.g.visible = true; bigOwl.g.position.set(110, 0, -2.6); bigOwl.g.scale.setScalar(1.25);
+    bigOwl.head.rotation.y = awake ? 0 : .9 - .9 * prog(t, S('hibou'), S('hibou') + .4);
+    bigOwl.wings.forEach((w, i) => w.rotation.z = (i ? -1 : 1) * (wingOpen ? 1.1 + Math.sin(t * 4) * .1 : .05));
+    const soft = t > WT('peur', /^Comme/);
+    bigOwl.face.material.map = owlFace(!awake ? 'closed' : soft ? 'soft' : 'wide'); bigOwl.face.material.needsUpdate = true;
+    const babyHappy = t > E('l1') - .6;
+    babies.forEach((b, i) => { b.g.visible = true; b.g.scale.setScalar(.28); b.g.position.set(109.3 + i * .7, .6, -.2 + (i % 2) * .2); b.g.rotation.y = (i - 1) * -.3;
+      b.head.rotation.z = babyHappy ? Math.sin(t * 3 + i) * .1 : Math.sin(t * 40 + i) * .05;
+      b.face.material.map = owlFace(babyHappy ? 'happy' : (t > WT('peur', /^Puis/) - .1 ? 'wide' : 'closed')); b.face.material.needsUpdate = true; });
+    const scared = t > S('peur') - .15 && t < WT('peur', /^Comme/), kneel = t > S('l1') - .15;
+    const lx = kneel ? 108.6 : (t < S('peur') ? 104 : lerp(106.6, 106.2, prog(t, S('peur'), S('peur') + .4)));
+    P(lina, { x: lx, z: kneel ? .9 : (t < S('peur') ? 3 : 1.6), s: .78, ry: kneel ? -1.2 : -.75, bend: kneel ? .45 : (scared ? -.12 : 0), arms: kneel ? [0, [1.5, -.2]] : (scared ? [[.6, -1.3], [.6, -1.3]] : [0, [1.5, 0]]),
+      talk: talk('L', t), face: { eyes: scared ? 'wide' : (soft ? 'happy' : 'wide'), mouth: scared ? 'o' : (soft ? 'smile' : 'o'), brow: scared ? -1 : 0, freckles: true, blush: true } });
+    torch.visible = torchLens.visible = true;
+    if (t < S('hibou')) { const x = lx; spot.intensity = 50; spot.position.set(x + .4, 1.1, 2.8); spot.target.position.set(110, 2, -2); }
+  }
+  // N: the whole village comes, lanterns in hand (dusk)
+  else if (t < S('regle2') - .15) {
+    setMood('dusk'); const k = t - S('village');
+    P(lina, { x: 60 + k * 1.6, z: 2, s: .78, ry: Math.PI / 2, walk: t * 7, arms: [0, 0], face: { eyes: 'happy', mouth: 'grin', freckles: true, blush: true } });
+    crowd.slice(0, 12).forEach((c, i) => { const x = 58.6 + k * 1.6 - (i + 1) * 1.15, z = 1.4 + (i % 2) * 1.2;
+      P(c, { x, z, ry: Math.PI / 2, walk: t * 7 + i, arms: [0, [1.2, -.5]], face: { eyes: 'happy', mouth: 'smile' } });
+      const l = handL[i]; l.visible = true; l.scale.setScalar(.7); l.position.set(x + .5, 1.55, z + .25); });
+  }
+  // O: the new rule
+  else if (t < S('fin') - .15) {
+    setMood('dusk');
+    handL.forEach((l, i) => { l.visible = true; l.scale.setScalar(.75); const a = i / handL.length; l.position.set(53.5 + a * 5, 3.3 + Math.sin(a * Math.PI) * .9 + Math.sin(t * 2 + i) * .05, .2 - Math.sin(a * Math.PI) * 1.5); });
+    P(mayor, { x: 57.9, z: 1.9, ry: -.5, s: 1, headX: Math.max(0, Math.sin(t * 6)) * .15, face: { eyes: 'happy', mouth: 'smile', mustache: true, round: true } });
+    P(lina, { x: 54.2, z: 2.1, s: .78, ry: .4, arms: [0, WAVE(t)[1]], face: { eyes: 'happy', mouth: 'grin', freckles: true, blush: true } });
+  }
+  // P: finale: Lina wins, the owl carries her lantern highest
+  else {
+    setMood('night'); warm.intensity = 100;
+    crowdScene(t, true, -1, true);
+    skyL.forEach((l, i) => { l.visible = true; l.position.set(-12 + rnd(i) * 24, 7 + rnd(i + 1) * 8 + Math.sin(t + i) * .2, -6 + rnd(i + 2) * 12); });
+    const up = t > WT('fin', /^Cette/);
+    P(lina, { x: 0, y: .82, z: -1.8, s: .78, arms: up ? [[2.6, 0], [2.6, 0]] : [[.4, -1.2], [.4, -1.2]], face: { eyes: 'happy', mouth: 'grin', freckles: true, blush: true } });
+    cup.position.set(0, up ? .82 + 1.75 : .82 + 1.0, up ? -1.75 : -1.35); cup.scale.setScalar(.6);
+    const k = t - S('fin');
+    bigOwl.g.visible = true; bigOwl.g.scale.setScalar(.8); bigOwl.g.position.set(-8 + k * 2.4, 9 + Math.sin(k * 3) * .4, -1); bigOwl.g.rotation.y = Math.PI / 2;
+    bigOwl.wings.forEach((w, i) => w.rotation.z = (i ? -1 : 1) * (1 + Math.sin(t * 10) * .6)); bigOwl.face.material.map = owlFace('happy'); bigOwl.face.material.needsUpdate = true;
+    linaL.visible = true; linaL.userData.bell.visible = true; linaL.position.set(bigOwl.g.position.x, bigOwl.g.position.y - 1.2, -1);
+    if (up) confetti.forEach((m, i) => { m.visible = true; const ph = ((t - S('fin')) * .4 + rnd(i)) % 1; m.position.set(-5 + rnd(i + 3) * 10, 8 - ph * 8, -3 + rnd(i + 7) * 8); m.rotation.set(t * 3 + i, t * 2 + i, 0); });
+  }
+  if (t >= S('bizarre') - .15 && t < S('suit') - .15 && t > REL2() - 5) {}
+  if (!(t < S('bizarre') - .15) && cup.parent && !(t >= S('fin') - .15)) { cup.position.set(2.6, 1.95, -1.6); cup.scale.setScalar(1.2); }
+}
+
+function dings(t) {
+  const list = [];
+  if (t > WT('plan', /^clochette/) && t < S('nuit') - .2) list.push([WT('plan', /^clochette/), .9]);
+  for (let k = 0; k < 6; k++) list.push([S('foret') + k * .55, .8 + k * .18]);
+  list.push([S('chene') + .3, 1.6]);
+  for (const [t0, s] of list) {
+    const k = (t - t0) / .9; if (k < 0 || k > 1) continue;
+    ctx.globalAlpha = 1 - k * k; ctx.save(); ctx.translate(W * .72, H * .26 - k * 60); const g = back(clamp(k * 4)) * s; ctx.scale(g, g); ctx.rotate(-.12);
+    text2('♪ ding !', 0, 0, 46, '#ffe14d', { lw: 10, font: 'Nun' }); ctx.restore(); ctx.globalAlpha = 1;
+  }
+}
+function overlay(t) {
+  const afraid = t > WT('lina', /^peur/) - .1 && t < S('plan') - .1;
+  if (afraid) { const g = ctx.createRadialGradient(W / 2, H * .42, 120, W / 2, H * .42, 640); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(5,5,20,${.85 * prog(t, WT('lina', /^peur/) - .1, WT('lina', /^peur/) + .4)})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+  if (t > S('foret') - .15 && t < S('chene') - .15) { const g = ctx.createRadialGradient(W / 2, H * .45, 200, W / 2, H * .45, 700); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,10,.7)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+  bubbleOn(mayor, 'C’est le vent, voilà tout.', t < E('a1') + .5 && t > S('a1') - .3 ? prog(t, S('a1') - .1, S('a1') + .1) : 0, 1.0);
+  bubbleOn(lina, 'Tiens. Moi aussi, j’ai peur du noir.', t < E('l1') + .5 && t > S('l1') - .3 ? prog(t, S('l1') - .1, S('l1') + .1) : 0, 1.1);
+  dings(t);
+  caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .6) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .6, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SH = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  bannerTex.redraw(); signTex.redraw(); render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.__dbg = () => ({ vis: lina.root.visible, pos: lina.root.position.toArray(), scale: lina.root.scale.x, cam: camera.position.toArray() });
+window.ready = true;
+</script></body></html>

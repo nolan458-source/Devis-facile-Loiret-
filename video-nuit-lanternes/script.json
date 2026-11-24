@@ -1,0 +1,20 @@
+[
+ {"id":"intro","who":"N","mood":"excited","text":"Dans le village de Clairbois, chaque été, il y a *la Nuit des Lanternes*.","pad":0.2},
+ {"id":"regle","who":"N","mood":"excited","text":"Tout le monde lâche une lanterne dans le ciel. Et celle qui monte *le plus haut* gagne *la coupe*.","pad":0.3},
+ {"id":"bizarre","who":"N","mood":"suspense","text":"Mais depuis trois ans, il se passe un truc *bizarre*. Toutes les lanternes partent... *vers la forêt*.","pad":0.4},
+ {"id":"lendemain","who":"N","mood":"suspense","text":"Et le lendemain, il n'en reste *plus une seule*.","pad":0.3},
+ {"id":"adultes","who":"N","mood":"normal","text":"Les adultes disent que c'est le vent.","pad":0.1},
+ {"id":"a1","who":"A","mood":"deadpan","text":"C'est le vent, voilà tout.","pad":0.2},
+ {"id":"lina","who":"N","mood":"normal","text":"Lina, elle, n'y croit pas. Le problème, c'est que Lina a *peur du noir*.","pad":0.3},
+ {"id":"plan","who":"N","mood":"excited","text":"Mais cette année, elle a *un plan*. Elle accroche *une clochette* à sa lanterne.","pad":0.4},
+ {"id":"nuit","who":"N","mood":"suspense","text":"La nuit tombe. Les lanternes s'envolent. Et la sienne... part *droit vers la forêt*.","pad":0.3},
+ {"id":"suit","who":"N","mood":"suspense","text":"Lina allume sa lampe de poche, et elle *la suit*.","pad":0.4},
+ {"id":"foret","who":"N","mood":"suspense","text":"Plus elle avance, plus la clochette sonne *fort*.","pad":0.5},
+ {"id":"chene","who":"N","mood":"suspense","text":"Au pied du plus vieux chêne, il y a *une lumière*.","pad":0.5},
+ {"id":"hibou","who":"N","mood":"hype","text":"Un hibou *géant*. Et dans son nid, *des centaines de lanternes*.","pad":0.5},
+ {"id":"peur","who":"N","mood":"sad","text":"Lina croit qu'il va la manger. Puis elle voit ses petits, serrés contre la lumière. Ils ont *peur du noir*. Comme elle.","pad":0.4},
+ {"id":"l1","who":"L","mood":"normal","text":"Tiens. Moi aussi, j'ai peur du noir.","pad":0.5},
+ {"id":"village","who":"N","mood":"excited","text":"Le lendemain, Lina revient. Avec *tout le village*.","pad":0.3},
+ {"id":"regle2","who":"N","mood":"excited","text":"Et depuis, à Clairbois, il y a une nouvelle règle : *une lanterne pour la forêt*.","pad":0.4},
+ {"id":"fin","who":"N","mood":"hype","text":"Et la coupe de la plus haute lanterne ? Cette année, c'est *Lina* qui l'a gagnée.","pad":1.2}
+]

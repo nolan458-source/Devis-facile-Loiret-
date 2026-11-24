@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Baloo;font-weight:800;src:url(fonts/baloo-2-latin-800-normal.woff2)}
+@font-face{font-family:Nun;font-weight:800;src:url(fonts/nunito-latin-800-normal.woff2)}
+html,body{margin:0;background:#000}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<canvas id="gl" width="720" height="1280"></canvas><canvas id="out" width="720" height="1280"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const W = 720, H = 1280, FPS = 25;
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const back = x => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const rnd = i => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+let TL, L = {};
+const S = id => L[id].start, E = id => L[id].start + L[id].dur;
+const WT = (id, re) => { const w = L[id].words.find(w => re.test(w.w)); return w ? w.t : S(id); };
+function talk(who, t) {
+  for (const l of TL.lines) if (l.who === who && t >= l.start && t <= l.start + l.dur) return l.env[Math.floor((t - l.start) * FPS)] || 0;
+  return 0;
+}
+
+// ---------- three setup ----------
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H, false); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 400);
+const hemi = new THREE.HemisphereLight('#dff1ff', '#5d8a3a', 1.25); scene.add(hemi);
+const sun = new THREE.DirectionalLight('#fff4e0', 2.2); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 80 }); sun.shadow.bias = -0.0005; sun.shadow.radius = 4;
+scene.add(sun); scene.add(sun.target);
+function skyTex(top, bottom) {
+  const c = document.createElement('canvas'); c.width = 4; c.height = 256; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, top); g.addColorStop(1, bottom); x.fillStyle = g; x.fillRect(0, 0, 4, 256);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const SKY_DAY = skyTex('#3f8ff0', '#bfe4ff'), SKY_EVE = skyTex('#5a6fd8', '#ffb38a');
+scene.fog = new THREE.Fog('#bfe4ff', 40, 110);
+
+const geoCache = {}, matCache = {};
+const RB = (w, h, d, r = .08) => geoCache[[w, h, d, r]] ||= new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2.1, h / 2.1, d / 2.1));
+const M = c => matCache[c] ||= new THREE.MeshStandardMaterial({ color: c, roughness: .78 });
+function box(w, h, d, color, x = 0, y = 0, z = 0, r = .08, parent = scene) {
+  const m = new THREE.Mesh(RB(w, h, d, r), M(color)); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+function textTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  t.redraw = (...a) => { draw(c.getContext('2d'), ...a); t.needsUpdate = true; }; t.redraw(); return t;
+}
+function panel(w, h, tex, x, y, z, parent = scene, ry = 0) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, roughness: .6 }));
+  m.position.set(x, y, z); m.rotation.y = ry; parent.add(m); return m;
+}
+const FONT = (s, w = 800) => `${w} ${s}px Baloo`;
+
