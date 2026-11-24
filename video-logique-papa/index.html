@@ -8,7 +8,7 @@ html,body{margin:0;background:#000}
 <body><canvas id="c" width="1280" height="720"></canvas>
 <script>
 const W = 1280, H = 720, FPS = 25, D = Math.PI / 180, GROUND = 615;
-const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const cv = document.getElementById('c'); let ctx = cv.getContext('2d'); let MODE = 'h';
 let TL, L = {};
 const OUT = '#2a2438';
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -285,7 +285,7 @@ function gauge(label, pct, t, broken) {
 
 // ---------- captions ----------
 const CAP = ['#ffd23f', '#ff5d5d', '#5de0ff', '#7dff7a', '#ff8ad8', '#ffffff', '#ffa53f'];
-function caption(t) {
+function caption(t, cx = W / 2, cy = 648, size = 70) {
   let best = null, idx = 0;
   TL.lines.forEach((l, li) => {
     if (t < l.start || t > l.start + l.dur + .2) return;
@@ -293,8 +293,8 @@ function caption(t) {
   });
   if (!best) return;
   const k = prog(t, best.t, best.t + .14), s = lerp(1.45, 1, back(k));
-  ctx.save(); ctx.translate(W / 2, 648); ctx.scale(s, s); ctx.rotate(Math.sin(idx * 1.7) * .04);
-  text(best.w, 0, 0, 70, CAP[idx % CAP.length], { lw: 14 });
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(s, s); ctx.rotate(Math.sin(idx * 1.7) * .04);
+  text(best.w, 0, 0, size, CAP[idx % CAP.length], { lw: size / 5 });
   ctx.restore();
 }
 
@@ -501,7 +501,7 @@ function sceneField(t) {
   }
   // +2H clock
   const ck = back(prog(t, S('champ') + .2, S('champ') + .45));
-  ctx.save(); ctx.translate(150, 130); ctx.scale(ck, ck);
+  ctx.save(); ctx.translate(MODE === 'v' ? 270 : 150, 130); ctx.scale(ck, ck);
   circle(0, 0, 80, '#fff', OUT, 7); ctx.strokeStyle = OUT; ctx.lineWidth = 7; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(t * 14) * 60, Math.sin(t * 14) * 60); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(t * 2) * 38, Math.sin(t * 2) * 38); ctx.stroke();
   text('+2 H', 120, 70, 54, '#ff3b3b', { lw: 12 });
@@ -571,14 +571,55 @@ function render(t) {
   ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
   SC[i][1](t);
   ctx.restore();
-  caption(t);
+  if (MODE === 'h') caption(t);
   if (i > 0 && since < .22) { ctx.fillStyle = `rgba(255,255,255,${1 - since / .22})`; ctx.fillRect(0, 0, W, H); }
   const tOut = TL.total - 1.5; if (t > tOut) outro(t, tOut);
 }
-window.init = async tl => {
-  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SC = SCENES();
+window.init = async (tl, mode = 'h') => {
+  TL = tl; if (mode === 'v') setupV(); L = {}; tl.lines.forEach(l => L[l.id] = l); SC = SCENES();
   await document.fonts.load('70px Lucky'); await document.fonts.load('800 30px Nun');
   render(0); return true;
 };
-window.frame = (t, type) => { render(t); return cv.toDataURL(type, .92); };
+window.frame = (t, type) => { if (MODE === 'v') renderV(t); else render(t); return (MODE === 'v' ? vcv : cv).toDataURL(type, .9); };
+
+// ---------- vertical 9:16 (TikTok) ----------
+const VW = 1080, VH = 1920; let vcv, vctx, sctx, bg, bgx;
+function setupV() {
+  MODE = 'v'; cv.width = 2560; cv.height = 1440; sctx = cv.getContext('2d'); ctx = sctx;
+  vcv = document.createElement('canvas'); vcv.width = VW; vcv.height = VH; vctx = vcv.getContext('2d'); document.body.appendChild(vcv);
+  bg = document.createElement('canvas'); bg.width = 108; bg.height = 192; bgx = bg.getContext('2d');
+}
+// camera keys: [time, centre x in scene px, zoom, hard cut]
+const camKeys = () => [
+  [0, 640, 1.7, 1], [S('froid') - .25, 700, 1.5, 1], [S('q1') - .2, 600, 1.5], [S('pull') - .2, 760, 1.5], [S('pulls') - .1, 480, 1.7],
+  [S('cache'), 640, 1.6], [S('garage') - .2, 820, 1.5], [S('thermo') - .25, 510, 1.25],
+  [S('lumiere') - .2, 620, 1.3, 1], [S('edf') - .3, 720, 1.35], [S('voiture') - .25, 620, 1.45, 1],
+  [S('champ') - .2, 520, 1.35, 1], [S('touri') - .4, 820, 1.4], [S('soir') - .2, 640, 1.25, 1], [S('q2') - .2, 480, 1.5], [S('factur') - .2, 760, 1.3], [S('fin') - .2, 640, 1.6, 1]];
+function cam(t) {
+  const K = camKeys(); let k = 0; K.forEach((key, i) => { if (t >= key[0]) k = i; });
+  const cur = K[k]; if (k === 0 || cur[3]) return [cur[1], cur[2]];
+  const prev = K[k - 1], e = ease(prog(t, cur[0], cur[0] + .6));
+  return [lerp(prev[1], cur[1], e), lerp(prev[2], cur[2], e)];
+}
+function renderV(t) {
+  ctx = sctx; ctx.setTransform(2, 0, 0, 2, 0, 0); render(t); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  let [cx, z] = cam(t); const sw = VW / z; cx = clamp(cx, sw / 2, W - sw / 2);
+  // blurred background (cover)
+  const cs = VH / H, cw = VW / cs;
+  bgx.filter = 'blur(2px)'; bgx.drawImage(cv, (clamp(cx, cw / 2, W - cw / 2) - cw / 2) * 2, 0, cw * 2, H * 2, 0, 0, 108, 192); bgx.filter = 'none';
+  vctx.imageSmoothingQuality = 'high'; vctx.drawImage(bg, 0, 0, VW, VH);
+  vctx.fillStyle = 'rgba(15,10,30,.45)'; vctx.fillRect(0, 0, VW, VH);
+  // sharp scene window
+  const y0 = 900 - H * z / 2, h = H * z;
+  vctx.save(); vctx.shadowColor = 'rgba(0,0,0,.5)'; vctx.shadowBlur = 30; vctx.fillStyle = '#000'; vctx.fillRect(0, y0, VW, h); vctx.restore();
+  vctx.drawImage(cv, (cx - sw / 2) * 2, 0, sw * 2, H * 2, 0, y0, VW, h);
+  // title + captions on the vertical canvas
+  ctx = vctx;
+  if (t < TL.total - 1.5) {
+    const g = back(prog(t, .1, .5)); ctx.save(); ctx.translate(VW / 2, y0 - 150); ctx.scale(g, g); ctx.rotate(-.03);
+    text('LOGIQUE', 0, -52, 104, '#ffd23f', { lw: 20 }); text('DE PAPA', 0, 48, 104, '#ffffff', { lw: 20 }); ctx.restore();
+  }
+  caption(t, VW / 2, Math.min(y0 + h - 40, 1440), 112);
+  ctx = sctx;
+}
 </script></body></html>
