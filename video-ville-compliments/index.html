@@ -377,7 +377,7 @@ function update(t) {
     // front row characters face the stage
     for (const c of [baker, facteur, mamie]) { c.root.rotation.y = Math.PI; }
     if (t > S('b1') - .15 && t < S('cpt')) baker.root.rotation.y = Math.PI;
-    if (onMax && t > S('max') - .15) P(max, { x: 120, y: .82, z: -1.6, s: 2.8, arms: t > S('max') + 1 ? CHEER(t) : [0, 0], face: { eyes: 'n', mouth: 'grin', shades: true } });
+    if (onMax) { if (t > S('max') - .15) P(max, { x: 120, y: .82, z: -1.6, s: 2.8, arms: t > S('max') + 1 ? CHEER(t) : [0, 0], face: { eyes: 'n', mouth: 'grin', shades: true } }); }
     else {
       const sN = t < S('cpt') ? (t > S('p1') + .2 ? .82 : t > S('b1') + .5 ? .81 : .8) : lerp(.82, 6, ease(prog(t, S('cpt') + .3, S('grand') - .2)));
       P(noe, { x: 120, y: .82, z: -1.6, s: sN, arms: t > S('cpt') + 1 ? CHEER(t * .6) : [0, 0], headX: t > S('grand') ? .12 : 0,

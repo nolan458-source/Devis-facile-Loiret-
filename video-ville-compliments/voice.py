@@ -1,10 +1,11 @@
-# French voice (Piper "siwis" medium, female) driven clause by clause with espeak-ng phonemes,
-# so that prosody.py can reshape each clause's intonation.
+# French voice (Piper "siwis" medium) driven clause by clause with espeak-ng phonemes.
+# Words wrapped in *stars* are returned as emphasis spans (sample ranges) for prosody.py.
 import json, re, unicodedata, numpy as np, onnxruntime as ort
 from piper import espeakbridge as eb
 import piper.phonemize_espeak as pe
 
 FIX = {"Noé": "No-é", "toise": "touaze"}
+PUNCT = r"[,.;:!?…]"
 
 class Voice:
     def __init__(self, onnx):
@@ -23,9 +24,28 @@ class Voice:
         return a.squeeze().astype(np.float32)
 
     def say(self, text, length=1.0):
-        for a, b in FIX.items(): text = text.replace(a, b)
-        sr = 22050; out = []; self.clauses = []; pos = 0
-        for ipa, term, end in eb.get_phonemes(text):
-            c = self.clause(ipa + term, length); out.append(c); self.clauses.append((pos, pos + len(c), term)); pos += len(c)
-            gap = np.zeros(int(sr * (0.18 if end else 0.07)), np.float32); out.append(gap); pos += len(gap)
+        # clause texts with emphasis flags per character
+        plain, flags, on = "", [], False
+        for ch in text:
+            if ch == "*": on = not on; continue
+            plain += ch; flags.append(on)
+        spoken = plain
+        for a, b in FIX.items(): spoken = spoken.replace(a, b)
+        chunks = [(m.start(), m.end()) for m in re.finditer(r"[^,.;:!?…]+" + PUNCT + "*", plain) if m.group().strip(" .…")]
+        sr = 22050; out = []; self.clauses = []; self.emph = []; pos = 0
+        res = list(eb.get_phonemes(spoken))
+        for ci, (ipa, term, end) in enumerate(res):
+            c = self.clause(ipa + term, length); n = len(c)
+            if len(res) == len(chunks):  # map emphasised characters proportionally into this clause's audio
+                s0, s1 = chunks[ci]; seg = flags[s0:s1]; L = max(1, len(seg))
+                i = 0
+                while i < len(seg):
+                    if seg[i]:
+                        j = i
+                        while j < len(seg) and seg[j]: j += 1
+                        self.emph.append((pos + int(n * (i / L) * .92), pos + int(n * min(1, (j / L) * 1.02))))
+                        i = j
+                    else: i += 1
+            out.append(c); self.clauses.append((pos, pos + n, term)); pos += n
+            gap = np.zeros(int(sr * (0.12 if end else 0.05)), np.float32); out.append(gap); pos += len(gap)
         a = np.concatenate(out); return a / (np.abs(a).max() + 1e-6) * 0.9, sr

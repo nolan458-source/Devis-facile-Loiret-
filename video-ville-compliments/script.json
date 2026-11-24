@@ -1,24 +1,154 @@
 [
- {"id":"hook","who":"N","text":"Dans une ville où chaque compliment te fait grandir d'un centimètre, Max mesure déjà trois mètres.","pad":0.2},
- {"id":"c1","who":"F","text":"Trop stylé, Max !","pad":0.3},
- {"id":"noe","who":"N","text":"Et Noé, lui, mesure un mètre dix. Parce que personne ne lui fait jamais de compliment.","pad":0.3},
- {"id":"mamie","who":"N","text":"Le seul qu'il a reçu cette année, c'était de sa grand-mère."},
- {"id":"g1","who":"G","text":"Qu'il est beau, mon trésor !","pad":0.2},
- {"id":"chien","who":"N","text":"Elle parlait au chien.","pad":0.7},
- {"id":"ecole","who":"N","text":"À l'école, Max ne passe même plus la porte."},
- {"id":"c2","who":"F","text":"Trop fort, Max !","pad":0.5},
- {"id":"idee","who":"N","text":"Alors Noé a une idée. Si personne ne le complimente, c'est lui qui va complimenter tout le monde.","pad":0.2},
- {"id":"o1","who":"O","text":"Madame, votre pain, c'est le meilleur de la ville !","pad":0.3},
- {"id":"o2","who":"O","text":"Monsieur le facteur, vous courez super vite !","pad":0.3},
- {"id":"tous","who":"N","text":"Les voisins, le maire, même les pigeons. Toute la ville grandit. Sauf lui.","pad":0.4},
- {"id":"toise","who":"N","text":"Puis arrive le jour de la grande toise.","pad":0.2},
- {"id":"max","who":"N","text":"Max monte sur la scène. Quatre mètres vingt. La foule hurle.","pad":0.4},
- {"id":"tour","who":"N","text":"Puis c'est le tour de Noé. Un mètre dix. Quelques rires... puis le silence.","pad":0.5},
- {"id":"foule","who":"N","text":"Parce que dans la foule, il y a tous ceux qu'il a complimentés.","pad":0.2},
- {"id":"b1","who":"B","text":"Noé, t'es le garçon le plus gentil de la ville !","pad":0.2},
- {"id":"p1","who":"P","text":"Merci pour tout, Noé !","pad":0.2},
- {"id":"cpt","who":"N","text":"Et là, le compteur s'affole.","pad":1.6},
- {"id":"grand","who":"N","text":"Ce jour-là, Noé est devenu le plus grand de la ville.","pad":0.3},
- {"id":"x1","who":"X","text":"Euh... t'es vraiment grand, Noé.","pad":0.4},
- {"id":"fin","who":"N","text":"Seul problème : maintenant, c'est lui qui ne passe plus la porte.","pad":1.0}
+ {
+  "id": "hook",
+  "who": "N",
+  "text": "Dans une ville où chaque compliment te fait *grandir* d'un centimètre, Max mesure déjà *trois mètres*.",
+  "pad": 0.14,
+  "mood": "excited"
+ },
+ {
+  "id": "c1",
+  "who": "F",
+  "text": "Trop *stylé*, Max !",
+  "pad": 0.21,
+  "mood": "hype"
+ },
+ {
+  "id": "noe",
+  "who": "N",
+  "text": "Et Noé, lui, mesure *un mètre dix*. Parce que *personne* ne lui fait jamais de compliment.",
+  "pad": 0.21,
+  "mood": "sad"
+ },
+ {
+  "id": "mamie",
+  "who": "N",
+  "text": "Le *seul* qu'il a reçu cette année, c'était de sa grand-mère.",
+  "mood": "normal"
+ },
+ {
+  "id": "g1",
+  "who": "G",
+  "text": "Qu'il est *beau*, mon trésor !",
+  "pad": 0.14,
+  "mood": "excited"
+ },
+ {
+  "id": "chien",
+  "who": "N",
+  "text": "Elle parlait *au chien*.",
+  "pad": 0.49,
+  "mood": "deadpan"
+ },
+ {
+  "id": "ecole",
+  "who": "N",
+  "text": "À l'école, Max ne passe *même plus* la porte.",
+  "mood": "excited"
+ },
+ {
+  "id": "c2",
+  "who": "F",
+  "text": "Trop *fort*, Max !",
+  "pad": 0.35,
+  "mood": "hype"
+ },
+ {
+  "id": "idee",
+  "who": "N",
+  "text": "Alors Noé a *une idée*. Si personne ne le complimente, c'est *lui* qui va complimenter *tout le monde*.",
+  "pad": 0.14,
+  "mood": "excited"
+ },
+ {
+  "id": "o1",
+  "who": "O",
+  "text": "Madame, votre pain, c'est *le meilleur* de la ville !",
+  "pad": 0.21,
+  "mood": "excited"
+ },
+ {
+  "id": "o2",
+  "who": "O",
+  "text": "Monsieur le facteur, vous courez *super vite* !",
+  "pad": 0.21,
+  "mood": "excited"
+ },
+ {
+  "id": "tous",
+  "who": "N",
+  "text": "Les voisins, le maire, *même les pigeons*. Toute la ville *grandit*. Sauf *lui*.",
+  "pad": 0.28,
+  "mood": "excited"
+ },
+ {
+  "id": "toise",
+  "who": "N",
+  "text": "Puis arrive le jour de *la grande toise*.",
+  "pad": 0.14,
+  "mood": "suspense"
+ },
+ {
+  "id": "max",
+  "who": "N",
+  "text": "Max monte sur la scène. *Quatre mètres vingt*. La foule *hurle*.",
+  "pad": 0.28,
+  "mood": "hype"
+ },
+ {
+  "id": "tour",
+  "who": "N",
+  "text": "Puis c'est le tour de Noé. *Un mètre dix*. Quelques rires... puis *le silence*.",
+  "pad": 0.35,
+  "mood": "suspense"
+ },
+ {
+  "id": "foule",
+  "who": "N",
+  "text": "Parce que dans la foule, il y a *tous ceux* qu'il a complimentés.",
+  "pad": 0.14,
+  "mood": "suspense"
+ },
+ {
+  "id": "b1",
+  "who": "B",
+  "text": "Noé, t'es le garçon *le plus gentil* de la ville !",
+  "pad": 0.14,
+  "mood": "excited"
+ },
+ {
+  "id": "p1",
+  "who": "P",
+  "text": "*Merci* pour tout, Noé !",
+  "pad": 0.14,
+  "mood": "excited"
+ },
+ {
+  "id": "cpt",
+  "who": "N",
+  "text": "Et là, le compteur *s'affole*.",
+  "pad": 1.12,
+  "mood": "hype"
+ },
+ {
+  "id": "grand",
+  "who": "N",
+  "text": "Ce jour-là, Noé est devenu *le plus grand* de la ville.",
+  "pad": 0.21,
+  "mood": "excited"
+ },
+ {
+  "id": "x1",
+  "who": "X",
+  "text": "Euh... t'es *vraiment* grand, Noé.",
+  "pad": 0.28,
+  "mood": "deadpan"
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "text": "Seul problème : maintenant, c'est *lui* qui ne passe plus *la porte*.",
+  "pad": 0.7,
+  "mood": "deadpan"
+ }
 ]
