@@ -1,0 +1,108 @@
+[
+ {
+  "id": "intro",
+  "who": "N",
+  "text": "La logique de papa. Niveau expert.",
+  "pad": 0.46
+ },
+ {
+  "id": "froid",
+  "who": "N",
+  "text": "Tu as froid. Tu demandes à ton père de monter le chauffage."
+ },
+ {
+  "id": "q1",
+  "who": "T",
+  "text": "Papa, je peux monter le chauffage ?",
+  "pad": 0.11
+ },
+ {
+  "id": "pull",
+  "who": "P",
+  "text": "Mets un pull.",
+  "pad": 0.34
+ },
+ {
+  "id": "pulls",
+  "who": "N",
+  "text": "Alors tu mets un pull. Puis deux. Puis trois.",
+  "pad": 0.68
+ },
+ {
+  "id": "cache",
+  "who": "N",
+  "text": "Tu montes le chauffage d'un degré, en cachette.",
+  "pad": 0.11
+ },
+ {
+  "id": "garage",
+  "who": "N",
+  "text": "Il le sent depuis le garage.",
+  "pad": 0.17
+ },
+ {
+  "id": "thermo",
+  "who": "P",
+  "text": "Qui a touché au thermostat ?",
+  "pad": 0.57
+ },
+ {
+  "id": "lumiere",
+  "who": "N",
+  "text": "Un jour, tu oublies la lumière des toilettes. Deux secondes.",
+  "pad": 0.23
+ },
+ {
+  "id": "edf",
+  "who": "P",
+  "text": "Tu crois que j'ai des actions chez EDF ?",
+  "pad": 0.57
+ },
+ {
+  "id": "voiture",
+  "who": "N",
+  "text": "Le week-end, en voiture, tu proposes le GPS.",
+  "pad": 0.11
+ },
+ {
+  "id": "raccour",
+  "who": "P",
+  "text": "Pas besoin. Je connais un raccourci.",
+  "pad": 0.46
+ },
+ {
+  "id": "champ",
+  "who": "N",
+  "text": "Deux heures plus tard, vous êtes au milieu d'un champ.",
+  "pad": 0.46
+ },
+ {
+  "id": "touri",
+  "who": "P",
+  "text": "C'est la route touristique.",
+  "pad": 0.8
+ },
+ {
+  "id": "soir",
+  "who": "N",
+  "text": "Le soir, tu rentres. Chauffage à vingt-six. Toutes les lumières allumées. Et lui, en short.",
+  "pad": 0.34
+ },
+ {
+  "id": "q2",
+  "who": "T",
+  "text": "Euh, papa ?"
+ },
+ {
+  "id": "factur",
+  "who": "P",
+  "text": "C'est pas pareil. Moi, je paie les factures.",
+  "pad": 0.57
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "text": "Logique de papa : deux cents pour cent.",
+  "pad": 0.23
+ }
+]
