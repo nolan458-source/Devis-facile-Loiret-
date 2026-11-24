@@ -43,8 +43,8 @@ class Tom:
 
     def say(self, text, length=1.0):
         for a, b in FIX.items(): text = text.replace(a, b)
-        sr = 22050; out = []
+        sr = 22050; out = []; self.clauses = []; pos = 0
         for ipa, term, end in eb.get_phonemes(text):
-            out.append(self.clause(ipa, length))
-            out.append(np.zeros(int(sr * (0.32 if end else 0.14)), np.float32))
+            c = self.clause(ipa, length); out.append(c); self.clauses.append((pos, pos + len(c), term)); pos += len(c)
+            gap = np.zeros(int(sr * (0.26 if end else 0.10)), np.float32); out.append(gap); pos += len(gap)
         a = np.concatenate(out); return a / (np.abs(a).max() + 1e-6) * 0.9, sr
