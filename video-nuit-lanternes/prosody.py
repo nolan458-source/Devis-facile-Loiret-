@@ -2,8 +2,8 @@
 # per-line mood (register shift, range, energy), and emphasised words (pitch accent + lengthening + louder).
 import numpy as np, pyworld as pw
 ST = np.log(2) / 12
-MOODS = {"normal": (0, 1.0, 1.0), "excited": (2.0, 1.15, 1.25), "hype": (3.5, 1.25, 1.4),
-         "sad": (-2.5, .75, .8), "deadpan": (-1.5, .6, .7), "suspense": (-1.0, .85, .9)}
+MOODS = {"normal": (0, 1.0, 1.0), "excited": (1.2, 1.08, 1.1), "hype": (2.0, 1.12, 1.2),
+         "sad": (-1.5, .85, .85), "deadpan": (-1.0, .75, .75), "suspense": (-.6, .9, .9)}
 
 def expressive(x, sr, clauses, pitch=1.0, formant=1.0, k=2.0, energy=1.0, emph=(), mood="normal"):
     shift, km, em = MOODS.get(mood, MOODS["normal"]); k *= km; energy *= em
@@ -19,15 +19,15 @@ def expressive(x, sr, clauses, pitch=1.0, formant=1.0, k=2.0, energy=1.0, emph=(
         u = np.linspace(0, 1, b - a)
         if term == "?": c = 1.0 * ST - 1.5 * ST * u + 7 * ST * np.clip((u - .65) / .35, 0, 1) ** 1.5
         elif term in (",", ":"): c = 1.5 * ST * (1 - u) + 3 * ST * np.clip((u - .72) / .28, 0, 1)
-        elif term == "!": c = 4 * ST * np.exp(-((u - .25) / .2) ** 2) * energy + 1.5 * ST * (1 - u) - 2 * ST * np.clip((u - .75) / .25, 0, 1)
-        else: c = 3 * ST * (1 - u) * energy - 3.5 * ST * np.clip((u - .7) / .3, 0, 1) + 1.5 * ST * np.exp(-((u - .15) / .1) ** 2) * energy
+        elif term == "!": c = 2.5 * ST * np.exp(-((u - .25) / .2) ** 2) * energy + 1.5 * ST * (1 - u) - 2 * ST * np.clip((u - .75) / .25, 0, 1)
+        else: c = 2 * ST * (1 - u) * energy - 2 * ST * np.clip((u - .75) / .25, 0, 1) + 1 * ST * np.exp(-((u - .15) / .12) ** 2) * energy
         seg = slice(a, b); out[seg] = np.where(v[seg], out[seg] + c, 0)
     gain = np.ones(len(f0)); stretch = np.ones(len(f0))
     for (s, e) in emph:
         a, b = fr(s), min(len(f0), fr(e))
         if b - a < 3: continue
         u = np.linspace(0, 1, b - a); bell = np.sin(np.pi * u) ** .7
-        out[a:b] = np.where(v[a:b], out[a:b] + 3.0 * ST * bell * max(.6, energy), 0)
+        out[a:b] = np.where(v[a:b], out[a:b] + 2.2 * ST * bell * max(.6, energy), 0)
         gain[a:b] *= 1 + .3 * bell; stretch[a:b] = 1.08
     f0n = np.where(v, np.clip(np.exp(out) * pitch, 60, 480), 0)
     if formant != 1.0:

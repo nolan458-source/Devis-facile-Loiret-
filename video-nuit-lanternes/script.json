@@ -12,7 +12,7 @@
  {"id":"foret","who":"N","mood":"suspense","text":"Plus elle avance, plus la clochette sonne *fort*.","pad":0.5},
  {"id":"chene","who":"N","mood":"suspense","text":"Au pied du plus vieux chêne, il y a *une lumière*.","pad":0.5},
  {"id":"hibou","who":"N","mood":"hype","text":"Un hibou *géant*. Et dans son nid, *des centaines de lanternes*.","pad":0.5},
- {"id":"peur","who":"N","mood":"sad","text":"Lina croit qu'il va la manger. Puis elle voit ses petits, serrés contre la lumière. Ils ont *peur du noir*. Comme elle.","pad":0.4},
+ {"id":"peur","who":"N","mood":"sad","text":"Lina croit qu'il va la manger. Puis, elle voit ses petits, serrés contre la lumière. Ils ont *peur du noir*. Comme elle.","pad":0.4},
  {"id":"l1","who":"L","mood":"normal","text":"Tiens. Moi aussi, j'ai peur du noir.","pad":0.5},
  {"id":"village","who":"N","mood":"excited","text":"Le lendemain, Lina revient. Avec *tout le village*.","pad":0.3},
  {"id":"regle2","who":"N","mood":"excited","text":"Et depuis, à Clairbois, il y a une nouvelle règle : *une lanterne pour la forêt*.","pad":0.4},

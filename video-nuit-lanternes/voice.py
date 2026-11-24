@@ -4,7 +4,7 @@ import json, re, unicodedata, numpy as np, onnxruntime as ort
 from piper import espeakbridge as eb
 import piper.phonemize_espeak as pe
 
-FIX = {"Clairbois": "Clèrboa"}
+FIX = {}
 PUNCT = r"[,.;:!?…]"
 
 class Voice:
@@ -47,7 +47,7 @@ class Voice:
                         i = j
                     else: i += 1
             out.append(c); self.clauses.append((pos, pos + n, term)); pos += n
-            gap = np.zeros(int(sr * (0.12 if end else 0.05)), np.float32); out.append(gap); pos += len(gap)
+            gap = np.zeros(int(sr * (0.2 if end else 0.08)), np.float32); out.append(gap); pos += len(gap)
         a = np.concatenate(out); return a / (np.abs(a).max() + 1e-6) * 0.9, sr
 
 
@@ -64,7 +64,8 @@ class Tom(Voice):
     NAS = {"a": "ɑ̃", "ɑ": "ɑ̃", "e": "ɛ̃", "ɛ": "ɛ̃", "o": "ɔ̃", "ɔ": "ɔ̃", "œ": "œ̃", "ø": "œ̃"}
 
     def clause(self, ipa, length):
-        I = self.ids; ipa = unicodedata.normalize("NFD", re.sub(r"\([^)]+\)", "", ipa)); seq = [I["^"], I["_"]]
+        I = self.ids; ipa = unicodedata.normalize("NFD", re.sub(r"\([^)]+\)", "", ipa)).replace("ˈ", "").replace("ˌ", "")
+        ipa = ipa.replace("nj", "ɲ").replace("yi", "ɥi"); seq = [I["^"], I["_"]]
         for k, w in enumerate(ipa.split()):
             raw = []
             for ch in w:
@@ -79,5 +80,5 @@ class Tom(Voice):
             for t in toks: seq += [I[t], I["_"]]
         seq.append(I["$"])
         a = self.sess.run(None, {"input": np.array([seq], np.int64), "input_lengths": np.array([len(seq)], np.int64),
-                                 "scales": np.array([0.6, length, 0.8], np.float32)})[0]
+                                 "scales": np.array([0.5, length, 0.9], np.float32)})[0]
         return a.squeeze().astype(np.float32)
