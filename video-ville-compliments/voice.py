@@ -49,3 +49,35 @@ class Voice:
             out.append(c); self.clauses.append((pos, pos + n, term)); pos += n
             gap = np.zeros(int(sr * (0.12 if end else 0.05)), np.float32); out.append(gap); pos += len(gap)
         a = np.concatenate(out); return a / (np.abs(a).max() + 1e-6) * 0.9, sr
+
+
+class Tom(Voice):
+    """Male French voice "tom_low" (Mimic 3 VITS) with the same clause/emphasis handling as Voice."""
+    def __init__(self, voice_dir):
+        self.sess = ort.InferenceSession(f"{voice_dir}/generator.onnx")
+        self.ids = {}
+        for line in open(f"{voice_dir}/phonemes.txt", encoding="utf-8"):
+            i, s = line.rstrip("\n").split(" ", 1); self.ids[s] = int(i)
+        eb.initialize(str(pe.ESPEAK_DATA_DIR)); eb.set_voice("fr")
+
+    MAP = {"ɐ": "a", "ɑ": "a", "ɜ": "ə", "ɪ": "i", "ʊ": "u", "r": "ʁ", "g": "ɡ", "ɒ": "ɔ", "ʌ": "œ", "æ": "a", "ɚ": "ə", "ɾ": "ʁ", "x": "ʁ"}
+    NAS = {"a": "ɑ̃", "ɑ": "ɑ̃", "e": "ɛ̃", "ɛ": "ɛ̃", "o": "ɔ̃", "ɔ": "ɔ̃", "œ": "œ̃", "ø": "œ̃"}
+
+    def clause(self, ipa, length):
+        I = self.ids; ipa = unicodedata.normalize("NFD", re.sub(r"\([^)]+\)", "", ipa)); seq = [I["^"], I["_"]]
+        for k, w in enumerate(ipa.split()):
+            raw = []
+            for ch in w:
+                if ch == "̃" and raw: raw[-1] += ch
+                else: raw.append(ch)
+            toks = []
+            for r in raw:
+                r = self.NAS.get(r[0], r[0]) if r.endswith("̃") else (r if r in I else self.MAP.get(r, r))
+                if r in I and r not in ("ˈ", "ˌ", "_", "^", "$", "#"): toks.append(r)
+            if not toks: continue
+            if k: seq += [I["#"], I["_"]]
+            for t in toks: seq += [I[t], I["_"]]
+        seq.append(I["$"])
+        a = self.sess.run(None, {"input": np.array([seq], np.int64), "input_lengths": np.array([len(seq)], np.int64),
+                                 "scales": np.array([0.6, length, 0.8], np.float32)})[0]
+        return a.squeeze().astype(np.float32)
