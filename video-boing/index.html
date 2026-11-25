@@ -401,7 +401,7 @@ function update(t) {
     rivals.forEach((c, i) => P(c, { x: 126 + i * 2.6, z: -14 - (i % 2) * 1.5, ry: Math.PI, s: .8, walk: t < S('penalty') ? t * 7 + i : 0, face: { eyes: t > S('arret') ? 'wide' : 'n', mouth: t > S('arret') ? 'o' : 'grin', brow: .6 } }));
     team.slice(0, 4).forEach((c, i) => P(c, { x: 125 + i * 3.2, z: -18 + (i % 2) * 2, ry: 0, s: .75, arms: t > S('gagne') - .1 ? CHEER(t + i) : [0, 0], face: { eyes: t > S('gagne') - .1 ? 'happy' : 'n', mouth: t > S('gagne') - .1 ? 'open' : 'smile' } }));
     // shots during "match" + saves during "b3"
-    const shotsT = [S('match') + .4, S('match') + 1.4, S('match') + 2.4, ...L.b3.words.map(w => w.t - .35)];
+    const shotsT = [S('match') + .4, S('match') + 1.4, S('match') + 2.4, ...L.b3.words.filter((w, i) => i % 3 === 0).map(w => w.t - .35)];
     for (let j = 0; j < shotsT.length; j++) { const t0 = shotsT[j], k = prog(t, t0, t0 + .45); if (t > t0 && t < t0 + .9) {
       const side = (j % 2 ? 1 : -1) * 1.6; ball.visible = true; ball.position.set(lerp(126 + j % 4 * 2, 130 + side, k), .3 + Math.sin(Math.PI * k) * 1.3 + k * .6, lerp(-15, GL + .4, k)); ball.rotation.x = t * 12;
       tx = 130 + side * ease(prog(t, t0 + .1, t0 + .4)); ty = jumpY(t, t0 + .1, .6, 1.1); arms = [[2.7, 0], [2.7, 0]]; face = { eyes: 'wide', mouth: 'grin', freckles: true, blush: true };
@@ -452,7 +452,8 @@ function defiCard(t) {
   ctx.restore();
 }
 function boingBurst(t) {
-  const times = [...L.b1.words.map(w => w.t), S('b2'), ...L.b3.words.map(w => w.t), WT('saut', /^si$/), ...L.b4.words.map(w => w.t)];
+  const g3 = id => L[id].words.filter((w, i) => i % 3 === 0).map(w => w.t);
+  const times = [...g3('b1'), S('b2'), ...g3('b3'), WT('saut', /^si$/), ...g3('b4')];
   for (const t0 of times) { const k = (t - t0) / .7; if (k < 0 || k > 1) continue;
     const [x, y] = proj(headTop(timeo, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
     for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }

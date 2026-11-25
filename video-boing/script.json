@@ -3,7 +3,7 @@
   "id": "intro",
   "who": "N",
   "mood": "excited",
-  "text": "À Boulanville, tout le monde est fou de foot. Tout le monde... sauf *Timéo*.",
+  "text": "À Boulanville, tout le monde adore le foot. Tout le monde... sauf *Timéo*.",
   "pad": 0.1
  },
  {
@@ -68,7 +68,7 @@
   "id": "rires",
   "who": "N",
   "mood": "suspense",
-  "text": "Toute l'équipe éclate de rire. Timéo mesure *un mètre vingt*.",
+  "text": "Toute l'équipe éclate de rire. Timéo, lui, mesure *un mètre vingt*.",
   "pad": 0.4
  },
  {
@@ -90,7 +90,7 @@
   "id": "arret",
   "who": "N",
   "mood": "hype",
-  "text": "Timéo arrête *tout*. Zéro à zéro.",
+  "text": "Il arrête *absolument tout*. Zéro à zéro.",
   "pad": 0.4
  },
  {
@@ -104,14 +104,14 @@
   "id": "saut",
   "who": "N",
   "mood": "hype",
-  "text": "Timéo saute *si haut*... qu'il attrape le ballon au-dessus de la barre.",
+  "text": "Et là, Timéo saute *si haut*... qu'il attrape le ballon au-dessus de la barre.",
   "pad": 0.4
  },
  {
   "id": "gagne",
   "who": "N",
   "mood": "excited",
-  "text": "Boulanville *gagne* !",
+  "text": "Et Boulanville *gagne le match* !",
   "pad": 0.1
  },
  {
