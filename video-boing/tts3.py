@@ -15,7 +15,7 @@ FIXES = [("(en)kˈəʊtʃ(fr)", "kˈotʃ"), ("(en)fˈʊt(fr)", "fˈut"), ("(en)b
 FPS = 25; SR = 44100; GAP = 0.05
 # voices = Kokoro style blends (French ff_siwis + male voices), chosen by an audition scored with Whisper
 _V = K.voices
-VOICE = {"N": (.4 * _V["ff_siwis"] + .35 * _V["bm_george"] + .25 * _V["am_onyx"], 1.0),   # narrator: naturally deep blend, no pitch processing
+VOICE = {"N": (.3 * _V["ff_siwis"] + .3 * _V["bm_george"] + .4 * _V["am_onyx"], 1.0),   # narrator: deeper, more natural male blend (audition: 132 Hz)
          "C": (.35 * _V["ff_siwis"] + .35 * _V["bm_george"] + .3 * _V["am_onyx"], 1.0),   # coach
          "V": (.4 * _V["ff_siwis"] + .6 * _V["am_onyx"], 1.0)}               # neighbour
 HUSS_VOICE = VOICE["N"][0]
@@ -61,7 +61,7 @@ for ln in lines:
         save(a * .9, sr, raw); pre = (f"rubberband=pitch={VOICE[who][1]}:formant=preserved:pitchq=quality," if VOICE[who][1] != 1.0 else "")
     else:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
-        a, sr = K.create(ph, voice=VOICE[who][0], speed=SPEED[mood], is_phonemes=True)
+        a, sr = K.create(ph, voice=VOICE[who][0], speed=SPEED[mood] * (.93 if who == "N" else 1.0), is_phonemes=True)
         save(a / (np.abs(a).max() + 1e-6) * .9, sr, raw)
         pre = (f"rubberband=pitch={VOICE[who][1]}:formant=preserved:pitchq=quality," if VOICE[who][1] != 1.0 else "")
     af = (f"aresample={SR},{pre}highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,deesser=i=0.3,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=90:makeup=2,"

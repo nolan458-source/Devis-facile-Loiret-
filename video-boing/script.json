@@ -68,7 +68,7 @@
   "id": "rires",
   "who": "N",
   "mood": "suspense",
-  "text": "Toute l'équipe éclate de rire. Timéo, lui, mesure *un mètre vingt*.",
+  "text": "Toute l'équipe rigole. Timéo, lui, mesure *un mètre vingt*.",
   "pad": 0.4
  },
  {
@@ -97,7 +97,7 @@
   "id": "penalty",
   "who": "N",
   "mood": "suspense",
-  "text": "Dernier tir au but. Le géant de Grandeville prend son élan...",
+  "text": "Dernier tir au but. Le géant de Grandeville se prépare à tirer...",
   "pad": 0.3
  },
  {
@@ -111,7 +111,7 @@
   "id": "gagne",
   "who": "N",
   "mood": "excited",
-  "text": "Et Boulanville *gagne le match* !",
+  "text": "Et c'est Boulanville qui *gagne le match* !",
   "pad": 0.1
  },
  {
