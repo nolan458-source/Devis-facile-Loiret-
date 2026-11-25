@@ -1,0 +1,184 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), boing = /^boing/i.test(best.w), s = lerp(boing ? 1.8 : 1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (boing) ctx.rotate(Math.sin(t * 30) * .05);
+  text2(boing ? 'BOING !' : best.w, 0, 0, boing ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: boing ? 16 : 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const jumpY = (t, t0, d, h) => h * Math.sin(Math.PI * clamp((t - t0) / d));
+const hop = (t, period, h) => h * Math.abs(Math.sin(Math.PI * t / period));
+function shots() {
+  return [
+    [0, [0, 3.2, 15], [0, 3, 12.5], [0, 1.4, 2], [0, 1.4, 2], 50],
+    [WT('intro', /^Timéo/) - .15, [-5, 1.1, 5.2], [-5, 1.05, 4.7], [-5, .9, 2.6], [-5, .9, 2.6], 42],
+    [S('saute') - .1, [-4.6, 1.5, 7.8], [.4, 1.5, 7.8], [-4.4, 1.2, 2.6], [.6, 1.2, 2.6], 48],
+    [S('b1') - .2, [7, 2, 11], [7, 2, 10.5], [2.6, 1.8, 4.8], [2.6, 1.8, 4.8], 48],
+    [S('v1') - .1, [8.4, 2.6, 11], [8.1, 2.6, 10.5], [3.9, 2.2, 4.5], [3.9, 2.2, 4.5], 50],
+    [S('trampo') - .1, [-5.6, 2.2, 6.6], [-6, 2.3, 6], [-9, 1.9, -1.4], [-9, 2.1, -1.4], 50],
+    [WT('trampo', /^par-dessus/) - .1, [-2.5, 2.2, 8], [-3, 2.2, 7.6], [-6.2, 1.6, -1.2], [-6.2, 1.6, -1.2], 52],
+    [WT('trampo', /^jusqu/) - .1, [41, 2.2, 9], [40.5, 2.2, 8.4], [38, 1.5, .5], [37.4, 1.5, .5], 52],
+    [WT('trampo', /^bizarre/) - .25, [34, 1.5, 4.6], [34.2, 1.5, 4.2], [35.4, 1.3, .8], [35.4, 1.3, .8], 45],
+    [S('defi') - .1, [0, 13, 24], [0, 12, 21], [0, 1, -3], [0, 1, -3], 50],
+    [S('gardien') - .1, [-57.6, 1.9, 3.6], [-57.9, 1.85, 3.2], [-60, 1, -2.3], [-60, .9, -2.3], 48],
+    [S('coach') - .1, [59.6, 1.9, 7.8], [59.6, 1.9, 7], [59.9, 1.2, -1.2], [59.9, 1.2, -1.2], 52],
+    [S('b2') - .2, [61.6, .6, 4.6], [61.6, .6, 4.4], [61.2, 2, 0], [61.2, 2.2, 0], 58],
+    [S('rires') - .1, [60.9, 1.5, 5.4], [60.9, 1.45, 4.9], [60.9, 1, .2], [60.9, 1, .2], 46],
+    [S('match') - .2, [130, 6.5, -35], [130, 6, -34], [130, 1, -14], [130, 1, -14], 52],
+    [S('b3') - .15, [130, 1.6, -18.5], [130, 1.6, -19.2], [130, 1.6, -25.4], [130, 1.6, -25.4], 55],
+    [S('arret') - .1, [130, 8, -8.5], [130, 8.2, -9.5], [130, 8.8, -29.5], [130, 8.8, -29.5], 45],
+    [WT('arret', /^Zéro/) - .1, [130, 4, -2], [130, 4.4, 0], [116, 3, -8], [114, 3.5, -8], 55],
+    [S('penalty') - .1, [133.4, 2.6, -7.5], [133, 2.4, -8.5], [130, 1.4, -22], [130, 1.4, -22], 50],
+    [S('saut') - .1, [130.6, .6, -20.8], [130.6, .6, -21.2], [130, 2.6, -25.6], [130, 3, -25.6], 62],
+    [S('gagne') - .1, [130, 3, -13], [130, 3.4, -12], [130, 1.5, -24], [130, 1.8, -24], 55],
+    [S('c1') - .1, [129.6, 1.6, -18.6], [129.6, 1.6, -19.1], [129.6, 1.3, -22.3], [129.6, 1.3, -22.3], 46],
+    [S('fin') - .1, [200, 4, 17], [200, 4.5, 15], [200, 4, -6], [200, 4.2, -6], 52],
+    [WT('fin', /^Et$/) - .1, [0, 2.6, 14], [0, 2.8, 12.5], [0, 2, 0], [0, 2.2, 0], 55],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, 18, look[2] + 12); sun.target.position.set(look[0], 0, look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const hideAll = () => { for (const c of Object.values(CH)) c.root.visible = false; ball.visible = false; confetti.forEach(m => m.visible = false); tramps.forEach(g => g.visible = false); cast_.visible = false; };
+const BOINGS = [];   // [time, char] big "BOING" bursts above Timéo
+let hallPink = 0;
+function update(t) {
+  hideAll(); updateFans(t, (t > S('arret') && t < S('penalty') - .2) ? 1 : (t > S('gagne') - .1 && t < S('fin') - .2 ? 1.6 : (t > S('match') && t < S('gagne') ? .15 : 0)));
+  scoreTex.redrawKey = scoreTex.redrawKey || '';
+  const sk = t > S('gagne') - .1 ? 'win' : 'zero'; if (scoreTex.redrawKey !== sk) { scoreTex.redraw(sk === 'win' ? 1 : 0, 0, sk === 'win' ? 'BOULANVILLE GAGNE !' : ''); scoreTex.redrawKey = sk; }
+  // A-D: street
+  if (t < S('trampo') - .1) {
+    [0, 1, 2, 3].forEach(i => P(team[i], { x: .5 + i * 1.6, z: 3.2 + (i % 2) * 1.2, ry: i % 2 ? Math.PI * .8 : .3, s: .75, walk: t < S('saute') ? t * 6 + i : 0, arms: [0, 0], face: { eyes: t > S('v1') - .3 ? 'wide' : 'happy', mouth: t > S('v1') - .3 ? 'o' : 'grin' } }));
+    if (t < S('saute')) { ball.visible = true; const ph = (t * .9) % 1, a = Math.floor(t * .9) % 3; ball.position.set(.5 + a * 1.6 + ph * 1.6, .24 + Math.abs(Math.sin(ph * Math.PI)) * .8, 3.8); ball.rotation.x = t * 8; }
+    let x = -5, y = 0, z = 2.6, ry = 0, face = { eyes: 'happy', mouth: 'grin', freckles: true, blush: true }, arms = [[.4, 0], [.4, 0]];
+    if (t > S('saute') - .1) { const k = prog(t, S('saute'), S('b1') - .1); x = lerp(-5, 1, k); y = hop(t - S('saute'), .5, .8); ry = Math.PI / 2; arms = [[2.4, 0], [2.4, 0]]; }
+    if (t > S('b1') - .2) { const k = prog(t, S('b1') - .2, S('b1') + .45); x = lerp(1, 3, k); z = lerp(2.6, 5.2, k); y = lerp(0, 1.9, k) + Math.sin(Math.PI * k) * 2.2; arms = [[2.8, 0], [2.8, 0]]; ry = .6; }
+    if (t > S('b1') + .45) { x = 3; z = 5.2; y = 1.9 + hop(t, .45, .5); ry = .4; face = { eyes: 'happy', mouth: 'open', freckles: true, blush: true }; }
+    P(timeo, { x, y, z, ry, s: .62, arms, face });
+    if (t > S('v1') - .3) P(voisin, { x: 5.6, z: 3, ry: -.9, s: 1, talk: talk('V', t), arms: [[2.5 + Math.sin(t * 16) * .2, -.3], [2.5 - Math.sin(t * 16) * .2, -.3]], headX: -.2, face: { eyes: 'n', mouth: 'flat', brow: 1, mustache: true } });
+  }
+  // E: trampoline, hedge, school
+  else if (t < S('defi') - .1) {
+    const tHedge = WT('trampo', /^par-dessus/), tSchool = WT('trampo', /^jusqu/);
+    let x = -9, z = -1.4, y = .66 + hop(t - S('trampo'), .75, 2.4);
+    if (t > tHedge - .1 && t < tSchool - .1) { const k = prog(t, tHedge, tSchool - .2); x = lerp(-9, -3, k); z = lerp(-1.4, -1, k); y = .66 * (1 - k) + Math.sin(Math.PI * k) * 3.2; }
+    if (t >= tSchool - .1) { const k = prog(t, tSchool, WT('trampo', /^bizarre/)); x = lerp(41, 36.5, k); z = 1.2; y = hop(t, .5, 1); }
+    P(timeo, { x, y, z, ry: t >= tSchool - .1 ? -Math.PI / 2 : (t > tHedge - .1 ? Math.PI / 2 : 0), s: .62, arms: [[2.6, 0], [2.6, 0]], face: { eyes: 'happy', mouth: 'open', freckles: true, blush: true } });
+    if (t >= tSchool - .1) [0, 1, 2].forEach(i => P(team[i], { x: 33.6 + i * .9, z: .4 + (i % 2) * .5, ry: .5, s: .75, headY: .3, face: { eyes: 'n', mouth: 'flat', brow: -.6 } }));
+  }
+  // F: the challenge (town from above)
+  else if (t < S('gardien') - .1) {
+    [0, 1, 2, 3].forEach(i => P(team[i], { x: -2 + i * 1.5, z: 3.4, s: .75, face: { eyes: 'wide', mouth: 'o' } }));
+  }
+  // G: goalkeeper falls off the sofa
+  else if (t < S('coach') - .1) {
+    const fall = WT('gardien', /^tombant/) - .1, k = prog(t, fall, fall + .5), down = t > fall + .5;
+    P(gardien, { x: -60, y: lerp(.44, .1, k), z: lerp(-2.4, -1.2, k), s: .78, ry: 0, sit: false, bend: lerp(0, 1.45, ease(k)),
+      arms: k > 0 ? [[2.4 + Math.sin(t * 20) * .3, 0], [2.4 - Math.sin(t * 20) * .3, 0]] : [[.4, -1], [.4, -1]], face: { eyes: down ? 'closed' : (k > 0 ? 'wide' : 'n'), mouth: down ? 'wavy' : (k > 0 ? 'o' : 'flat') } });
+    if (t < fall) { gardien.root.position.y = .44; gardien.legs.forEach(l => l.rotation.x = -1.4); }
+    cast_.visible = t > WT('gardien', /^cassé/) - .2;
+  }
+  // H-J: training field
+  else if (t < S('match') - .2) {
+    const nobody = t > WT('coach', /^Personne/), laugh = t > S('rires') - .1;
+    P(coachC, { x: 57.8, z: -.6, ry: .9, s: 1, arms: [0, [1.5, -.2]], face: { eyes: t > S('b2') ? 'wide' : 'n', mouth: laugh ? 'open' : 'smile', mustache: true } });
+    team.forEach((c, i) => P(c, { x: 60 + i * 1.05, z: -2.2 + (i % 2) * .6 + (nobody && !laugh ? -.6 : 0), ry: -.4, s: .75, headY: nobody && !laugh && t < S('b2') ? Math.sin(t * 10 + i) * .4 : 0, hop: laugh ? Math.abs(Math.sin(t * 14 + i)) * .05 : 0,
+      face: { eyes: laugh ? 'happy' : 'n', mouth: laugh ? 'open' : (nobody ? 'flat' : 'smile') } }));
+    if (t > WT('coach', /^seul/) - .3) {
+      const k = prog(t, S('b2') - .25, S('b2') + .4);
+      P(timeo, { x: lerp(65, 61.2, prog(t, WT('coach', /^seul/) - .3, S('b2') - .25)), y: k > 0 && k < 1 ? Math.sin(Math.PI * k) * 2 : 0, z: .4, s: .62, ry: -.2,
+        arms: k > 0 && k < 1 ? [[2.8, 0], [2.8, 0]] : [0, [2.6, 0]], face: { eyes: laugh ? 'n' : 'happy', mouth: laugh ? 'smile' : 'grin', freckles: true, blush: true } });
+    }
+  }
+  // K-O: the match
+  else if (t < S('fin') - .1) {
+    const GL = -25.3;
+    let tx = 130, ty = 0, arms = [[.6, 0], [.6, 0]], face = { eyes: 'n', mouth: 'grin', brow: .6, freckles: true, blush: true }, bend = .15;
+    rivals.forEach((c, i) => P(c, { x: 126 + i * 2.6, z: -14 - (i % 2) * 1.5, ry: Math.PI, s: .8, walk: t < S('penalty') ? t * 7 + i : 0, face: { eyes: t > S('arret') ? 'wide' : 'n', mouth: t > S('arret') ? 'o' : 'grin', brow: .6 } }));
+    team.slice(0, 4).forEach((c, i) => P(c, { x: 125 + i * 3.2, z: -18 + (i % 2) * 2, ry: 0, s: .75, arms: t > S('gagne') - .1 ? CHEER(t + i) : [0, 0], face: { eyes: t > S('gagne') - .1 ? 'happy' : 'n', mouth: t > S('gagne') - .1 ? 'open' : 'smile' } }));
+    // shots during "match" + saves during "b3"
+    const shotsT = [S('match') + .4, S('match') + 1.4, S('match') + 2.4, ...L.b3.words.map(w => w.t - .35)];
+    for (let j = 0; j < shotsT.length; j++) { const t0 = shotsT[j], k = prog(t, t0, t0 + .45); if (t > t0 && t < t0 + .9) {
+      const side = (j % 2 ? 1 : -1) * 1.6; ball.visible = true; ball.position.set(lerp(126 + j % 4 * 2, 130 + side, k), .3 + Math.sin(Math.PI * k) * 1.3 + k * .6, lerp(-15, GL + .4, k)); ball.rotation.x = t * 12;
+      tx = 130 + side * ease(prog(t, t0 + .1, t0 + .4)); ty = jumpY(t, t0 + .1, .6, 1.1); arms = [[2.7, 0], [2.7, 0]]; face = { eyes: 'wide', mouth: 'grin', freckles: true, blush: true };
+      if (k >= 1) ball.position.set(tx, ty + 1.2, GL + .5); } }
+    // penalty
+    if (t > S('penalty') - .1 && t < S('gagne') - .1) {
+      const run = prog(t, S('penalty') + .8, S('saut') + .25);
+      P(giant, { x: 130, z: lerp(-14.5, -19.8, run), ry: Math.PI, s: 1.55, walk: run > 0 && run < 1 ? t * 9 : 0, face: { eyes: t > S('saut') + 1 ? 'wide' : 'n', mouth: t > S('saut') + 1 ? 'o' : 'grin', brow: 1 } });
+      rivals.forEach(c => c.root.visible = false);
+      const kick = S('saut') + .25, kb = prog(t, kick, kick + .9), catchT = kick + .75;
+      ball.visible = true;
+      if (t < kick) ball.position.set(130, .24, -20.5);
+      else if (t < catchT) ball.position.set(lerp(130, 131.2, kb), .24 + kb * 3.4, lerp(-20.5, GL + .2, kb));
+      bend = t < kick ? .35 : 0;
+      if (t > kick - .1) { const j = jumpY(t, kick - .05, 1.6, 2.9); ty = j; tx = lerp(130, 131.1, prog(t, kick - .05, catchT)); arms = [[2.9, 0], [2.9, 0]]; face = { eyes: 'wide', mouth: 'open', freckles: true, blush: true }; }
+      if (t >= catchT) ball.position.set(tx, ty + 1.25, GL + .45);
+    }
+    if (t > S('gagne') - .1) { ty = hop(t, .45, .9); arms = CHEER(t); face = { eyes: 'happy', mouth: 'open', freckles: true, blush: true }; ball.visible = false;
+      confetti.forEach((m, i) => { m.visible = true; const ph = ((t - S('gagne')) * .35 + rnd(i)) % 1; m.position.set(124 + rnd(i + 3) * 12, 7 - ph * 7, -27 + rnd(i + 7) * 12); m.rotation.set(t * 3 + i, t * 2 + i, 0); }); }
+    if (t > S('c1') - .15) { tx = 130.3; ty = 0; P(coachC, { x: 129.1, z: -22.2, ry: .5, s: 1, talk: talk('C', t), arms: [0, [2.2, -.6]], face: { eyes: 'happy', mouth: 'smile', mustache: true } }); arms = [[2.7, 0], [.4, 0]]; face = { eyes: 'happy', mouth: 'grin', freckles: true, blush: true }; }
+    P(timeo, { x: tx, y: ty, z: t > S('c1') - .15 ? -22.3 : GL + .3, s: .62, ry: t > S('c1') - .15 ? -.4 : 0, bend: t > S('c1') - .15 ? 0 : bend, arms, face });
+  }
+  // P-Q: pink town hall, then jumping is mandatory
+  else {
+    const toEt = WT('fin', /^Et$/) - .1;
+    if (t < toEt) {
+      const k = back(prog(t, S('fin') + .4, S('fin') + .9)); hallMat.color.set('#e8e0d0').lerp(new THREE.Color('#ff7fb8'), clamp(k)); hall.scale.setScalar(1 + .04 * Math.sin(Math.PI * clamp(prog(t, S('fin') + .4, S('fin') + .9))));
+      P(maireG, { x: 200, z: 1.8, s: 1, face: { eyes: 'n', mouth: 'sad', brow: -1, round: true, mustache: true, tear: t > S('fin') + 1 }, headX: .2 });
+    } else {
+      tramps.forEach((g, i) => { g.visible = true; g.position.set(-12 + i * 6, 0, 1.4); });
+      const all = t > S('b4') - .2;
+      [timeo, ...team.slice(0, 4)].forEach((c, i) => { const h = all ? jumpY(t, S('b4') - .2, .8, 3) : hop(t + i * .17, .7, 1.6);
+        P(c, { x: -12 + i * 6, y: .66 + h, z: 1.4, s: c === timeo ? .62 : .75, arms: [[2.7, 0], [2.7, 0]], face: c === timeo ? { eyes: 'happy', mouth: 'open', freckles: true, blush: true } : { eyes: 'happy', mouth: 'open' } }); });
+      P(voisin, { x: 3, z: 3.4, s: 1, ry: -.2, y: all ? jumpY(t, S('b4') - .2, .8, 1.2) : 0, arms: [[2.7, 0], [2.7, 0]], face: { eyes: 'happy', mouth: 'open', mustache: true } });
+      if (all) confetti.forEach((m, i) => { m.visible = true; const ph = ((t - S('b4')) * .5 + rnd(i)) % 1; m.position.set(-8 + rnd(i + 3) * 16, 7 - ph * 7, -2 + rnd(i + 7) * 6); m.rotation.set(t * 3 + i, t * 2 + i, 0); });
+    }
+  }
+}
+function defiCard(t) {
+  const a = S('defi'), b = S('gardien') - .1; if (t < a + .1 || t > b) return;
+  const k = back(prog(t, a + .1, a + .45)); ctx.save(); ctx.translate(W / 2, H * .34); ctx.scale(k, k); ctx.rotate(-.03);
+  ctx.fillStyle = '#fff8e6'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 6; ctx.beginPath(); ctx.roundRect(-290, -250, 580, 500, 18); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#e0533d'; ctx.fillRect(-290, -250, 580, 90); text2('DÉFI !', 0, -205, 64, '#ffffff', { lw: 0 });
+  text2('De : Grandeville', 0, -120, 38, '#2b2f86');
+  if (t > WT('defi', /^match/) - .1) text2('MATCH DE FOOT', 0, -40, 50, '#1e1a22');
+  if (t > WT('defi', /^perd/) - .1) { text2('Le perdant repeint', 0, 50, 40, '#1e1a22'); text2('sa mairie', 0, 100, 40, '#1e1a22'); }
+  if (t > WT('defi', /^rose/) - .15) { const g = back(prog(t, WT('defi', /^rose/) - .15, WT('defi', /^rose/) + .2)); ctx.save(); ctx.translate(0, 175); ctx.scale(g, g); ctx.rotate(-.08); text2('EN ROSE !', 0, 0, 66, '#ff5da8', { lw: 10 }); ctx.restore(); }
+  ctx.restore();
+}
+function boingBurst(t) {
+  const times = [S('b1'), S('b2'), ...L.b3.words.map(w => w.t), WT('saut', /^si$/), S('b4')];
+  for (const t0 of times) { const k = (t - t0) / .7; if (k < 0 || k > 1) continue;
+    const [x, y] = proj(headTop(timeo, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
+    for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }
+    ctx.restore(); ctx.globalAlpha = 1; }
+}
+function overlay(t) {
+  bubbleOn(voisin, 'Timéo ! Arrête de sauter sur ma voiture !', t > S('v1') - .2 && t < E('v1') + .4 ? prog(t, S('v1') - .1, S('v1') + .1) : 0, 1.0);
+  bubbleOn(coachC, 'Timéo, t’es le meilleur gardien de l’histoire !', t > S('c1') - .2 && t < E('c1') + .4 ? prog(t, S('c1') - .1, S('c1') + .1) : 0, 1.0);
+  if (t > WT('rires', /^mesure/) && t < S('match') - .2) label(timeo, '1 m 20', '#ffffff', 1.0, 46);
+  if (t > WT('trampo', /^bizarre/) - .2 && t < S('defi') - .1) team.slice(0, 3).forEach((c, i) => { const [x, y] = proj(headTop(c, .9)); text2('?', x, y - Math.sin(t * 6 + i) * 6, 54, '#ffd23f', { lw: 10 }); });
+  defiCard(t); boingBurst(t); caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SH = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  scoreTex.redraw(0, 0, ''); render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>

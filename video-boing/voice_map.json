@@ -1,0 +1,26 @@
+{
+ "N": {
+  "target_median": 181,
+  "down": 1.45,
+  "up": 2.3,
+  "formant": 1.0
+ },
+ "T": {
+  "target_median": 235,
+  "down": 1.0,
+  "up": 1.6,
+  "formant": 1.05
+ },
+ "C": {
+  "target_median": 120,
+  "down": 1.1,
+  "up": 1.5,
+  "formant": 1.0
+ },
+ "V": {
+  "target_median": 112,
+  "down": 1.0,
+  "up": 1.2,
+  "formant": 1.0
+ }
+}

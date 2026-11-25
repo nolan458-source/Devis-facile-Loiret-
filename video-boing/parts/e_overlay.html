@@ -1,0 +1,32 @@
+// ---------- 2D overlay ----------
+const out = document.getElementById('out'), ctx = out.getContext('2d');
+function text2(s, x, y, size, fill, { stroke = '#1e1a22', lw = 0, font = 'Baloo', align = 'center' } = {}) {
+  ctx.font = `800 ${size}px ${font}`; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  if (lw) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.strokeText(s, x, y); } ctx.fillStyle = fill; ctx.fillText(s, x, y);
+}
+const proj = v => { const p = v.clone().project(camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H, p.z]; };
+const headTop = (c, extra = .9) => { const v = new THREE.Vector3(); c.head.getWorldPosition(v); return v.add(new THREE.Vector3(0, extra * c.root.scale.y, 0)); };
+function bubble(str, x, y, k, size = 26) {
+  if (k <= 0) return; str = str.replace(/ ([!?:])/g, '\u00a0$1'); ctx.save(); ctx.translate(x, y); const s = back(clamp(k)); ctx.scale(s, s);
+  ctx.font = `800 ${size}px Nun`; const words = str.split(' '), lines = []; let cur = '';
+  for (const w of words) { const tr = cur ? cur + ' ' + w : w; if (ctx.measureText(tr).width > 360 && cur) { lines.push(cur); cur = w; } else cur = tr; } lines.push(cur);
+  const lh = size * 1.2, bw = Math.max(...lines.map(l => ctx.measureText(l).width)) + 36, bh = lines.length * lh + 20;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.roundRect(-bw / 2, -bh, bw, bh, 18); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-12, -2); ctx.lineTo(0, 16); ctx.lineTo(12, -2); ctx.fill(); ctx.stroke(); ctx.fillRect(-14, -8, 28, 8);
+  lines.forEach((l, i) => text2(l, 0, -bh + 10 + lh * (i + .5), size, '#1e1a22', { font: 'Nun' }));
+  ctx.restore();
+}
+function bubbleOn(c, str, k, dy = 1.0) { if (k <= 0) return; const [x, y, z] = proj(headTop(c, dy)); if (z < 1) bubble(str, clamp(x, 190, W - 190), clamp(y, 140, H - 200), k); }
+function label(c, str, col = '#fff', dy = 1.25, size = 44) { const [x, y, z] = proj(headTop(c, dy)); if (z < 1) text2(str, x, Math.max(80, y), size, col, { lw: 10 }); }
+const POPS = [];
+function pops(t) {
+  for (const p of POPS) {
+    const k = (t - p.t) / 1.1; if (k < 0 || k > 1) continue;
+    const c = p.c; const v = !c.root ? (() => { const w = new THREE.Vector3(); c.getWorldPosition(w); return w.add(new THREE.Vector3(0, (p.dy || 1) * c.scale.y, 0)); })() : headTop(c, p.dy || 1);
+    const [x, y, z] = proj(v); if (z > 1) continue;
+    ctx.globalAlpha = 1 - Math.pow(k, 3); const s = back(clamp(k * 4)) * (p.size || 1);
+    ctx.save(); ctx.translate(clamp(x + (p.ox || 0), 70, W - 70), Math.max(90, y - k * 110 + (p.oy || 0))); ctx.scale(s, s);
+    text2(p.txt || '+1 cm', 0, 0, 40, p.col || '#7dff7a', { lw: 9 }); ctx.restore(); ctx.globalAlpha = 1;
+  }
+}
