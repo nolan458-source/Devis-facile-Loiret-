@@ -5,11 +5,14 @@ from kokoro_onnx import Kokoro
 KD, PD = sys.argv[1], sys.argv[2]
 K = Kokoro(f"{KD}/kokoro-v1.0.onnx", f"{KD}/voices-v1.0.bin")
 sys.path.insert(0, "."); from voice2 import PiperFR
+from pitchmap import remap
+MAP = json.load(open("voice_map.json"))  # target pitch statistics per voice (from the "Logique de papa" table)
 TOM = PiperFR(f"{PD}/fr_FR-tom-medium.onnx")
 OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
 SPEED = {"normal": 1.06, "excited": 1.1, "hype": 1.14, "sad": .96, "deadpan": 1.0, "suspense": 1.0}
 FIXES = [("ɡanjˈe", "ɡaɲˈe"), ("ɡanj", "ɡaɲ"), ("nyˈi", "nɥˈi"), ("syˈi", "sɥˈi"), ("pyˈi", "pɥˈi"), ("pyˌi", "pɥˌi"), ("lyˈi", "lɥˈi")]
 FPS = 25; SR = 44100; GAP = 0.08
+PRE = json.load(open("voice_pre.json")) if os.path.exists("voice_pre.json") else {}  # per-voice pitch chain (calibrated)
 def ipa(text):
     p = K.tokenizer.phonemize(text, "fr-fr")
     for a, b in FIXES: p = p.replace(a, b)
@@ -22,13 +25,12 @@ for ln in lines:
     raw, fin = f"{OUT}/{ln['id']}_raw.wav", f"{OUT}/{ln['id']}.wav"
     if who == "A":
         a = np.concatenate([np.concatenate([TOM.synth(c[0], .92), np.zeros(int(TOM.sr * (.12 if c[2] else .05)), np.float32)]) for c in TOM.clauses(text)])
-        save(a / (np.abs(a).max() + 1e-6) * .9, TOM.sr, raw); pre = ""
+        save(remap(a / (np.abs(a).max() + 1e-6) * .9, TOM.sr, **MAP[who]), TOM.sr, raw); pre = ""
     else:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
         a, sr = K.create(ph, voice="ff_siwis", speed=SPEED[mood] * (1.04 if who == "L" else 1.0), is_phonemes=True)
-        save(a / (np.abs(a).max() + 1e-6) * .9, sr, raw)
-        pre = ("rubberband=pitch=1.19:formant=preserved:pitchq=quality," if who == "L"      # Lina: younger
-               else "rubberband=pitch=0.794:formant=preserved:pitchq=quality,equalizer=f=140:t=q:w=0.9:g=2.5,")  # narrator: 4 semitones deeper
+        save(remap(a / (np.abs(a).max() + 1e-6) * .9, sr, **MAP[who]), sr, raw)
+        pre = ""
     af = (f"aresample={SR},{pre}highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,deesser=i=0.3,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=90:makeup=2,"
           "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-16:TP=-1.5")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", raw, "-af", af, "-ar", str(SR), "-ac", "1", fin], check=True)
