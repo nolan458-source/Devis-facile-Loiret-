@@ -1,6 +1,6 @@
-# BOING ! Le gardien de Boulanville: 3D animation (56 s, 1080×1920, TikTok)
+# HUSS ! Le gardien de Boulanville: 3D animation (56 s, 1080×1920, TikTok)
 
-An original story: Timéo, who jumps everywhere ("BOING!"), becomes Boulanville's goalkeeper for the match against Grandeville. The losing town repaints its town hall pink.
+An original story: Timéo, who jumps everywhere ("HUSS!", one every 0.8 s like the reference rhythm), becomes Boulanville's goalkeeper for the match against Grandeville. The losing town repaints its town hall pink.
 
 1. Voices: `pip install kokoro-onnx pyworld`, Kokoro (kokoro-v1.0.onnx + voices-v1.0.bin, github.com/thewh1teagle/kokoro-onnx) for the narrator, Piper `fr_FR-tom-medium` / `fr_FR-upmc-medium` (huggingface.co/rhasspy/piper-voices) for the coach and the neighbour.
    `python3 tts3.py /path/to/kokoro /path/to/piper`: target pitch per voice in `voice_map.json`, pronunciation fixes in `tts3.py` (FIXES).

@@ -1,21 +1,139 @@
 [
- {"id":"intro","who":"N","mood":"excited","text":"À Boulanville, tout le monde est fou de foot. Tout le monde... sauf *Timéo*.","pad":0.1},
- {"id":"saute","who":"N","mood":"excited","text":"Timéo, lui, il *saute*. Partout. Tout le temps.","pad":0.0},
- {"id":"b1","who":"N","mood":"hype","text":"*Boing !*","pad":0.3},
- {"id":"v1","who":"V","mood":"deadpan","text":"Timéo ! Arrête de sauter sur ma voiture !","pad":0.2},
- {"id":"trampo","who":"N","mood":"normal","text":"Il saute sur son trampoline, par-dessus la haie, jusqu'à l'école. Et tout le monde le trouve *bizarre*.","pad":0.3},
- {"id":"defi","who":"N","mood":"suspense","text":"Un jour, un défi arrive de Grandeville, la ville d'à côté. Un match de foot. Et la ville qui perd... doit repeindre *sa mairie en rose*.","pad":0.4},
- {"id":"gardien","who":"N","mood":"sad","text":"Gros problème : le gardien de Boulanville s'est cassé la jambe... en tombant du canapé.","pad":0.4},
- {"id":"coach","who":"N","mood":"normal","text":"Le coach cherche un remplaçant. Personne ne veut. Sauf *un seul*.","pad":0.1},
- {"id":"b2","who":"N","mood":"hype","text":"*Boing !*","pad":0.3},
- {"id":"rires","who":"N","mood":"suspense","text":"Toute l'équipe éclate de rire. Timéo mesure *un mètre vingt*.","pad":0.4},
- {"id":"match","who":"N","mood":"excited","text":"Le jour du match, Grandeville tire. Une fois. Deux fois. *Dix fois*.","pad":0.1},
- {"id":"b3","who":"N","mood":"hype","text":"*Boing ! Boing ! Boing !*","pad":0.2},
- {"id":"arret","who":"N","mood":"hype","text":"Timéo arrête *tout*. Zéro à zéro.","pad":0.4},
- {"id":"penalty","who":"N","mood":"suspense","text":"Dernier tir au but. Le géant de Grandeville prend son élan...","pad":0.3},
- {"id":"saut","who":"N","mood":"hype","text":"Timéo saute *si haut*... qu'il attrape le ballon au-dessus de la barre.","pad":0.4},
- {"id":"gagne","who":"N","mood":"excited","text":"Boulanville *gagne* !","pad":0.1},
- {"id":"c1","who":"C","mood":"excited","text":"Timéo, t'es le meilleur gardien de l'histoire !","pad":0.3},
- {"id":"fin","who":"N","mood":"excited","text":"Depuis, à Grandeville, la mairie est *rose*. Et à Boulanville, sauter, c'est *obligatoire*.","pad":0.1},
- {"id":"b4","who":"N","mood":"hype","text":"*Boing !*","pad":1.0}
+ {
+  "id": "intro",
+  "who": "N",
+  "mood": "excited",
+  "text": "À Boulanville, tout le monde est fou de foot. Tout le monde... sauf *Timéo*.",
+  "pad": 0.1
+ },
+ {
+  "id": "saute",
+  "who": "N",
+  "mood": "excited",
+  "text": "Timéo, lui, il *saute*. Partout. Tout le temps.",
+  "pad": 0.0
+ },
+ {
+  "id": "b1",
+  "who": "N",
+  "mood": "hype",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "v1",
+  "who": "V",
+  "mood": "deadpan",
+  "text": "Timéo ! Arrête de sauter sur ma voiture !",
+  "pad": 0.2
+ },
+ {
+  "id": "trampo",
+  "who": "N",
+  "mood": "normal",
+  "text": "Il saute sur son trampoline, par-dessus la haie, jusqu'à l'école. Et tout le monde le trouve *bizarre*.",
+  "pad": 0.3
+ },
+ {
+  "id": "defi",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Un jour, un défi arrive de Grandeville, la ville d'à côté. Un match de foot. Et la ville qui perd... doit repeindre *sa mairie en rose*.",
+  "pad": 0.4
+ },
+ {
+  "id": "gardien",
+  "who": "N",
+  "mood": "sad",
+  "text": "Gros problème : le gardien de Boulanville s'est cassé la jambe... en tombant du canapé.",
+  "pad": 0.4
+ },
+ {
+  "id": "coach",
+  "who": "N",
+  "mood": "normal",
+  "text": "Le coach cherche un remplaçant. Personne ne veut. Sauf *un seul*.",
+  "pad": 0.1
+ },
+ {
+  "id": "b2",
+  "who": "N",
+  "mood": "hype",
+  "text": "*Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "rires",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Toute l'équipe éclate de rire. Timéo mesure *un mètre vingt*.",
+  "pad": 0.4
+ },
+ {
+  "id": "match",
+  "who": "N",
+  "mood": "excited",
+  "text": "Le jour du match, Grandeville tire. Une fois. Deux fois. *Dix fois*.",
+  "pad": 0.1
+ },
+ {
+  "id": "b3",
+  "who": "N",
+  "mood": "hype",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.2,
+  "huss": true
+ },
+ {
+  "id": "arret",
+  "who": "N",
+  "mood": "hype",
+  "text": "Timéo arrête *tout*. Zéro à zéro.",
+  "pad": 0.4
+ },
+ {
+  "id": "penalty",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Dernier tir au but. Le géant de Grandeville prend son élan...",
+  "pad": 0.3
+ },
+ {
+  "id": "saut",
+  "who": "N",
+  "mood": "hype",
+  "text": "Timéo saute *si haut*... qu'il attrape le ballon au-dessus de la barre.",
+  "pad": 0.4
+ },
+ {
+  "id": "gagne",
+  "who": "N",
+  "mood": "excited",
+  "text": "Boulanville *gagne* !",
+  "pad": 0.1
+ },
+ {
+  "id": "c1",
+  "who": "C",
+  "mood": "excited",
+  "text": "Timéo, t'es le meilleur gardien de l'histoire !",
+  "pad": 0.3
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "mood": "excited",
+  "text": "Depuis, à Grandeville, la mairie est *rose*. Et à Boulanville, sauter, c'est *obligatoire*.",
+  "pad": 0.1
+ },
+ {
+  "id": "b4",
+  "who": "N",
+  "mood": "hype",
+  "text": "*Huss ! Huss !*",
+  "pad": 1.0,
+  "huss": true
+ }
 ]

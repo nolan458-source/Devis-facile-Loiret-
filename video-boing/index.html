@@ -298,9 +298,9 @@ function caption(t) {
   let best = null;
   TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
   if (!best) return;
-  const k = prog(t, best.t, best.t + .12), boing = /^boing/i.test(best.w), s = lerp(boing ? 1.8 : 1.28, 1, back(k));
+  const k = prog(t, best.t, best.t + .12), boing = /^huss/i.test(best.w), s = lerp(boing ? 1.8 : 1.28, 1, back(k));
   ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (boing) ctx.rotate(Math.sin(t * 30) * .05);
-  text2(boing ? 'BOING !' : best.w, 0, 0, boing ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: boing ? 16 : 12 }); ctx.restore();
+  text2(boing ? 'HUSS !' : best.w, 0, 0, boing ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: boing ? 16 : 12 }); ctx.restore();
 }
 
 // ---------- direction ----------
@@ -452,7 +452,7 @@ function defiCard(t) {
   ctx.restore();
 }
 function boingBurst(t) {
-  const times = [S('b1'), S('b2'), ...L.b3.words.map(w => w.t), WT('saut', /^si$/), S('b4')];
+  const times = [...L.b1.words.map(w => w.t), S('b2'), ...L.b3.words.map(w => w.t), WT('saut', /^si$/), ...L.b4.words.map(w => w.t)];
   for (const t0 of times) { const k = (t - t0) / .7; if (k < 0 || k > 1) continue;
     const [x, y] = proj(headTop(timeo, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
     for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }

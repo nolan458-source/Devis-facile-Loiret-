@@ -59,7 +59,7 @@ def crowd(d=3, g=.3):
     tt = np.arange(n) / SR; return y * np.minimum(1, tt * 3) * np.minimum(1, (d - tt) * 1.5) * g * 4
 def thud(): 
     t = np.arange(int(.4 * SR)) / SR; return np.sin(2 * np.pi * 70 * t) * np.exp(-t * 10) * .7
-for t in [S("b1"), S("b2"), *[w["t"] for w in L["b3"]["words"]], WT("saut", r"^si$"), S("b4")]: put(sfx, boing(), t)
+for t in [*[w["t"] for w in L["b1"]["words"]], S("b2"), *[w["t"] for w in L["b3"]["words"]], WT("saut", r"^si$"), *[w["t"] for w in L["b4"]["words"]]]: put(sfx, boing(.3), t)
 for k in range(8): put(sfx, boing(.12), S("saute") + k * .25)
 for k in range(6): put(sfx, boing(.15), S("trampo") + k * .375)
 for t in [S("match") + .4, S("match") + 1.4, S("match") + 2.4, *[w["t"] - .35 for w in L["b3"]["words"]], S("saut") + .25]: put(sfx, thump(), t)

@@ -10,9 +10,10 @@ MAP = json.load(open("voice_map.json"))  # target pitch statistics per voice (fr
 TOM = PiperFR(f"{PD}/fr_FR-tom-medium.onnx"); PIERRE = PiperFR(f"{PD}/fr_FR-upmc-medium.onnx", "pierre")
 PIPER = {"C": TOM, "V": PIERRE}
 OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
-SPEED = {"normal": 1.1, "excited": 1.14, "hype": 1.12, "sad": 1.0, "deadpan": 1.05, "suspense": 1.04}
+SPEED = {"normal": 1.2, "excited": 1.24, "hype": 1.2, "sad": 1.08, "deadpan": 1.12, "suspense": 1.12}
 FIXES = [("(en)kˈəʊtʃ(fr)", "kˈotʃ"), ("(en)fˈʊt(fr)", "fˈut"), ("(en)bˈɔɪŋ(fr)", "bwˈɛ̃ɡ"), ("ɡanjˈe", "ɡaɲˈe"), ("ɡanj", "ɡaɲ"), ("nyˈi", "nɥˈi"), ("syˈi", "sɥˈi"), ("pyˈi", "pɥˈi"), ("pyˌi", "pɥˌi"), ("lyˈi", "lɥˈi")]
-FPS = 25; SR = 44100; GAP = 0.08
+FPS = 25; SR = 44100; GAP = 0.05
+HUSS_IPA, HUSS_EVERY = "hˈʌs !", 0.8   # rhythm measured on the reference: one "HUSS!" every 0.8 s
 PRE = json.load(open("voice_pre.json")) if os.path.exists("voice_pre.json") else {}  # per-voice pitch chain (calibrated)
 def ipa(text):
     p = K.tokenizer.phonemize(text, "fr-fr")
@@ -27,6 +28,12 @@ for ln in lines:
     if who in PIPER:
         P_ = PIPER[who]; a = np.concatenate([np.concatenate([P_.synth(c[0], .88), np.zeros(int(P_.sr * (.12 if c[2] else .05)), np.float32)]) for c in P_.clauses(text)])
         save(remap(a / (np.abs(a).max() + 1e-6) * .9, P_.sr, **MAP[who]), P_.sr, raw); pre = ""
+    elif ln.get("huss"):
+        one, sr = K.create(HUSS_IPA, voice="ff_siwis", speed=1.0, is_phonemes=True); one = one / (np.abs(one).max() + 1e-6)
+        nh = text.lower().count("huss"); a = np.zeros(int(sr * (HUSS_EVERY * (nh - 1) + len(one) / sr)), np.float32)
+        for j in range(nh): i0 = int(sr * HUSS_EVERY * j); a[i0:i0 + len(one)] += one
+        log.append(f"{ln['id']}: {nh} x {HUSS_IPA} every {HUSS_EVERY}s")
+        save(remap(a * .9, sr, **MAP[who]), sr, raw); pre = ""
     else:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
         a, sr = K.create(ph, voice="ff_siwis", speed=SPEED[mood] * (1.06 if who == "T" else 1.0), is_phonemes=True)
@@ -43,11 +50,13 @@ for ln in lines:
         on = on or w_.startswith("*"); emph.append(on)
         if w_.rstrip(".,!?:…").endswith("*"): on = False
     words = [w_.replace("*", "") for w_ in raw_words]; w8 = [len(w_.strip(".,?!:…")) + 2 for w_ in words]; tot = sum(w8); acc = 0; wt = []
+    hi = 0
     for w_, kk, e in zip(words, w8, emph):
         s = w_.strip(".,!:?…")
-        if s: wt.append({"w": s, "t": round(t + dur * acc / tot, 3), "e": e})
+        if s and ln.get("huss"): wt.append({"w": s, "t": round(t + .18 + HUSS_EVERY * hi, 3), "e": True}); hi += 1
+        elif s: wt.append({"w": s, "t": round(t + dur * acc / tot, 3), "e": e})
         acc += kk
     out.append({**ln, "text": text, "start": round(t, 3), "dur": round(dur, 3), "words": wt, "env": env})
-    t += dur + GAP + ln.get("pad", 0) * .45
+    t += dur + GAP + ln.get("pad", 0) * .3
 json.dump({"total": round(t + 0.8, 2), "lines": out}, open("build/timeline.json", "w"), ensure_ascii=False)
 open("build/ipa.txt", "w").write("\n".join(log)); print("total", round(t + 0.8, 2))
