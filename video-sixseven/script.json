@@ -1,0 +1,231 @@
+[
+ {
+  "id": "n1",
+  "who": "N",
+  "mood": "excited",
+  "text": "Dans la classe de Noah, il y a un problème. Un énorme problème. Il s'appelle... le *six-seven*.",
+  "say": "Dans la classe de Noah, il y a un problème. Un énorme problème. Il s'appelle... le sixe-sévène.",
+  "pad": 0.0
+ },
+ {
+  "id": "c1",
+  "who": "C",
+  "text": "*Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.2
+ },
+ {
+  "id": "n2",
+  "who": "N",
+  "mood": "excited",
+  "text": "Dès que quelqu'un prononce le chiffre six ou le chiffre sept, toute la classe se met à crier :",
+  "pad": 0.0
+ },
+ {
+  "id": "c2",
+  "who": "C",
+  "text": "*Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.2
+ },
+ {
+  "id": "d1",
+  "who": "D",
+  "mood": "sad",
+  "text": "Ouvrez vos livres page soixante...",
+  "pad": 0.0
+ },
+ {
+  "id": "c3",
+  "who": "C",
+  "text": "*Seven ! Six seven !*",
+  "chant": [
+   [
+    "Seven!",
+    "en-us"
+   ],
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.2
+ },
+ {
+  "id": "n3a",
+  "who": "N",
+  "mood": "excited",
+  "text": "L'exercice numéro six ?",
+  "pad": 0.0
+ },
+ {
+  "id": "c4",
+  "who": "C",
+  "text": "*Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.05
+ },
+ {
+  "id": "n3b",
+  "who": "N",
+  "mood": "excited",
+  "text": "Il est seize heures et sept minutes ?",
+  "pad": 0.0
+ },
+ {
+  "id": "c5",
+  "who": "C",
+  "text": "*Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.05
+ },
+ {
+  "id": "n3c",
+  "who": "N",
+  "mood": "excited",
+  "text": "Le professeur a soixante-sept ans ?",
+  "pad": 0.0
+ },
+ {
+  "id": "c6",
+  "who": "C",
+  "text": "*Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.3
+ },
+ {
+  "id": "d2",
+  "who": "D",
+  "mood": "hype",
+  "text": "Ça suffit ! Le prochain qui dit *six-seven* copie six cent soixante-sept fois !",
+  "say": "Ça suffit ! Le prochain qui dit sixe-sévène copie six cent soixante-sept fois !",
+  "pad": 0.4
+ },
+ {
+  "id": "n4",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Silence. Une semaine entière. Personne n'ose. Noah se mord la langue.",
+  "pad": 0.2
+ },
+ {
+  "id": "n5",
+  "who": "N",
+  "mood": "normal",
+  "text": "Vendredi, c'est le contrôle de maths. Lundi, les résultats.",
+  "pad": 0.1
+ },
+ {
+  "id": "d3",
+  "who": "D",
+  "mood": "deadpan",
+  "text": "Lucas : six sur vingt. Emma : sept sur vingt.",
+  "pad": 0.2
+ },
+ {
+  "id": "n6",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Toute la classe tremble. Tout le monde retient son rire. Mais *personne* ne craque.",
+  "pad": 0.1
+ },
+ {
+  "id": "d4",
+  "who": "D",
+  "mood": "normal",
+  "text": "Bravo. Enfin une classe sérieuse.",
+  "pad": 0.2
+ },
+ {
+  "id": "n7",
+  "who": "N",
+  "mood": "normal",
+  "text": "C'est là que la directrice entre.",
+  "pad": 0.0
+ },
+ {
+  "id": "r1",
+  "who": "R",
+  "mood": "excited",
+  "text": "Monsieur Durand, félicitations ! Votre classe a la meilleure moyenne du collège.",
+  "pad": 0.1
+ },
+ {
+  "id": "d5",
+  "who": "D",
+  "mood": "normal",
+  "text": "Ah oui ? Combien ?",
+  "pad": 0.1
+ },
+ {
+  "id": "r2",
+  "who": "R",
+  "mood": "suspense",
+  "text": "Six... virgule sept.",
+  "pad": 0.5
+ },
+ {
+  "id": "n8",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Silence total. Trente élèves retiennent leur souffle. Et là... c'est Monsieur Durand qui lève les mains.",
+  "pad": 0.2
+ },
+ {
+  "id": "d6",
+  "who": "D",
+  "text": "*Six... seven !*",
+  "lang": "en-us",
+  "say": "Six... seven!",
+  "pad": 0.1
+ },
+ {
+  "id": "c7",
+  "who": "C",
+  "text": "*Six seven ! Six seven !*",
+  "chant": [
+   [
+    "Six seven!",
+    "en-us"
+   ],
+   [
+    "Six seven!",
+    "en-us"
+   ]
+  ],
+  "pad": 0.4
+ },
+ {
+  "id": "n9",
+  "who": "N",
+  "mood": "normal",
+  "text": "Et c'est comme ça que Monsieur Durand a copié six cent soixante-sept fois : je ne dirai plus *six-seven*.",
+  "say": "Et c'est comme ça que Monsieur Durand a copié six cent soixante-sept fois : je ne dirai plus sixe-sévène.",
+  "pad": 1.0
+ }
+]

@@ -1,0 +1,44 @@
+// ---------- world: a French middle-school classroom ----------
+const MOODS = {
+  day: { bg: SKY_DAY, hemi: ['#fff6ea', '#9a8a7a', 1.3], sun: ['#fff4e0', 2.0], exp: 1.05, win: '#cfeeff' },
+  dusk: { bg: skyTex('#3b3f8f', '#ff9a6b'), hemi: ['#ffcfa0', '#4a3a5a', .8], sun: ['#ff9a50', 2.2], exp: 1.1, win: '#ffb07a' },
+};
+const winMat = new THREE.MeshBasicMaterial({ color: '#cfeeff' });
+function setMood(m) { const M_ = MOODS[m]; scene.background = M_.bg; hemi.color.set(M_.hemi[0]); hemi.groundColor.set(M_.hemi[1]); hemi.intensity = M_.hemi[2]; sun.color.set(M_.sun[0]); sun.intensity = M_.sun[1]; renderer.toneMappingExposure = M_.exp; winMat.color.set(M_.win); }
+scene.background = SKY_DAY;
+function canvasMat(w, h, draw, rough = .8) { return new THREE.MeshStandardMaterial({ map: textTex(w, h, draw), roughness: rough }); }
+function plane(w, h, mat, x, y, z, rx = 0, ry = 0) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); m.receiveShadow = true; scene.add(m); return m; }
+const floorMat = canvasMat(512, 512, x => { for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? '#c99a6a' : '#bf8f5f'; x.fillRect(0, i * 32, 512, 32); x.fillStyle = 'rgba(0,0,0,.12)'; x.fillRect(0, i * 32, 512, 2); } });
+floorMat.map.wrapS = floorMat.map.wrapT = THREE.RepeatWrapping; floorMat.map.repeat.set(2, 2);
+plane(18, 16, floorMat, 0, .01, -1, -Math.PI / 2);
+box(18, 6, .3, '#f3e3c0', 0, 3, -6.2, .02); box(.3, 6, 16, '#efd9b0', -8.6, 3, -1, .02); box(.3, 6, 16, '#efd9b0', 8.6, 3, -1, .02);
+box(18, .5, .32, '#9a6a3a', 0, .25, -6.05, .02);
+box(18, 6, .3, '#efd9b0', 0, 3, 7.2, .02); box(18, .3, 16, '#fbf6ea', 0, 6.1, -1, .02);
+for (const x of [-4, 0, 4]) { const l = box(1.6, .08, .5, '#ffffff', x, 5.92, -1, .02); l.castShadow = false; }
+const corkTex = textTex(512, 256, x => { x.fillStyle = '#c99a5a'; x.fillRect(0, 0, 512, 256); ['#ff7fb0', '#5de0ff', '#ffd23f', '#7dff7a'].forEach((c, i) => { x.fillStyle = c; x.fillRect(30 + i * 120, 40 + (i % 2) * 30, 90, 120); }); }); panel(4, 2, corkTex, -3, 3.2, 7.04, scene, Math.PI);
+for (const z of [-3, 1.5]) { plane(2.6, 2.2, winMat, -8.43, 3.2, z, 0, Math.PI / 2); box(.12, 2.4, .12, '#ffffff', -8.38, 3.2, z, .02); box(.12, .12, 2.8, '#ffffff', -8.38, 3.2, z, .02); }
+// blackboard
+const boardTex = textTex(1024, 512, (x, mode = 'lesson', lines = 0) => {
+  x.fillStyle = '#1f4a3a'; x.fillRect(0, 0, 1024, 512); x.strokeStyle = '#7a5236'; x.lineWidth = 24; x.strokeRect(0, 0, 1024, 512);
+  x.fillStyle = 'rgba(255,255,255,.9)'; x.textAlign = 'left'; x.font = `600 44px Nun`;
+  if (mode === 'lesson') { x.font = '800 52px Nun'; x.fillText('Chapitre 6 : les fractions', 60, 100); x.font = '600 46px Nun'; x.fillText('6 / 7  +  1 / 7  =  ?', 80, 210); x.fillText('Exercice 6 page 67', 80, 300); }
+  else { x.font = '600 30px Nun'; for (let i = 0; i < lines; i++) x.fillText('Je ne dirai plus six-seven.', 50 + (i % 2) * 470, 50 + Math.floor(i / 2) * 38); }
+});
+const board = panel(8, 3.6, boardTex, 0, 3.2, -6.02); box(8.3, 3.9, .1, '#7a5236', 0, 3.2, -6.1, .03);
+// clock
+const clockTex = textTex(256, 256, (x, time = '10:12') => { x.clearRect(0, 0, 256, 256); x.fillStyle = '#fff'; x.beginPath(); x.arc(128, 128, 120, 0, 7); x.fill(); x.lineWidth = 12; x.strokeStyle = '#1e1a22'; x.stroke();
+  x.fillStyle = '#1e1a22'; x.font = FONT(64); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(time, 128, 132); });
+const clock = new THREE.Mesh(new THREE.CircleGeometry(.55, 32), new THREE.MeshStandardMaterial({ map: clockTex, transparent: true })); clock.position.set(5.6, 4.6, -6.03); scene.add(clock);
+// door (right wall)
+const doorPivot = new THREE.Group(); doorPivot.position.set(8.4, 0, -4.6); scene.add(doorPivot);
+const door = box(.12, 3.2, 1.6, '#8a5a3c', 0, 1.6, .8, .03, doorPivot); box(.16, .14, .14, '#f5c400', -.08, 1.5, 1.4, .03, doorPivot);
+box(.14, 3.4, .14, '#ffffff', 8.42, 1.7, -4.6, .02); box(.14, 3.4, .14, '#ffffff', 8.42, 1.7, -2.95, .02);
+// teacher's desk + pile of copies
+box(3, 1.1, 1.3, '#8a5a3c', 2.4, .55, -4.2, .05); box(3.1, .1, 1.4, '#a8744a', 2.4, 1.12, -4.2, .02);
+const pile = new THREE.Group(); scene.add(pile); for (let i = 0; i < 26; i++) { const p = box(.6, .05, .8, i % 2 ? '#ffffff' : '#f4f1e8', 1.6 + (rnd(i) - .5) * .08, 1.2 + i * .05, -4.2 + (rnd(i + 3) - .5) * .08, .01, pile); p.rotation.y = (rnd(i + 7) - .5) * .3; }
+// pupils' desks: 4 rows x 4 columns, pupils face the board (-z)
+const SEATS = []; for (const z of [-1.6, .5, 2.6, 4.7]) for (const x of [-4.8, -1.6, 1.6, 4.8]) SEATS.push([x, z]);
+for (const [x, z] of SEATS) { box(1.6, .9, .8, '#d7b48a', x, .45, z - .55, .03); box(1.7, .08, .9, '#c49a6a', x, .92, z - .55, .02); box(.7, .7, .1, '#3b4a6b', x, .9, z + .45, .03); box(.7, .08, .6, '#3b4a6b', x, .55, z + .2, .02); }
+// flying papers
+const papers = []; for (let i = 0; i < 40; i++) { const m = box(.28, .01, .38, '#ffffff', 0, -5, 0, .005); m.castShadow = false; papers.push(m); }
+

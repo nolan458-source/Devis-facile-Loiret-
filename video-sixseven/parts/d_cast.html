@@ -1,0 +1,8 @@
+// cast
+const noah = character('noah', { skin: '#f1c9a5', shirt: '#3b6fd8', pants: '#2a2a3a', hair: 'spiky', hairCol: '#6b4226', face: { eyes: 'n', mouth: 'smile', freckles: true, blush: true } });
+const durand = character('durand', { skin: '#f0c39c', shirt: '#8a5a3c', pants: '#4a3a2a', shoes: '#222', hair: 'bald', hairCol: '#bbbbbb', face: { eyes: 'n', mouth: 'flat', mustache: true, round: true } });
+box(.5, .5, .06, '#d9c7a0', 0, 1.1, .21, .02, durand.body);   // sweater vest
+const dir = character('dir', { skin: '#f3cfb3', shirt: '#2b3a6b', pants: '#2b3a6b', shoes: '#222', hair: 'short', hairCol: '#c9c9d2', face: { eyes: 'n', mouth: 'smile', round: true } });
+const SK = ['#f1c9a5', '#8d5a3b', '#c98a5a', '#f3cfb3', '#6b3f28'], SH = ['#e8473f', '#4fbf68', '#f5c400', '#9a6be0', '#ff8a3d', '#5de0ff', '#ff7fb0', '#ffffff'];
+const pupils = SEATS.map((s, i) => i === 1 ? noah : character('p' + i, { skin: SK[i % 5], shirt: SH[i % 8], pants: ['#2a2a3a', '#3b4a6b'][i % 2], hair: ['short', 'pony', 'spiky', 'bun', 'cap', 'pigtails'][i % 6], hairCol: ['#2a1c14', '#1e1410', '#7a4a2c', '#e8b23a'][i % 4], capCol: '#e0533d', face: { eyes: 'n', mouth: 'smile', blush: i % 3 === 0 } }));
+

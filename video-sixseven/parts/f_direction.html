@@ -1,0 +1,118 @@
+function caption(t) {
+  let best = null, line = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) { best = w; line = l; } }); });
+  if (!best) return;
+  const chant = line.who === 'C' || line.id === 'd6';
+  const k = prog(t, chant ? line.start : best.t, (chant ? line.start : best.t) + .12), s = lerp(chant ? 1.9 : 1.3, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (chant) ctx.rotate(Math.sin(t * 40) * .06);
+  const txt = chant ? line.text.replace(/\*/g, '').toUpperCase() : best.w.toUpperCase();
+  let size = chant ? 84 : 62; ctx.font = `800 ${size}px Baloo`; const wd = ctx.measureText(txt).width; if (wd > 640) size = Math.floor(size * 640 / wd);
+  text2(txt, 0, 0, size, chant || best.e ? '#ffd23f' : '#ffffff', { lw: chant ? 16 : 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const CHANTS = () => ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'd6', 'c7'].map(S);
+function shots() {
+  const wideA = [[0, 3.3, -4.2], [0, 3.5, -4.6], [0, 1.1, 1.4], [0, 1.2, 1.4], 64], wideB = [[-3.4, 3.1, -3.9], [-3.2, 3.3, -4.3], [.4, 1.1, 1.4], [.4, 1.2, 1.4], 62], wideC = [[3.4, 3.1, -3.9], [3.2, 3.3, -4.3], [-.4, 1.1, 1.4], [-.4, 1.2, 1.4], 62];
+  return [
+    [0, [-1.6, 1.3, -3.9], [-1.6, 1.25, -3.4], [-1.6, 1.0, -1.6], [-1.6, 1.0, -1.6], 44],
+    [S('c1') - .05, ...wideA], [S('n2') - .05, [0, 2.2, -5.2], [0, 2.1, -4.6], [0, 1, 1.5], [0, 1, 1.5], 58],
+    [S('c2') - .05, ...wideB], [S('d1') - .05, [1.2, 1.7, -1.4], [1.3, 1.7, -1.9], [1.5, 1.6, -5], [1.5, 1.6, -5], 44],
+    [S('c3') - .05, ...wideC], [S('n3a') - .05, [-1.6, 2.2, -2.9], [-1.6, 2.1, -2.7], [-1.6, .95, -2.1], [-1.6, .95, -2.1], 46],
+    [S('c4') - .05, ...wideA], [S('n3b') - .05, [4.6, 4.3, -3.6], [4.8, 4.4, -4], [5.6, 4.6, -6], [5.6, 4.6, -6], 42],
+    [S('c5') - .05, ...wideB], [S('n3c') - .05, [1.6, 1.8, -1.6], [1.6, 1.8, -2], [1.5, 1.7, -5], [1.5, 1.75, -5], 40],
+    [S('c6') - .05, ...wideC], [S('d2') - .05, [2.4, 1.6, -1.8], [2.4, 1.7, -2.3], [2.4, 1.5, -5], [2.4, 1.6, -5], 46],
+    [S('n4') - .05, [-6, 1.5, -3.4], [6, 1.5, -3.4], [-4, 1.1, 1], [4, 1.1, 1], 50],
+    [S('n5') - .05, [0, 3, -5.5], [0, 2.8, -5], [0, 1, 2], [0, 1, 2], 56],
+    [S('d3') - .05, [-3.4, 1.7, 2.8], [-3.2, 1.7, 2.4], [-2.6, 1.6, 1], [-2.4, 1.6, 1], 50],
+    [S('n6') - .05, [-1.6, 1.25, -3.6], [1.6, 1.25, -3.6], [-1.6, 1, -1.6], [1.6, 1, -1.6], 46],
+    [S('d4') - .05, [0, 1.8, -2.4], [0, 1.8, -2.8], [0, 1.7, -5.2], [0, 1.7, -5.2], 44],
+    [S('n7') - .05, [5.6, 2.2, -.9], [5.4, 2.2, -1.3], [7.6, 1.6, -4.1], [5, 1.6, -4.2], 54],
+    [S('r1') - .05, [2.6, 1.9, -.6], [2.6, 1.9, -1], [2.6, 1.7, -4.7], [2.6, 1.7, -4.7], 58],
+    [S('d5') - .05, [1.6, 1.8, -2.8], [1.6, 1.8, -3.1], [1.9, 1.75, -4.8], [1.9, 1.75, -4.8], 40],
+    [S('r2') - .05, [3, 1.85, -2.2], [3, 1.85, -2.5], [3.3, 1.8, -4.2], [3.3, 1.8, -4.2], 40],
+    [S('n8') - .05, [1.9, 1.85, -3.2], [1.9, 1.82, -3.9], [1.9, 1.8, -4.8], [1.9, 1.8, -4.8], 36],
+    [S('d6') - .05, [1.9, 1.9, -2.4], [1.9, 2, -2], [1.9, 1.6, -4.8], [1.9, 1.7, -4.8], 52],
+    [S('c7') - .05, ...wideA],
+    [S('n9') - .05, [0, 2.4, -1.5], [0, 3, 3], [0, 2.4, -6], [0, 2.6, -6], 52],
+  ];
+}
+let SHOTS;
+function applyCamera(t) {
+  let i = 0; SHOTS.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SHOTS[i], tEnd = i + 1 < SHOTS.length ? SHOTS[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  let sh = 0; for (const c of CHANTS()) if (t > c && t < c + .5) sh = Math.max(sh, .07 * Math.exp(-(t - c) * 6));
+  camera.position.set(pos[0] + Math.sin(t * 61) * sh, pos[1] + Math.cos(t * 53) * sh, pos[2]); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(-14, 12, 6); sun.target.position.set(0, 0, -1); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const G67 = (t, a = 1) => [[.35, -1.25 + .35 * Math.sin(t * 14) * a], [.35, -1.25 - .35 * Math.sin(t * 14) * a]];   // the 6-7 "scale" gesture
+const inLine = (t, id, pre = .05, post = .35) => t > S(id) - pre && t < E(id) + post;
+function update(t) {
+  const dusk = t > S('n9') - .1; setMood(dusk ? 'dusk' : 'day');
+  const chanting = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'].some(id => inLine(t, id, .08, .3));
+  const finale = t > S('d6') + .3 && t < S('n9') - .1;
+  // clock + board
+  const time = (t > S('n3b') - .1 && t < S('n3c')) ? '16:07' : '10:12'; if (clockTex.k !== time) { clockTex.redraw(time); clockTex.k = time; }
+  const lines = dusk ? Math.min(22, Math.floor((t - S('n9')) * 5)) : -1; const bk = dusk ? 'l' + lines : 'lesson'; if (boardTex.k !== bk) { boardTex.redraw(dusk ? 'lines' : 'lesson', lines); boardTex.k = bk; }
+  pile.visible = dusk; pile.scale.y = dusk ? lerp(.4, 1.6, prog(t, S('n9'), E('n9'))) : 1;
+  // pupils
+  const silent = t > S('n4') - .1 && t < S('d6');
+  pupils.forEach((c, i) => {
+    if (dusk) { c.root.visible = false; return; }
+    const [x, z] = SEATS[i], up = chanting || finale, ph = t * 7 + i;
+    const shake = silent && t > S('n6') - .1 ? Math.sin(t * 50 + i) * .012 : 0;
+    P(c, { x: x + shake, z, ry: Math.PI, s: .72, hop: up ? Math.abs(Math.sin(ph)) * .25 : 0, arms: up ? G67(t + i * .07) : [[.3, -1.1], [.3, -1.1]],
+      headY: t > S('n2') && t < S('c2') - .1 ? Math.sin(t * 3 + i) * .4 : 0, headX: silent && t > S('n5') && t < S('n7') ? .15 : 0,
+      face: up ? { eyes: 'happy', mouth: 'open', blush: true, freckles: c === noah } : silent ? { eyes: t > S('r2') ? 'wide' : 'n', mouth: c === noah ? 'wavy' : 'flat', blush: true, freckles: c === noah }
+        : c === noah && t < S('c1') ? { eyes: 'n', mouth: 'wavy', brow: -1, freckles: true, blush: true } : { eyes: 'n', mouth: 'smile', blush: i % 3 === 0, freckles: c === noah } });
+    if (!up) { c.legs.forEach(l => l.rotation.x = -1.5); }
+  });
+  // M. Durand
+  let dx = 1.5, dz = -5, dry = 0, darms = [0, 0], dface = { eyes: 'n', mouth: 'flat', mustache: true, round: true }, dwalk = 0, dhead = 0;
+  if (inLine(t, 'd1', .1, .1)) { darms = [[.5, -1.3], [.5, -1.3]]; dface.eyes = 'closed'; dhead = .15; }
+  if (t > S('c3') - .1 && t < S('d2') - .1) { dface = { eyes: 'flat', mouth: 'wavy', mustache: true, round: true, brow: -.6 }; }
+  if (inLine(t, 'd2', .1, .3)) { dx = 2.4; dz = -5; const k = prog(t, S('d2'), S('d2') + .25); darms = [[.4, -1.4 + 1.2 * Math.sin(Math.PI * k)], 0]; dface = { eyes: 'n', mouth: 'open', brow: 1, mustache: true, round: true }; }
+  if (t > S('n5') - .1 && t < S('d4') - .1) { const k = prog(t, S('n5'), E('d3')); dx = lerp(-3.2, -3.2, k); dz = lerp(-3, 3.4, k); dry = Math.PI * .1; dwalk = k < 1 ? t * 5 : 0; darms = [[.5, -1.2], 0]; dface = { eyes: 'flat', mouth: 'flat', brow: .8, mustache: true, round: true }; }
+  if (t > S('d4') - .1 && t < S('n8')) { dx = t > S('r1') - .1 ? 1.9 : 0; dz = -5.1; dry = t > S('r1') - .1 ? .6 : 0; dface = { eyes: t > S('r2') ? 'wide' : 'happy', mouth: t > S('r2') ? 'o' : 'smile', mustache: true, round: true }; }
+  if (t > S('n8') - .05 && t < S('d6') - .05) { dx = 1.9; dz = -5.1; dry = .2; dface = { eyes: 'wide', mouth: 'wavy', brow: -1, mustache: true, round: true }; dhead = Math.sin(t * 30) * .02; }
+  if (finale || inLine(t, 'd6', .05, .3)) { dx = 1.9; dz = -5.1; dry = .2; darms = G67(t, 1.3); dface = { eyes: 'happy', mouth: 'open', mustache: true, round: true }; }
+  if (dusk) { dx = .8; dz = -5.4; dry = Math.PI; darms = [0, [2.3 + Math.sin(t * 9) * .15, -.3]]; dface = { eyes: 'n', mouth: 'smile', mustache: true, round: true }; }
+  P(durand, { x: dx, z: dz, ry: dry, s: 1, walk: dwalk, arms: darms, headX: dhead, hop: finale ? Math.abs(Math.sin(t * 7)) * .15 : 0, talk: talk('D', t), face: dface });
+  // la directrice + door
+  const dirIn = t > S('n7') - .1 && !dusk;
+  doorPivot.rotation.y = dirIn ? -1.3 * ease(prog(t, S('n7'), S('n7') + .6)) : 0;
+  if (dirIn) { const k = prog(t, S('n7') + .3, S('n7') + 1.6); P(dir, { x: lerp(8.2, 3.3, ease(k)), z: -4.2, ry: -Math.PI / 2 + (k >= 1 ? .9 : 0), s: .98, walk: k > 0 && k < 1 ? t * 6 : 0, talk: talk('R', t), arms: t > S('r2') - .1 ? [0, [1.4, -.7]] : (finale ? G67(t) : [0, 0]), face: { eyes: finale ? 'happy' : 'n', mouth: finale ? 'open' : 'smile', round: true } }); }
+  else dir.root.visible = false;
+  // flying papers on chants and the finale
+  papers.forEach((m, i) => { const vis = chanting || finale; m.visible = vis; if (!vis) return; const ph = ((t * .9) + rnd(i)) % 1; m.position.set(-6 + rnd(i + 1) * 12, 4 - ph * 3.6, -3 + rnd(i + 2) * 8); m.rotation.set(t * 4 + i, t * 3 + i, 0); });
+}
+function card(t, t0, t1, draw, x = W / 2, y = H * .3) {
+  if (t < t0 || t > t1) return; const k = back(prog(t, t0, t0 + .25)); ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(-.04); draw(); ctx.restore();
+}
+const paperCard = (w, h, body) => () => { ctx.fillStyle = '#fffdf5'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 6; ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 16); ctx.fill(); ctx.stroke(); body(); };
+function overlay(t) {
+  card(t, S('d1') - .05, E('d1') + .2, paperCard(320, 200, () => { text2('PAGE', 0, -45, 48, '#1e1a22'); text2('67', 0, 35, 96, '#e0303a'); }));
+  card(t, S('n3a') - .05, E('n3a') + .1, paperCard(380, 170, () => text2('EXERCICE 6', 0, 4, 64, '#2b2f86')));
+  card(t, S('n3c') - .05, E('n3c') + .1, paperCard(300, 300, () => { text2('JOYEUX', 0, -80, 44, '#e0303a'); text2('ANNIVERSAIRE', 0, -30, 38, '#e0303a'); text2('67', 0, 70, 120, '#f5a623', { lw: 8 }); }));
+  card(t, S('n5') + .2, E('n5') + .1, paperCard(420, 160, () => { text2('VENDREDI', -95, -20, 46, '#1e1a22'); text2('…', 30, -20, 46, '#1e1a22'); text2('LUNDI', 120, 30, 52, '#e0303a'); }));
+  const g = L.d3.words; card(t, g[0].t - .05, E('d3') + .3, paperCard(280, 200, () => { text2('Lucas', 0, -55, 40, '#1e1a22'); text2('6/20', 0, 30, 96, '#e0303a'); }), W * .3, H * .3);
+  card(t, g[Math.floor(g.length / 2)].t - .05, E('d3') + .3, paperCard(280, 200, () => { text2('Emma', 0, -55, 40, '#1e1a22'); text2('7/20', 0, 30, 96, '#e0303a'); }), W * .7, H * .34);
+  card(t, S('r2') - .05, S('n8') + 1.2, paperCard(420, 300, () => { text2('MOYENNE', 0, -95, 48, '#1e1a22'); text2('6,7', 0, 30, 170, '#2b9a4a', { lw: 10 }); }));
+  if (t > S('n9') + 1.5) { const n = Math.min(667, Math.floor((t - S('n9') - 1.5) * 200)); text2('×' + n, W * .76, H * .16, 64, '#ffd23f', { lw: 12 }); }
+  caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SHOTS = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun'); await document.fonts.load('600 30px Nun');
+  boardTex.redraw(); clockTex.redraw(); render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>
