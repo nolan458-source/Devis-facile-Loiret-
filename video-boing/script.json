@@ -17,7 +17,7 @@
   "id": "b1",
   "who": "N",
   "mood": "hype",
-  "text": "*Huss ! Huss !*",
+  "text": "*Huss ! Huss ! Huss !*",
   "pad": 0.3,
   "huss": true
  },
@@ -132,7 +132,7 @@
   "id": "b4",
   "who": "N",
   "mood": "hype",
-  "text": "*Huss ! Huss !*",
+  "text": "*Huss ! Huss ! Huss !*",
   "pad": 1.0,
   "huss": true
  }

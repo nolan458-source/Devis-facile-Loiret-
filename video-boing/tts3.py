@@ -13,7 +13,8 @@ OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
 SPEED = {"normal": 1.2, "excited": 1.24, "hype": 1.2, "sad": 1.08, "deadpan": 1.12, "suspense": 1.12}
 FIXES = [("(en)kˈəʊtʃ(fr)", "kˈotʃ"), ("(en)fˈʊt(fr)", "fˈut"), ("(en)bˈɔɪŋ(fr)", "bwˈɛ̃ɡ"), ("ɡanjˈe", "ɡaɲˈe"), ("ɡanj", "ɡaɲ"), ("nyˈi", "nɥˈi"), ("syˈi", "sɥˈi"), ("pyˈi", "pɥˈi"), ("pyˌi", "pɥˌi"), ("lyˈi", "lɥˈi")]
 FPS = 25; SR = 44100; GAP = 0.05
-HUSS_IPA, HUSS_EVERY = "hˈʌs !", 0.8   # rhythm measured on the reference: one "HUSS!" every 0.8 s
+HUSS_VOICE = "ff_siwis"
+HUSS_IPA, HUSS_EVERY, HUSS_HITS, HUSS_GAP = "hˈʌs", 0.8, 3, 0.16   # measured on the reference: bursts of 3 "huss" 0.16 s apart, a burst every 0.8 s
 PRE = json.load(open("voice_pre.json")) if os.path.exists("voice_pre.json") else {}  # per-voice pitch chain (calibrated)
 def ipa(text):
     p = K.tokenizer.phonemize(text, "fr-fr")
@@ -29,10 +30,13 @@ for ln in lines:
         P_ = PIPER[who]; a = np.concatenate([np.concatenate([P_.synth(c[0], .88), np.zeros(int(P_.sr * (.12 if c[2] else .05)), np.float32)]) for c in P_.clauses(text)])
         save(remap(a / (np.abs(a).max() + 1e-6) * .9, P_.sr, **MAP[who]), P_.sr, raw); pre = ""
     elif ln.get("huss"):
-        one, sr = K.create(HUSS_IPA, voice="ff_siwis", speed=1.0, is_phonemes=True); one = one / (np.abs(one).max() + 1e-6)
-        nh = text.lower().count("huss"); a = np.zeros(int(sr * (HUSS_EVERY * (nh - 1) + len(one) / sr)), np.float32)
-        for j in range(nh): i0 = int(sr * HUSS_EVERY * j); a[i0:i0 + len(one)] += one
-        log.append(f"{ln['id']}: {nh} x {HUSS_IPA} every {HUSS_EVERY}s")
+        one, sr = K.create(HUSS_IPA, voice=HUSS_VOICE, speed=1.5, is_phonemes=True)
+        nz = np.where(np.abs(one) > .02 * np.abs(one).max())[0]; one = one[nz[0]:nz[-1]][: int(sr * .2)]
+        one = one * np.concatenate([np.ones(len(one) - int(sr * .03)), np.linspace(1, 0, int(sr * .03))]); one /= np.abs(one).max() + 1e-6
+        nh = text.lower().count("huss"); a = np.zeros(int(sr * (HUSS_EVERY * (nh - 1) + HUSS_GAP * (HUSS_HITS - 1) + .3)), np.float32)
+        for j in range(nh):
+            for k_ in range(HUSS_HITS): i0 = int(sr * (HUSS_EVERY * j + HUSS_GAP * k_)); a[i0:i0 + len(one)] += one * (1.0, .8, .9)[k_]
+        log.append(f"{ln['id']}: {nh} bursts x {HUSS_HITS} '{HUSS_IPA}' ({HUSS_GAP}s apart), a burst every {HUSS_EVERY}s")
         save(remap(a * .9, sr, **MAP[who]), sr, raw); pre = ""
     else:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
@@ -53,7 +57,9 @@ for ln in lines:
     hi = 0
     for w_, kk, e in zip(words, w8, emph):
         s = w_.strip(".,!:?…")
-        if s and ln.get("huss"): wt.append({"w": s, "t": round(t + .18 + HUSS_EVERY * hi, 3), "e": True}); hi += 1
+        if s and ln.get("huss"):
+            for k_ in range(HUSS_HITS): wt.append({"w": s, "t": round(t + .02 + HUSS_EVERY * hi + HUSS_GAP * k_, 3), "e": True})
+            hi += 1
         elif s: wt.append({"w": s, "t": round(t + dur * acc / tot, 3), "e": e})
         acc += kk
     out.append({**ln, "text": text, "start": round(t, 3), "dur": round(dur, 3), "words": wt, "env": env})

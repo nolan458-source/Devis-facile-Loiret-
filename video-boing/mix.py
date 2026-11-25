@@ -59,10 +59,12 @@ def crowd(d=3, g=.3):
     tt = np.arange(n) / SR; return y * np.minimum(1, tt * 3) * np.minimum(1, (d - tt) * 1.5) * g * 4
 def thud(): 
     t = np.arange(int(.4 * SR)) / SR; return np.sin(2 * np.pi * 70 * t) * np.exp(-t * 10) * .7
-for t in [*[w["t"] for w in L["b1"]["words"]], S("b2"), *[w["t"] for w in L["b3"]["words"]], WT("saut", r"^si$"), *[w["t"] for w in L["b4"]["words"]]]: put(sfx, boing(.3), t)
+G3 = lambda i: [w["t"] for k, w in enumerate(L[i]["words"]) if k % 3 == 0]
+for t in [*G3("b1"), S("b2"), *G3("b3"), WT("saut", r"^si$"), *G3("b4")]: put(sfx, boing(.25), t)
+for t in [w["t"] for i in ("b1", "b2", "b3", "b4") for w in L[i]["words"]]: put(sfx, thump(.18), t)
 for k in range(8): put(sfx, boing(.12), S("saute") + k * .25)
 for k in range(6): put(sfx, boing(.15), S("trampo") + k * .375)
-for t in [S("match") + .4, S("match") + 1.4, S("match") + 2.4, *[w["t"] - .35 for w in L["b3"]["words"]], S("saut") + .25]: put(sfx, thump(), t)
+for t in [S("match") + .4, S("match") + 1.4, S("match") + 2.4, *[t_ - .35 for t_ in G3("b3")], S("saut") + .25]: put(sfx, thump(), t)
 put(sfx, whistle(), S("match") - .3); put(sfx, whistle(1.2), S("gagne") - .15)
 put(sfx, crowd(1.6, .2), S("arret")); put(sfx, crowd(4, .35), S("gagne")); put(sfx, crowd(1.5, .15), S("rires"))
 put(sfx, thud(), WT("gardien", r"^tombant") + .45)
