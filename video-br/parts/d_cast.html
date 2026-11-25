@@ -1,0 +1,10 @@
+// cast
+const kenzo = character('kenzo', { skin: '#c98a5a', shirt: '#1e1a22', pants: '#8a8f99', shoes: '#ffffff', hair: 'beanie', capCol: '#ff8a1e', hairCol: '#2a1c14', face: { eyes: 'n', mouth: 'smile', brow: .4 } });
+const kenzoPad = controller(kenzo, 1); kenzoPad.visible = false;
+const mamie = character('mamie', { skin: '#f3cfb3', shirt: '#ff9ec4', pants: '#7d7d8c', hair: 'bun', hairCol: '#eeeeee', shoes: '#7a4a2c', face: { eyes: 'n', mouth: 'open', round: true, brow: 1 } }); headset(mamie);
+const baker = character('baker', { skin: '#7a4a30', shirt: '#ffffff', pants: '#3b6fd8', hair: 'chef', apron: true, face: { eyes: 'n', mouth: 'grin' } }); headset(baker); controller(baker, 0);
+const SK = ['#f1c9a5', '#8d5a3b', '#c98a5a', '#f3cfb3', '#6b3f28'], SHC = ['#e8473f', '#4fbf68', '#3b6fd8', '#f5c400', '#ff7fb0', '#5de0ff', '#9a6be0', '#ff8a3d'];
+const mk = (n, i, extra = {}) => character(n + i, Object.assign({ skin: SK[i % 5], shirt: SHC[i % 8], pants: ['#2a2a3a', '#3b4a6b', '#5a4030'][i % 3], hair: ['short', 'spiky', 'pony', 'bun', 'cap'][i % 5], hairCol: ['#2a1c14', '#e8b23a', '#7a4a2c', '#1e1410'][i % 4], capCol: '#2f5fb0', face: { eyes: 'n', mouth: 'grin' } }, extra));
+const neighbors = [0, 1, 2].map(i => { const c = mk('nb', i); headset(c); controller(c, 1); return c; });
+const kids = [0, 1, 2].map(i => { const c = mk('kid', i + 3); headset(c); return c; });
+const crowd = []; for (let i = 0; i < 12; i++) { const c = mk('cr', i); headset(c); waterGun(c); crowd.push(c); }

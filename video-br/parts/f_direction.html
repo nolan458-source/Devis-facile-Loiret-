@@ -1,0 +1,144 @@
+function caption(t) {
+  let best = null, line = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) { best = w; line = l; } }); });
+  if (!best) return;
+  const huss = !!line.huss, k = prog(t, best.t, best.t + (huss ? .08 : .12)), s = lerp(huss ? 1.7 : 1.3, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (huss) ctx.rotate(Math.sin(best.t * 37) * .08);
+  text2(huss ? 'HUSS !' : best.w.toUpperCase(), 0, 0, huss ? 96 : 62, huss || best.e ? '#ffd23f' : '#ffffff', { lw: huss ? 16 : 12 }); ctx.restore();
+}
+// ---------- direction ----------
+const HITS = id => L[id].words.map(w => w.t);
+function shots() {
+  return [
+    [0, [0, 7, 22], [0, 6, 18], [0, 2.4, -5], [0, 2.4, -5], 50],
+    [WT('k1', /^sauf/) - .1, [-4, 1.3, 6.2], [-4, 1.3, 5.6], [-4, 1.05, 3.3], [-4, 1.05, 3.3], 42],
+    [S('h1') - .9, 'followK', null, null, null, 54],
+    [S('k2') - .1, [-60, 1.6, 1.6], [-60, 1.55, 1.2], [-60, 1.25, -2.4], [-60, 1.25, -2.4], 50],
+    [WT('k2', /^Mamie/) - .1, [-60, 1.5, .2], [-60, 1.5, -.2], [-60, 1.35, -2.4], [-60, 1.35, -2.4], 42],
+    [WT('k2', /^Le$/) - .1, [-36.4, 1.8, 1.6], [-36.6, 1.8, 1.2], [-38.6, 1.5, -1.6], [-38.6, 1.5, -1.6], 46],
+    [WT('k2', /^Même/) - .1, [-58.6, 1.6, 1], [-58.8, 1.55, .6], [-60, 1.1, -2.3], [-60, 1.1, -2.3], 46],
+    [S('k3') - .1, [57, 2.2, 8], [58, 2, 7], [56.5, 1, 0], [59, 1, -1.5], 50],
+    [S('h2') - .1, [61.5, 1.4, 4.5], [61.2, 1.5, 4], [59.5, 1.2, -1.5], [59.5, 1.6, -1.5], 52],
+    [S('e1') - .15, [90, 2.6, 5.5], [90, 2.6, 4.8], [90, 2.6, -.5], [90, 2.6, -.5], 46],
+    [E('e1') + .5, [57.4, 1.4, 4], [57.4, 1.4, 3.6], [57.4, 1.15, 1], [57.4, 1.15, 1], 42],
+    [S('k4') - .1, [130, 5, 16], [130, 4.5, 14], [130, 3.5, -6], [130, 3.5, -6], 52],
+    [WT('k4', /^Cent/) - .1, [123, 2, 6], [137, 2, 6], [126, 1.3, -1], [134, 1.3, -1], 52],
+    [WT('k4', /^Une$/) - .1, [130, 14, 24], [130, 15, 26], [130, 1, -2], [130, 1, -2], 55],
+    [S('k5') - .1, [130, 3.2, 9], [130, 3, 8], [130, 1, -1], [130, 1, -1], 55],
+    [S('g1') - .1, [127.6, 1.6, 3], [127.4, 1.6, 2.6], [127.2, 1.2, .4], [127.2, 1.2, .4], 42],
+    [S('h3') - .1, [130.4, 1.1, 3.4], [130.2, 1.2, 3], [130, 1.3, -1], [130, 1.6, -1], 58],
+    [S('top') - .1, [130, 4, 10], [130, 5, 12], [130, 1.5, -1], [130, 2, -1], 55],
+    [S('k6') - .1, [0, 3, 13], [0, 3, 12], [0, 1.2, 2.5], [0, 1.2, 2.5], 52],
+    [WT('k6', /^Et$/) - .1, [-60, 1.55, 1.2], [-60, 1.5, .8], [-60, 1.3, -2.4], [-60, 1.3, -2.4], 44],
+  ];
+}
+let SHOTS;
+function applyCamera(t) {
+  let i = 0; SHOTS.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SHOTS[i], tEnd = i + 1 < SHOTS.length ? SHOTS[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  let pos, look;
+  if (s[1] === 'followK') { const r = kenzo.root.position; look = [r.x, 1.2 + r.y * .5, r.z]; pos = [r.x - .8, 1.9, r.z + 6.2]; }
+  else { pos = s[1].map((v, j) => lerp(v, s[2][j], k)); look = s[3].map((v, j) => lerp(v, s[4][j], k)); }
+  let sh = 0; for (const id of ['h1', 'h2', 'h3', 'h4']) for (const h of HITS(id)) if (t > h && t < h + .2) sh = Math.max(sh, .05 * Math.exp(-(t - h) * 14));
+  camera.position.set(pos[0] + Math.sin(t * 71) * sh, pos[1] + Math.cos(t * 63) * sh, pos[2]); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, 18, look[2] + 12); sun.target.position.set(look[0], 0, look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const RUN = t => ({ walk: t * 13, walkAmp: .9 });
+function hitPulse(t, id) { let v = 0; for (const h of HITS(id)) if (t > h && t < h + .18) v = Math.max(v, Math.sin(Math.PI * (t - h) / .18)); return v; }
+function update(t) {
+  for (const c of Object.values(CH)) c.root.visible = false; dog.visible = false; storm.visible = false; balloons.forEach(b => b.visible = false); cardWall.forEach(b => b.visible = false); confetti.forEach(m => m.visible = false);
+  tvLight.intensity = 0; kidsLight.intensity = 0; kenzoPad.visible = false; kenzo.body.rotation.z = 0;
+  // A: the town at night, Kenzo runs and vaults the fence
+  if (t < S('k2') - .1) {
+    setMood('night');
+    let x = -4, z = 3.3, y = 0, ry = 0, run = null, arms = [0, 0], face = { eyes: 'n', mouth: 'smile', brow: .5 };
+    if (t > S('h1') - .9) { const k = prog(t, S('h1') - .9, HITS('h1')[3] - .05); x = lerp(-1, 5.6, k); z = 5.4; ry = Math.PI / 2; run = RUN(t); arms = [0, 0]; face = { eyes: 'n', mouth: 'grin', brow: .8 };
+      const v = prog(t, HITS('h1')[3] - .05, HITS('h1')[5] + .15); if (v > 0) { x = 5.6 + v * .8; z = lerp(5.4, 3.1, v); y = Math.sin(Math.PI * v) * 1.05; run = null; arms = [[2.8, 0], [2.8, 0]]; ry = Math.PI * .9; }
+      y += hitPulse(t, 'h1') * .25; }
+    P(kenzo, Object.assign({ x, y, z, ry, s: .75, arms, face }, run || {}));
+    kidsLight.intensity = 90; kidsLight.position.set(x + .5, 2.6, z + 2.6);
+  }
+  // B: night montage of gamers
+  else if (t < S('k3') - .1) {
+    setMood('indoor'); tvLight.intensity = 30;
+    const tM = WT('k2', /^Mamie/), tB = WT('k2', /^Le$/), tD = WT('k2', /^Même/);
+    const bob = Math.sin(t * 9) * .06;
+    if (t < tM - .1) neighbors.forEach((c, i) => { P(c, { x: -61.3 + i * 1.3, z: -2.4, s: .9, arms: [[.4, -1.2 + bob], [.4, -1.2 - bob]], headX: .1, face: { eyes: 'wide', mouth: i === 1 ? 'open' : 'grin', brow: .8 } }); c.legs.forEach(l => l.rotation.x = -1.5); c.root.position.y = .15; });
+    else if (t < tB - .1) { P(mamie, { x: -60, y: .15, z: -2.4, s: .9, arms: [[2.4 + Math.sin(t * 16) * .3, 0], [2.4 - Math.sin(t * 16) * .3, 0]], talk: .6 + .4 * Math.abs(Math.sin(t * 10)), face: { eyes: 'wide', mouth: 'open', round: true, brow: 1 } }); mamie.legs.forEach(l => l.rotation.x = -1.5); }
+    else if (t < tD - .1) { P(baker, { x: -38.6, z: -1.4, ry: .5, s: 1, arms: [[.5, -1.2 + bob], [.5, -1.2 - bob]], headX: -.1, face: { eyes: 'wide', mouth: 'grin' } }); }
+    else { dog.visible = true; dog.position.set(-60, .95, -2.3); dog.rotation.y = -Math.PI / 2; dog.scale.setScalar(1.3); dogTail.rotation.z = Math.sin(t * 20) * .5; }
+  }
+  // C: training in the park at dusk
+  else if (t < S('e1') - .15) {
+    setMood('dusk');
+    const k = prog(t, S('k3'), S('h2') - .2);
+    let x = lerp(54, 58.6, k), z = lerp(1.6, -1.2, k), y = 0, ry = 2.2, run = RUN(t), spin = 0, arms = [0, 0];
+    const bench = prog(t, S('k3') + .9, S('k3') + 1.6); if (bench > 0 && bench < 1) { y = Math.sin(Math.PI * bench) * 1.3; run = null; arms = [[2.6, 0], [2.6, 0]]; }
+    if (t > S('h2') - .2) { x = 59.5; z = -1.4; ry = Math.PI * .1; run = null; const h = HITS('h2'); const r1 = prog(t, h[0], h[2] + .15); spin = r1 > 0 && r1 < 1 ? r1 * Math.PI * 2 : 0; const j2 = prog(t, h[3], h[5] + .2); y = Math.sin(Math.PI * j2) * 1.6; arms = j2 > 0 ? [[2.8, 0], [2.8, 0]] : [[1, -1], [1, -1]]; }
+    P(kenzo, Object.assign({ x, y, z, ry, s: .75, arms, face: { eyes: 'n', mouth: 'grin', brow: .8 } }, run || {})); kenzo.body.rotation.x = spin; if (spin) kenzo.body.position.y = .5;
+  }
+  // D: laughing kids at the window, Kenzo shrugs
+  else if (t < S('k4') - .1) {
+    if (t < E('e1') + .5) { setMood('night'); kidsLight.intensity = 25;
+      kids.forEach((c, i) => P(c, { x: 89 + i * 1, y: 1.4, z: -.7, s: .75, hop: Math.abs(Math.sin(t * 12 + i)) * .05, talk: i === 1 ? talk('E', t) : 0, arms: i === 1 ? [0, [1.6, -.6]] : [[.6, -1.2], [.6, -1.2]], face: { eyes: 'happy', mouth: 'open' } })); }
+    else { setMood('dusk'); P(kenzo, { x: 57.4, z: 1, s: .75, arms: [[1.2, -.4], [1.2, -.4]], headZ: .12, face: { eyes: 'happy', mouth: 'smile' } }); }
+  }
+  // E-G: the giant real-life BR
+  else if (t < S('k6') - .1) {
+    setMood('day'); storm.visible = true;
+    const r = t < S('k5') ? lerp(22, 15, prog(t, S('k4'), S('k5'))) : t < S('h3') ? lerp(15, 9, prog(t, S('k5'), S('h3'))) : lerp(9, 6, prog(t, S('h3'), S('top')));
+    storm.scale.set(r, 1, r); storm.rotation.y = t * .3;
+    const tired = t > S('k5') + .6, win = t > S('top') - .1;
+    crowd.forEach((c, i) => { const a = i / crowd.length * Math.PI * 2, rr = Math.min(r - 1.5, 4 + (i % 3) * 1.2);
+      if (win) { P(c, { x: 130 + Math.cos(a) * 5.5, z: -1 + Math.sin(a) * 3, ry: Math.atan2(130 - (130 + Math.cos(a) * 5.5), -1 - (-1 + Math.sin(a) * 3)), s: .9, arms: CHEER(t + i), face: { eyes: 'happy', mouth: 'open' } }); return; }
+      if (!tired) P(c, { x: 130 + Math.cos(a + t * .3) * rr, z: -1 + Math.sin(a + t * .3) * rr * .7, ry: -a - t * .3, s: .9, ...RUN(t + i), face: { eyes: 'n', mouth: 'grin', brow: .6 } });
+      else P(c, { x: (i % 2 ? 134.2 : 124.6) + (i % 4 > 1 ? 1.3 : 0) + (i === 0 ? 2.6 : 0), z: .4 - Math.floor(i / 4) * 1.4, ry: (i % 2 ? .3 : -.3), s: .9, bend: i === 0 ? .25 : .7, headX: i === 0 ? 0 : .4, talk: i === 0 ? talk('G', t) : 0,
+        arms: i === 0 ? [[.4, -1.3 + Math.sin(t * 22) * .15], [.4, -1.3 - Math.sin(t * 22) * .15]] : [[.25, -.5], [.25, -.5]], face: { eyes: i === 0 ? 'wide' : 'closed', mouth: 'open', brow: -1 } });
+    });
+    if (t > S('h3') - .2) {
+      const h = HITS('h3'); let y = hitPulse(t, 'h3') * .3, spin = 0, dx = 0;
+      const r1 = prog(t, h[0], h[2] + .15); if (r1 > 0 && r1 < 1) { spin = r1 * Math.PI * 2; dx = Math.sin(Math.PI * r1) * 1.2; }
+      P(kenzo, { x: 130 + dx, y, z: -1, s: .75, arms: win ? CHEER(t) : [[1, -1], [1, -1]], face: { eyes: win ? 'happy' : 'n', mouth: win ? 'open' : 'grin', brow: win ? 0 : .9 } });
+      kenzo.body.rotation.x = spin; if (spin) kenzo.body.position.y = .5;
+      balloons.forEach((b, i) => { const t0 = h[0] - .4 + i * .25, k = prog(t, t0, t0 + .6); if (k <= 0 || k >= 1) return; b.visible = true; const sx = i % 2 ? 136 : 124; b.position.set(lerp(sx, 130 + (i % 2 ? -1.2 : 1.2), k), 1 + Math.sin(Math.PI * k) * 2, lerp(-3, -1.2, k)); });
+      const wb = prog(t, h[3], h[3] + .25); if (wb > 0) cardWall.forEach((b, i) => { b.visible = true; b.position.set(127.9 + (i % 2) * .95, .4 + Math.floor(i / 2) * .8, -.6); b.scale.setScalar(back(clamp(wb * 1.4 - i * .1))); });
+    }
+    if (win) confetti.forEach((m, i) => { m.visible = true; const ph = ((t - S('top')) * .4 + rnd(i)) % 1; m.position.set(124 + rnd(i + 3) * 12, 8 - ph * 8, -6 + rnd(i + 7) * 10); m.rotation.set(t * 3 + i, t * 2 + i, 0); });
+  }
+  // H: the next morning: everyone trains outside; Kenzo gets a controller
+  else {
+    if (t < WT('k6', /^Et$/) - .1) {
+      setMood('day');
+      crowd.slice(0, 8).forEach((c, i) => P(c, { x: -10 + ((t * 2.2 + i * 2.5) % 20), z: 2.4 + (i % 2) * .9, ry: Math.PI / 2, s: .9, ...RUN(t * .6 + i), walkAmp: .7, face: { eyes: 'happy', mouth: 'smile' } }));
+      P(mamie, { x: 2.5, y: .25 + Math.abs(Math.sin(t * 4)) * .25, z: 1, ry: Math.PI / 2, s: .9, bend: 1.45, arms: [[.1, -1.4], [.1, -1.4]], face: { eyes: 'closed', mouth: 'grin', round: true } });
+    } else {
+      setMood('day'); tvLight.intensity = 18;
+      const mash = Math.max(hitPulse(t, 'h4'), 0);
+      P(kenzo, { x: -60, y: .15 + mash * .12, z: -2.4, s: .75, arms: [[.4, -1.25 + mash * .3], [.4, -1.25 - mash * .3]], face: { eyes: t > WT('k6', /^manette/) - .2 && t < S('h4') ? 'wink' : 'happy', mouth: 'grin' } });
+      kenzo.legs.forEach(l => l.rotation.x = -1.5); kenzoPad.visible = true;
+    }
+  }
+}
+function overlay(t) {
+  if (t > S('k2') - .1 && t < WT('k2', /^Mamie/) - .1) { const k = back(prog(t, S('k2'), S('k2') + .25)); ctx.save(); ctx.translate(W * .76, H * .17); ctx.scale(k, k); ctx.fillStyle = '#111'; ctx.strokeStyle = '#5ab4ff'; ctx.lineWidth = 6; ctx.beginPath(); ctx.roundRect(-110, -55, 220, 110, 18); ctx.fill(); ctx.stroke(); text2('03:00', 0, 4, 64, '#5ab4ff'); ctx.restore(); }
+  if (t > S('top') - .1 && t < S('k6') - .1) { const k = back(prog(t, S('top') - .1, S('top') + .25)); ctx.save(); ctx.translate(W / 2, H * .28); ctx.scale(k, k); ctx.rotate(-.05);
+    const g = ctx.createLinearGradient(0, -80, 0, 80); g.addColorStop(0, '#fff3a0'); g.addColorStop(.5, '#ffd23f'); g.addColorStop(1, '#e09a00'); text2('TOP 1', 0, 0, 170, g, { lw: 20 }); ctx.restore();
+    for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28 + t; text2('★', W / 2 + Math.cos(a) * 260, H * .28 + Math.sin(a) * 120, 34, '#fff6c0', { font: 'Nun' }); } }
+  for (const id of ['h1', 'h2', 'h3', 'h4']) { const h0 = HITS(id); for (let b = 0; b < h0.length; b += 3) { const k = (t - h0[b]) / .5; if (k < 0 || k > 1) continue; const [x, y] = proj(headTop(kenzo, .5));
+    ctx.save(); ctx.globalAlpha = 1 - k; ctx.translate(clamp(x, 160, W - 160), clamp(y - 30, 140, H * .45)); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 55 * (1 + k), Math.sin(a) * 55 * (1 + k)); ctx.lineTo(Math.cos(a) * 90 * (1 + k), Math.sin(a) * 90 * (1 + k)); ctx.stroke(); } ctx.restore(); } }
+  caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SHOTS = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>

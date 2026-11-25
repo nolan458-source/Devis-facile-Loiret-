@@ -1,0 +1,110 @@
+[
+ {
+  "id": "k1",
+  "who": "N",
+  "mood": "excited",
+  "text": "Dans ma ville, tout le monde joue à la *BR*. Tout le monde... sauf *moi*.",
+  "say": "Dans ma ville, tout le monde joue à la bé-ère. Tout le monde... sauf moi.",
+  "pad": 0.1,
+  "at": 0.3
+ },
+ {
+  "id": "h1",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "huss": true,
+  "pad": 0.3,
+  "at": 4.2
+ },
+ {
+  "id": "k2",
+  "who": "N",
+  "mood": "excited",
+  "text": "Les voisins jouent toute la nuit. Mamie joue. Le boulanger joue. Même le chien a *une manette*.",
+  "pad": 0.3,
+  "at": 8.0
+ },
+ {
+  "id": "k3",
+  "who": "N",
+  "mood": "normal",
+  "text": "Moi, je n'ai pas de console. Alors je m'entraîne... *dans la vraie vie*.",
+  "pad": 0.1,
+  "at": 16.0
+ },
+ {
+  "id": "h2",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "huss": true,
+  "pad": 0.3,
+  "at": 20.6
+ },
+ {
+  "id": "e1",
+  "who": "E",
+  "mood": "hype",
+  "text": "Il joue à la *BR* sans manette !",
+  "say": "Il joue à la bé-ère sans manette !",
+  "pad": 0.4,
+  "at": 24.6
+ },
+ {
+  "id": "k4",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Un jour, la mairie organise la première *BR géante*... en vrai. Cent joueurs. Une seule zone. *Un seul gagnant*.",
+  "say": "Un jour, la mairie organise la première bé-ère géante... en vrai. Cent joueurs. Une seule zone. Un seul gagnant.",
+  "pad": 0.3,
+  "at": 32.0
+ },
+ {
+  "id": "k5",
+  "who": "N",
+  "mood": "excited",
+  "text": "Au bout de dix mètres, les joueurs sont *épuisés*.",
+  "pad": 0.1,
+  "at": 40.0
+ },
+ {
+  "id": "g1",
+  "who": "G",
+  "mood": "sad",
+  "text": "Mais où est le bouton pour sauter ?",
+  "pad": 0.3,
+  "at": 43.4
+ },
+ {
+  "id": "h3",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "huss": true,
+  "pad": 0.2,
+  "at": 48.0
+ },
+ {
+  "id": "top",
+  "who": "N",
+  "mood": "hype",
+  "text": "Résultat ? *Top un !*",
+  "say": "Résultat ? Top un !",
+  "pad": 0.6,
+  "at": 50.6
+ },
+ {
+  "id": "k6",
+  "who": "N",
+  "mood": "excited",
+  "text": "Depuis, toute la ville s'entraîne dehors. Et moi ? Je me suis *finalement* acheté une manette.",
+  "pad": 0.2,
+  "at": 54.0
+ },
+ {
+  "id": "h4",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "huss": true,
+  "pad": 1.0,
+  "at": 58.3
+ }
+]
