@@ -19,7 +19,8 @@ VOICE = {"N": (.4 * _V["ff_siwis"] + .35 * _V["bm_george"] + .25 * _V["am_onyx"]
          "C": (.35 * _V["ff_siwis"] + .35 * _V["bm_george"] + .3 * _V["am_onyx"], 1.0),   # coach
          "V": (.4 * _V["ff_siwis"] + .6 * _V["am_onyx"], 1.0)}               # neighbour
 HUSS_VOICE = VOICE["N"][0]
-HUSS_IPA, HUSS_EVERY, HUSS_HITS, HUSS_GAP = "hˈʌs", 0.8, 3, 0.16   # measured on the reference: bursts of 3 "huss" 0.16 s apart, a burst every 0.8 s
+HUSS_IPA, HUSS_EVERY, HUSS_HITS, HUSS_GAP = "hˈœs", 0.97, 3, 0.2   # measured on the reference video
+HUSS_OFFS, HUSS_F0, HUSS_S = (0.0, 0.23, 0.415), 350.0, 0.3
 PRE = json.load(open("voice_pre.json")) if os.path.exists("voice_pre.json") else {}  # per-voice pitch chain (calibrated)
 def ipa(text):
     p = K.tokenizer.phonemize(text, "fr-fr")
@@ -34,13 +35,29 @@ for ln in lines:
     if False:
         pass
     elif ln.get("huss"):
-        one, sr = K.create(HUSS_IPA, voice=HUSS_VOICE, speed=1.5, is_phonemes=True)
-        nz = np.where(np.abs(one) > .02 * np.abs(one).max())[0]; one = one[nz[0]:nz[-1]][: int(sr * .2)]
-        one = one * np.concatenate([np.ones(len(one) - int(sr * .03)), np.linspace(1, 0, int(sr * .03))]); one /= np.abs(one).max() + 1e-6
-        nh = text.lower().count("huss"); a = np.zeros(int(sr * (HUSS_EVERY * (nh - 1) + HUSS_GAP * (HUSS_HITS - 1) + .3)), np.float32)
+        # "HUSS" as on the reference: the whole word "heuss" (never cut), squeezed to 0.11 s (1st hit) / 0.08 s (others),
+        # shouted high (~350 Hz), placed at the measured offsets 0 / 0.23 / 0.415 s, bursts every 0.97 s
+        sr = 24000; word, _ = K.create("hˈœs !", voice=HUSS_VOICE, speed=1.3, is_phonemes=True)
+        nz = np.where(np.abs(word) > .03 * np.abs(word).max())[0]; word = word[nz[0]:nz[-1] + 1]
+        import pyworld as _pw
+        f0w, _t = _pw.harvest(word.astype(np.float64), sr, f0_floor=60, f0_ceil=500, frame_period=5); f0m = float(np.median(f0w[f0w > 0])) if (f0w > 0).any() else 150.
+        def squeeze(dur):
+            tmp_in, tmp_out = f"{OUT}/_huss_in.wav", f"{OUT}/_huss_{dur}.wav"; save(word / (np.abs(word).max() + 1e-6) * .9, sr, tmp_in)
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp_in, "-af", f"rubberband=tempo={len(word) / sr / dur:.3f}:pitch={HUSS_F0 / f0m:.3f}:formant=preserved,highpass=f=150",
+                            "-ar", str(sr), "-ac", "1", tmp_out], check=True)
+            with wave.open(tmp_out) as w_: x = np.frombuffer(w_.readframes(w_.getnframes()), np.int16).astype(np.float32) / 32768
+            x = x[: int(sr * dur)]; f = np.ones(len(x)); f[:int(sr * .004)] = np.linspace(0, 1, int(sr * .004)); f[-int(sr * .015):] = np.linspace(1, 0, int(sr * .015))
+            x = x * f / (np.abs(x).max() + 1e-6)
+            nse = np.random.default_rng(int(dur * 1000)).standard_normal(len(x)); nse = np.convolve(np.diff(nse, prepend=0), np.ones(6) / 6, "same")   # band-limited hiss (~2-6 kHz) for the final "s"
+            u = np.linspace(0, 1, len(x)); env = np.clip((u - .3) / .3, 0, 1) * np.clip((1 - u) / .15, 0, 1)
+            x = x + nse / (np.abs(nse).max() + 1e-6) * env * HUSS_S
+            return x / (np.abs(x).max() + 1e-6)
+        long_, short_ = squeeze(.11), squeeze(.08)
+        nh = text.lower().count("huss"); a = np.zeros(int(sr * (HUSS_EVERY * (nh - 1) + HUSS_OFFS[-1] + .3)), np.float32)
         for j in range(nh):
-            for k_ in range(HUSS_HITS): i0 = int(sr * (HUSS_EVERY * j + HUSS_GAP * k_)); a[i0:i0 + len(one)] += one * (1.0, .8, .9)[k_]
-        log.append(f"{ln['id']}: {nh} bursts x {HUSS_HITS} '{HUSS_IPA}' ({HUSS_GAP}s apart), a burst every {HUSS_EVERY}s")
+            for k_, off in enumerate(HUSS_OFFS):
+                one = long_ if k_ == 0 else short_; i0 = int(sr * (HUSS_EVERY * j + off)); a[i0:i0 + len(one)] += one * (1.0, .85, .9)[k_]
+        log.append(f"{ln['id']}: {nh} bursts, hits at {HUSS_OFFS} s, every {HUSS_EVERY} s, word squeezed to 0.11/0.08 s at {HUSS_F0} Hz (from {f0m:.0f} Hz)")
         save(a * .9, sr, raw); pre = (f"rubberband=pitch={VOICE[who][1]}:formant=preserved:pitchq=quality," if VOICE[who][1] != 1.0 else "")
     else:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
@@ -62,7 +79,7 @@ for ln in lines:
     for w_, kk, e in zip(words, w8, emph):
         s = w_.strip(".,!:?…")
         if s and ln.get("huss"):
-            for k_ in range(HUSS_HITS): wt.append({"w": s, "t": round(t + .02 + HUSS_EVERY * hi + HUSS_GAP * k_, 3), "e": True})
+            for off in HUSS_OFFS: wt.append({"w": s, "t": round(t + .01 + HUSS_EVERY * hi + off, 3), "e": True})
             hi += 1
         elif s: wt.append({"w": s, "t": round(t + dur * acc / tot, 3), "e": e})
         acc += kk
