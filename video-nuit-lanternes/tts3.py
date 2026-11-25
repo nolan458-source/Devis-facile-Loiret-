@@ -27,7 +27,8 @@ for ln in lines:
         ph = ipa(text); log.append(f"{ln['id']}: {ph}")
         a, sr = K.create(ph, voice="ff_siwis", speed=SPEED[mood] * (1.04 if who == "L" else 1.0), is_phonemes=True)
         save(a / (np.abs(a).max() + 1e-6) * .9, sr, raw)
-        pre = "rubberband=pitch=1.19:formant=preserved:pitchq=quality," if who == "L" else ""   # Lina: younger
+        pre = ("rubberband=pitch=1.19:formant=preserved:pitchq=quality," if who == "L"      # Lina: younger
+               else "rubberband=pitch=0.794:formant=preserved:pitchq=quality,equalizer=f=140:t=q:w=0.9:g=2.5,")  # narrator: 4 semitones deeper
     af = (f"aresample={SR},{pre}highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,deesser=i=0.3,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=90:makeup=2,"
           "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=-16:TP=-1.5")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", raw, "-af", af, "-ar", str(SR), "-ac", "1", fin], check=True)
