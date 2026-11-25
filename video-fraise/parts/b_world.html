@@ -1,0 +1,82 @@
+// ---------- world ----------
+scene.background = SKY_DAY;
+const MOODS = {
+  day: { bg: SKY_DAY, hemi: ['#fff4ea', '#a58a7a', 1.25], sun: ['#fff4e0', 2.0], exp: 1.05, lamp: 0 },
+  night: { bg: skyTex('#0a0f30', '#1d2660'), hemi: ['#8f9cff', '#20182a', .35], sun: ['#9fb4ff', .25], exp: 1.2, lamp: 40 },
+  hall: { bg: skyTex('#1a1440', '#3a2a70'), hemi: ['#ffe9d0', '#40304a', .9], sun: ['#ffe0b0', 1.6], exp: 1.1, lamp: 0 },
+};
+const lampL = new THREE.PointLight('#ffc36b', 0, 14, 1.6); scene.add(lampL);
+function setMood(m) { const M_ = MOODS[m]; scene.background = M_.bg; hemi.color.set(M_.hemi[0]); hemi.groundColor.set(M_.hemi[1]); hemi.intensity = M_.hemi[2]; sun.color.set(M_.sun[0]); sun.intensity = M_.sun[1]; renderer.toneMappingExposure = M_.exp; lampL.intensity = M_.lamp; }
+scene.fog = new THREE.Fog('#bfe4ff', 40, 140);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(700, 300), M('#7cc26a')); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+function canvasMat(w, h, draw, rough = .8) { return new THREE.MeshStandardMaterial({ map: textTex(w, h, draw), roughness: rough }); }
+function plane(w, h, mat, x, y, z, rx = 0, ry = 0) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); m.receiveShadow = true; scene.add(m); return m; }
+function sign(w, h, draw, x, y, z, ry = 0) { const t = textTex(512, Math.round(512 * h / w), draw); const b = box(w + .15, h + .15, .1, '#ffffff', x, y, z - .06, .03); b.rotation.y = ry; return panel(w, h, t, x, y, z, scene, ry); }
+const txt = (x, s, col, size, y, bg) => { if (bg) { x.fillStyle = bg; x.fillRect(0, 0, x.canvas.width, x.canvas.height); } x.fillStyle = col; x.font = FONT(size); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(s, x.canvas.width / 2, y ?? x.canvas.height / 2 + 4); };
+// ---------- fruit heads ----------
+const seedTex = (base, dot) => textTex(256, 256, x => { x.fillStyle = base; x.fillRect(0, 0, 256, 256); x.fillStyle = dot; for (let i = 0; i < 70; i++) { x.beginPath(); x.ellipse(rnd(i) * 256, rnd(i + 99) * 256, 4, 6, 0, 0, 7); x.fill(); } });
+const FRUIT_MAT = {};
+function fruitHead(kind) {
+  const g = new THREE.Group(); let z = .47, y = .45, s = .6;
+  const mat = c => FRUIT_MAT[c] ||= new THREE.MeshStandardMaterial({ color: c, roughness: .55 });
+  if (kind === 'fraise') {
+    const prof = [[0, 0], [.18, .08], [.36, .26], [.48, .5], [.47, .7], [.36, .84], [0, .88]].map(([r, h]) => new THREE.Vector2(r, h));
+    const m = new THREE.Mesh(new THREE.LatheGeometry(prof, 28), new THREE.MeshStandardMaterial({ map: seedTex('#e0303a', '#ffe08a'), roughness: .45 })); m.castShadow = true; g.add(m);
+    for (let i = 0; i < 6; i++) { const l = box(.32, .05, .14, '#3fa548', 0, .87, 0, .02, g); l.rotation.y = i * Math.PI / 3; l.position.x = Math.cos(i * Math.PI / 3) * .14; l.position.z = -Math.sin(i * Math.PI / 3) * .14; l.rotation.z = .25; }
+    box(.06, .16, .06, '#2f7a35', 0, .96, 0, .02, g); z = .48; y = .58; s = .56;
+  } else if (kind === 'citron') {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.46, 28, 20), mat('#ffe14d')); m.scale.set(1.18, .98, .95); m.position.y = .46; m.castShadow = true; g.add(m);
+    for (const sx of [-1, 1]) { const c = new THREE.Mesh(new THREE.ConeGeometry(.08, .16, 12), mat('#f5cf2a')); c.rotation.z = -sx * Math.PI / 2; c.position.set(sx * .58, .46, 0); g.add(c); }
+    box(.62, .5, .58, '#ffffff', 0, 1.05, -.02, .2, g); box(.66, .12, .6, '#f0f0f0', 0, .86, -.02, .04, g); z = .45; y = .46;
+  } else if (kind === 'kiwi') {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.46, 28, 20), new THREE.MeshStandardMaterial({ map: seedTex('#8a6a3a', '#6b4f2a'), roughness: .95 })); m.scale.set(1, 1.06, .94); m.position.y = .48; m.castShadow = true; g.add(m); z = .44; y = .48;
+  } else if (kind === 'pomme') {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.45, 28, 20), mat('#d9342b')); m.scale.set(1.05, .95, 1); m.position.y = .44; g.add(m); box(.05, .18, .05, '#5a3a1a', 0, .92, 0, .02, g); box(.18, .04, .1, '#3fa548', .1, .9, 0, .02, g); z = .46; y = .44;
+  } else if (kind === 'orange') {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.46, 28, 20), new THREE.MeshStandardMaterial({ map: seedTex('#ff8a1e', '#f07a10'), roughness: .7 })); m.position.y = .46; g.add(m); box(.08, .06, .08, '#3fa548', 0, .93, 0, .02, g); z = .47; y = .46;
+  } else if (kind === 'raisin') {
+    for (let i = 0; i < 9; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(.2, 16, 12), mat('#6b3aa8')); b.position.set((i % 3 - 1) * .26, .25 + Math.floor(i / 3) * .25, -.08 + (i % 2) * .06); g.add(b); }
+    z = .2; y = .5; s = .5;
+  } else if (kind === 'myrtille') {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.44, 28, 20), mat('#3d4fa8')); m.position.y = .44; g.add(m);
+    for (let i = 0; i < 5; i++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.05, .12, 6), mat('#2a3a80')); c.position.set(Math.cos(i * 1.256) * .1, .9, Math.sin(i * 1.256) * .1); g.add(c); } z = .45; y = .44;
+  }
+  return { g, z, y, s };
+}
+// ---------- pastry shop (x ~ 0) ----------
+const floorMat = canvasMat(512, 512, x => { for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { x.fillStyle = (i + j) % 2 ? '#ffd6e0' : '#ffffff'; x.fillRect(i * 64, j * 64, 64, 64); } });
+floorMat.map.wrapS = floorMat.map.wrapT = THREE.RepeatWrapping; floorMat.map.repeat.set(3, 2);
+plane(16, 10, floorMat, 0, .01, 0, -Math.PI / 2);
+box(16, 6, .3, '#bde8d6', 0, 3, -5, .02); box(.3, 6, 10, '#a9dcc8', -8, 3, 0, .02); box(.3, 6, 10, '#a9dcc8', 8, 3, 0, .02);
+const winMat = new THREE.MeshBasicMaterial({ color: '#cfeeff' }); const shopWin = plane(3, 2, winMat, -4.5, 3.2, -4.84); box(3.3, .2, .2, '#ffffff', -4.5, 2.1, -4.8, .03);
+sign(5, 1, x => txt(x, 'PÂTISSERIE CITRON', '#e0a800', 44, null, '#fff8e6'), 2, 4.6, -4.82);
+const CAKE_COLS = ['#ff9ec4', '#fff0b3', '#b8e6ff', '#d8b4ff', '#ffc49e'];
+for (let r = 0; r < 2; r++) { box(5, .14, .6, '#c98a5a', 2, 1.8 + r * 1.1, -4.6, .03); for (let i = 0; i < 6; i++) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.28, .3, .34, 20), M(CAKE_COLS[(i + r) % 5])); c.position.set(-.1 + i * .82, 2.05 + r * 1.1, -4.55); c.castShadow = true; scene.add(c); } }
+box(6, 1.1, 1.2, '#ffffff', 0, .55, -1.4, .08); box(6.1, .1, 1.3, '#f4a6c0', 0, 1.13, -1.4, .03);
+const oven = box(1.8, 2.2, 1.2, '#9aa3b5', -6, 1.1, -3.8, .1); const ovenWin = new THREE.Mesh(new THREE.PlaneGeometry(1.1, .7), new THREE.MeshStandardMaterial({ color: '#ff9a3d', emissive: '#ff7a1a', emissiveIntensity: 1.2 })); ovenWin.position.set(-6, 1.2, -3.19); scene.add(ovenWin);
+const dough = box(.7, .3, .5, '#f5e6c8', -1.5, 1.33, -1.4, .14);
+// the secret cake (3 tiers)
+const cake = new THREE.Group(); scene.add(cake);
+[[.75, .5, '#ff9ec4'], [.55, .45, '#ffd6e6'], [.36, .4, '#ff9ec4']].forEach(([r, h], i) => { const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 32), M(i % 2 ? '#ffd6e6' : '#ff9ec4')); c.position.y = .25 + i * .46; c.castShadow = true; cake.add(c); });
+for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const s_ = new THREE.Mesh(new THREE.SphereGeometry(.08, 12, 10), M('#e0303a')); s_.position.set(Math.cos(a) * .3, 1.42, Math.sin(a) * .3); cake.add(s_); }
+const topS = new THREE.Mesh(new THREE.SphereGeometry(.13, 14, 12), M('#e0303a')); topS.position.y = 1.55; cake.add(topS);
+// ---------- contest hall (x ~ 60) ----------
+plane(30, 24, M('#5a3a5c'), 60, .01, 0, -Math.PI / 2);
+box(30, 9, .3, '#3a2a60', 60, 4.5, -8, .02);
+box(12, .8, 4, '#7a3b5c', 60, .4, -5, .05); box(12.2, .1, 4.2, '#a5527d', 60, .82, -5, .03);
+{ const t_ = textTex(1024, 144, x => { x.fillStyle = '#2b2f86'; x.fillRect(0, 0, 1024, 144); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#ffd23f'; x.font = FONT(64); x.fillText('GRAND CONCOURS', 512, 50); x.fillStyle = '#fff'; x.font = FONT(44); x.fillText('DE PÂTISSERIE', 512, 108); }); box(10.15, 1.55, .1, '#ffffff', 60, 6.6, -7.86, .03); panel(10, 1.4, t_, 60, 6.6, -7.8); }
+box(3.6, .9, 1.1, '#ffffff', 60, 1.27, -4.6, .05);
+box(3.2, .9, 1, '#2b2f86', 66.5, .45, -2, .05); sign(1.4, .45, x => txt(x, 'JUGE', '#ffffff', 90, null, '#c0392b'), 66.5, .65, -1.47);
+const spotA = new THREE.SpotLight('#fff2d0', 0, 30, .35, .5, 1); spotA.position.set(60, 9, 4); spotA.target.position.set(60, 1, -5); scene.add(spotA); scene.add(spotA.target);
+// ---------- Chez Fraise kitchen (x ~ 120) ----------
+plane(14, 10, floorMat, 120, .01, 0, -Math.PI / 2);
+box(14, 6, .3, '#ffd6e6', 120, 3, -5, .02);
+sign(5, 1.1, x => txt(x, 'CHEZ FRAISE', '#e0303a', 58, null, '#fff8e6'), 120, 4.4, -4.82);
+box(4, 1.1, 1.2, '#ffffff', 121.5, .55, -3.6, .08); box(1.6, .3, .9, '#9fd5ef', 121.5, 1.05, -3.6, .1);
+const bubbles = []; for (let i = 0; i < 14; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(.08 + rnd(i) * .1, 12, 10), new THREE.MeshStandardMaterial({ color: '#ffffff', transparent: true, opacity: .8, roughness: .1 })); scene.add(b); bubbles.push(b); }
+const plates = []; for (let i = 0; i < 5; i++) { const p = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .04, 24), M('#f4f4f4')); p.position.set(119.6, 1.14 + i * .05, -3.6); scene.add(p); plates.push(p); }
+// trophy
+const GOLD = new THREE.MeshStandardMaterial({ color: '#f2c230', roughness: .25, metalness: .35, emissive: '#5a3c00', emissiveIntensity: .4 });
+const cup = new THREE.Mesh(new THREE.LatheGeometry([[0, 0], [.32, 0], [.32, .1], [.12, .16], [.08, .5], [.1, .58], [.38, .7], [.44, 1.15], [.4, 1.18], [0, .78]].map(([r, h]) => new THREE.Vector2(r, h)), 24), GOLD); cup.scale.setScalar(.5); scene.add(cup);
+const confetti = []; for (let i = 0; i < 60; i++) { const m = box(.12, .12, .02, ['#ff5d9e', '#ffd23f', '#5de0ff', '#7dff7a', '#ffffff'][i % 5], 0, 0, 0, .01); m.castShadow = false; confetti.push(m); }
+

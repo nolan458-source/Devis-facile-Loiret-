@@ -1,0 +1,127 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .1), s = lerp(1.3, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .62); ctx.scale(s, s);
+  text2(best.w.toUpperCase(), 0, 0, 62, best.e ? '#ffd23f' : '#ffffff', { lw: 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+function shots() {
+  return [
+    [0, [0, 2.2, 5.6], [0, 2.1, 4.8], [0, 1.7, -2], [0, 1.7, -2], 50],
+    [WT('intro', /^Madame/) - .1, [3.1, 1.6, 2.6], [3.2, 1.6, 2.2], [3.8, 1.5, .2], [3.8, 1.5, .2], 40],
+    [S('journee') - .1, [-5.2, 1.9, 1.2], [-5.4, 1.9, .8], [-6, 1.3, -3.5], [-6, 1.3, -3.5], 45],
+    [WT('journee', /^pétrit/) - .1, [-1.2, 1.9, 1.6], [-1.3, 1.85, 1.3], [-1.4, 1.45, -1.6], [-1.4, 1.45, -1.6], 42],
+    [WT('journee', /^cuit/) - .1, [-5, 1.6, 1.4], [-5.3, 1.5, 1], [-6, 1.2, -3.2], [-6, 1.2, -3.2], 42],
+    [WT('journee', /^décore/) - .1, [.4, 2, 1.4], [.5, 1.9, 1.1], [.5, 1.5, -1.6], [.5, 1.5, -1.6], 42],
+    [WT('journee', /^gagne/) - .1, [0, 2.2, 3.4], [0, 2.1, 2.9], [0, 2, -2.3], [0, 2, -2.3], 42],
+    [S('c1') - .1, [2.6, 1.8, 3.4], [2.8, 1.8, 3], [3.6, 1.6, .2], [3.6, 1.6, .2], 44],
+    [S('triste') - .1, [0, 2, .9], [0, 1.95, .6], [0, 1.85, -2.3], [0, 1.85, -2.3], 40],
+    [S('nuit') - .1, [1.6, 2.4, 3.6], [1.2, 2.3, 3], [.6, 1.6, -1.8], [.6, 1.7, -1.8], 50],
+    [WT('nuit', /^Le$/) - .1, [1.4, 2.4, 1.6], [1.4, 2.2, 1.2], [1.4, 1.9, -1.4], [1.4, 1.9, -1.4], 42],
+    [S('decouvre') - .1, [-3, 2.2, 4.5], [-2.6, 2.2, 4], [1, 1.5, -1.5], [1, 1.5, -1.5], 50],
+    [S('c2') - .1, [3.8, 2.2, 1.8], [3.6, 2.2, 1.5], [1.7, 1.8, -.6], [1.7, 1.8, -.6], 46],
+    [S('concours') - .1, [60, 4.5, 14], [60, 4, 12], [60, 3.5, -6], [60, 3.6, -6], 52],
+    [WT('concours', /^Monsieur/) - .15, [65.4, 1.9, 1], [65.5, 1.9, .6], [66.5, 1.8, -2.9], [66.5, 1.8, -2.9], 40],
+    [S('presente') - .1, [60, 2.8, 4], [60, 2.6, 3], [59.6, 2.1, -5], [59.6, 2.1, -5], 46],
+    [S('k1') - .1, [65.3, 1.9, 1.6], [65.4, 1.9, 1.2], [66.5, 1.7, -2.9], [66.5, 1.7, -2.9], 42],
+    [S('pale') - .1, [59, 2.6, -1.2], [59, 2.6, -1.6], [59, 2.45, -5.2], [59, 2.45, -5.2], 40],
+    [S('k2') - .1, [65.5, 1.9, .9], [65.6, 1.9, .5], [66.5, 1.8, -2.9], [66.5, 1.8, -2.9], 40],
+    [S('voix') - .1, [61, 2.6, -2], [61.6, 2.6, -1.4], [62.5, 1.5, 5], [63.6, 1.6, 5.6], 52],
+    [S('f1') - .1, [63.7, 1.7, 3.4], [63.7, 1.7, 3.8], [63.9, 1.55, 5.6], [63.9, 1.55, 5.6], 40],
+    [S('k3') - .1, [64.6, 2, 2.4], [64.4, 2, 2], [66.2, 1.7, -2.9], [66.2, 1.7, -2.9], 46],
+    [S('fin') - .1, [60, 2.6, 2.8], [60, 2.8, 4], [60, 2.2, -5], [60, 2.4, -5], 46],
+    [WT('fin', /^Madame/) - .1, [123.5, 2.2, 1.6], [123.2, 2.2, 1.2], [121.4, 1.6, -3.8], [121.4, 1.6, -3.8], 46],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 6, 16, look[2] + 12); sun.target.position.set(look[0], 0, look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const CROSS = [[.5, -1.25], [.5, -1.25]], PRESENT = [[1.2, -.6], [1.2, -.6]];
+function update(t) {
+  for (const c of Object.values(CH)) c.root.visible = false; cake.visible = false; cup.visible = false; confetti.forEach(m => m.visible = false); bubbles.forEach(b => b.visible = false); dough.visible = false; spotA.intensity = 0;
+  const kneadA = Math.sin(t * 12) * .25;
+  if (t < S('nuit') - .1) {             // the shop, by day
+    setMood('day'); winMat.color.set('#cfeeff');
+    const sad = t > S('triste') - .1, c1 = t > S('c1') - .1;
+    const kneading = t > WT('journee', /^pétrit/) - .1 && t < WT('journee', /^cuit/), decor = t > WT('journee', /^décore/) - .1 && t < WT('journee', /^gagne/);
+    dough.visible = true;
+    P(fraise, { x: kneading ? -1.4 : (decor ? -.1 : 0), z: -2.3, s: .8, arms: kneading ? [[.4, -1.1 + kneadA], [.4, -1.1 - kneadA]] : (decor ? [0, [1.4, -.9 + Math.sin(t * 8) * .1]] : [0, 0]), headX: sad ? .35 : (kneading || decor ? .3 : 0),
+      face: { eyes: sad ? 'n' : 'happy', mouth: sad ? 'sad' : 'smile', brow: sad ? -1 : 0, tear: sad && t > S('triste') + .8, blush: true } });
+    if (decor) { cake.visible = true; cake.position.set(1.1, 1.18, -1.4); cake.scale.setScalar(.5); }
+    P(citron, { x: 3.8, z: .2, ry: -.6, s: 1, talk: talk('C', t), arms: c1 && !sad ? [0, [1.5, -.3]] : CROSS, headZ: c1 ? Math.sin(t * 3) * .05 : 0,
+      face: { eyes: 'n', mouth: c1 && !sad ? 'flat' : 'grin', brow: .8 } });
+  } else if (t < S('concours') - .1) { // the shop, at night
+    setMood('night'); winMat.color.set('#1d2660'); lampL.position.set(.5, 3, -.5);
+    cake.visible = true; cake.position.set(1.4, 1.18, -1.4); cake.scale.setScalar(lerp(.6, .9, ease(prog(t, S('nuit'), WT('nuit', /^Le$/))))); cake.rotation.y = t * .3;
+    const grab = t > S('c2') - .1;
+    P(fraise, { x: grab ? -.8 : -.2, z: grab ? -2.1 : -2.3, s: .8, arms: grab ? [[2.6, 0], [2.6, 0]] : [0, [1.4, -.9 + Math.sin(t * 8) * .1]], headX: grab ? 0 : .25, face: { eyes: grab ? 'wide' : 'happy', mouth: grab ? 'o' : 'grin', blush: true } });
+    if (t > S('decouvre') - .1) {
+      const k = prog(t, S('decouvre'), S('decouvre') + 1.2);
+      P(citron, { x: lerp(-6.5, grab ? 1.9 : -1.6, ease(grab ? prog(t, S('c2') - .1, S('c2') + .5) : k)), z: grab ? -.6 : .6, ry: grab ? .6 : .6, s: 1, talk: talk('C', t), walk: k < 1 && !grab ? t * 7 : 0,
+        arms: grab ? [[.9, -1.3], [.9, -1.3]] : [0, 0], face: { eyes: grab ? 'happy' : 'wide', mouth: grab ? 'grin' : 'o', brow: grab ? .9 : -.4 } });
+      if (grab) { cake.position.set(1.9, .55, -.1); cake.scale.setScalar(.55); cake.rotation.y = 0; }
+    }
+  } else {                               // contest hall, then Chez Fraise
+    const kitchen = t > WT('fin', /^Madame/) - .1;
+    if (!kitchen) {
+      setMood('hall'); spotA.intensity = 120;
+      crowd.forEach((c, i) => { const row = Math.floor(i / 4), col = i % 4; const cheer = t > S('k3') - .1;
+        P(c, { x: 57.6 + col * 1.6 + (row % 2) * .5, z: 2.4 + row * 1.6, ry: Math.PI + (t > S('voix') && t < S('k3') ? (col < 2 ? -.6 : .6) : 0), s: .85, arms: cheer ? CHEER(t + i) : [0, 0], face: { eyes: cheer ? 'happy' : (t > S('c3') ? 'wide' : 'n'), mouth: cheer ? 'open' : (t > S('c3') ? 'o' : 'smile') } }); });
+      const pale = prog(t, S('pale'), S('pale') + 1.2), stage = t < S('fin') - .1;
+      if (stage) {
+        P(citron, { x: 59, y: .82, z: -5.4, s: 1, talk: talk('C', t), arms: t < S('pale') ? PRESENT : [[.3, -.2], [.3, -.2]], headX: t > S('c3') ? .2 : 0,
+          face: { eyes: t > S('pale') ? 'wide' : 'happy', mouth: t > S('pale') ? 'wavy' : 'grin', brow: t > S('pale') ? -1 : .4, tear: t > S('k2') } });
+        citron.head.children[0].children[0].material.color.set('#ffe14d').lerp(new THREE.Color('#fffbe6'), pale);
+        cake.visible = true; cake.position.set(60.3, 1.72, -4.6); cake.scale.setScalar(.6); cake.rotation.y = 0;
+      }
+      const fork = t > S('k1') - .1 && t < S('pale');
+      P(kiwi, { x: 66.5, z: -2.9, ry: -.45, s: 1.05, talk: talk('K', t), arms: t > S('k3') - .1 ? [[1.6, -.3], 0] : (fork ? [0, [1.2 + Math.sin(t * 6) * .3, -.9]] : [0, 0]),
+        face: { eyes: t > S('k3') - .1 ? 'happy' : 'n', mouth: t > S('k3') - .1 ? 'smile' : 'flat', round: true, brow: t > S('k2') - .1 && t < S('k3') ? 1 : .4 } });
+      const up = t > S('voix') + .8;
+      P(fraise, { x: stage ? 63.9 : 60.4, y: stage ? 0 : .82, z: stage ? 5.6 : -5.2, ry: stage ? Math.PI : 0, s: .8, talk: talk('F', t), hop: up && stage ? .1 : 0, arms: !stage ? [[2.6, 0], [2.6, 0]] : (up ? [0, [2.8, 0]] : [0, 0]),
+        face: { eyes: t > S('k3') ? 'happy' : 'n', mouth: t > S('k3') ? 'grin' : 'smile', blush: true } });
+      if (!stage) { cup.visible = true; cup.position.set(60.4, .82 + 2.05, -5.1);
+        confetti.forEach((m, i) => { m.visible = true; const ph = ((t - S('fin')) * .4 + rnd(i)) % 1; m.position.set(55 + rnd(i + 3) * 10, 7 - ph * 7, -7 + rnd(i + 7) * 8); m.rotation.set(t * 3 + i, t * 2 + i, 0); }); }
+    } else {
+      setMood('day');
+      P(citron, { x: 121.5, z: -4.4, s: 1, arms: [[.6, -1.2 + Math.sin(t * 10) * .2], [.6, -1.2 - Math.sin(t * 10) * .2]], headX: .25, face: { eyes: 'n', mouth: 'sad', brow: -1 } });
+      citron.head.children[0].children[0].material.color.set('#ffe14d');
+      bubbles.forEach((b, i) => { b.visible = true; const ph = (t * .4 + rnd(i)) % 1; b.position.set(120.7 + rnd(i + 1) * 1.6, 1.15 + ph * .45, -3.6 + rnd(i + 2) * .6); b.scale.setScalar(1 - ph * .5); });
+      P(fraise, { x: 119.7, z: -2.2, s: .8, ry: .6, arms: [0, WAVE(t)[1]], face: { eyes: 'happy', mouth: 'grin', blush: true } });
+    }
+  }
+}
+function overlay(t) {
+  const B = (c, s, id, dy = 1.15) => bubbleOn(c, s, t > S(id) - .2 && t < E(id) + .35 ? prog(t, S(id) - .1, S(id) + .1) : 0, dy);
+  B(citron, 'Tu es lente, Fraise. Et tes gâteaux sont moches.', 'c1'); B(citron, 'Ce gâteau-là, c’est moi qui l’ai fait. Compris ?', 'c2');
+  B(kiwi, 'Magnifique. Quel est l’ingrédient secret ?', 'k1'); B(citron, 'Euh… du sucre ?', 'c3'); B(kiwi, 'Mauvaise réponse.', 'k2');
+  B(fraise, 'De la fleur d’oranger. Et une pincée de cannelle.', 'f1'); B(kiwi, 'Exact. Alors c’est toi, la vraie pâtissière.', 'k3');
+  // "5 h 00" clock and "3 €" pop during the day montage
+  const cl = prog(t, WT('journee', /^cinq/) - .1, WT('journee', /^cinq/) + .2); if (cl > 0 && t < WT('journee', /^pétrit/)) { ctx.save(); ctx.translate(W * .74, H * .2); ctx.scale(back(cl), back(cl)); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0, 0, 70, 0, 7); ctx.fill(); ctx.stroke(); text2('5:00', 0, 4, 40, '#1e1a22'); ctx.restore(); }
+  const eu = prog(t, WT('journee', /^trois/) - .05, WT('journee', /^trois/) + .25); if (eu > 0 && t < S('c1') - .1) { ctx.save(); ctx.translate(W * .5, H * .3); ctx.scale(back(eu), back(eu)); ctx.fillStyle = '#ffd23f'; ctx.strokeStyle = '#7a5a00'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(0, 0, 80, 0, 7); ctx.fill(); ctx.stroke(); text2('3 €', 0, 6, 64, '#7a5a00'); ctx.restore(); }
+  if (t > WT('nuit', /^Le$/) - .1 && t < S('decouvre') - .1) for (let i = 0; i < 8; i++) { const a = t * 1.5 + i * .785; text2('✦', W / 2 + Math.cos(a) * 200, H * .4 + Math.sin(a) * 140, 30 + (i % 3) * 10, '#fff6c0', { font: 'Nun' }); }
+  if (t > S('pale') + .4 && t < S('voix')) { const [x, y] = proj(headTop(citron, .3)); for (let i = 0; i < 3; i++) { const ph = (t * 1.3 + i / 3) % 1; ctx.globalAlpha = 1 - ph; ctx.fillStyle = '#5de0ff'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(x + 60 + i * 14, y + ph * 60, 8, 12, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.globalAlpha = 1; } }
+  caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SH = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>

@@ -1,0 +1,121 @@
+[
+ {
+  "id": "intro",
+  "who": "N",
+  "mood": "excited",
+  "text": "Voici Fraise. Elle travaille chez Madame Citron, la pâtisserie la plus chic de la ville.",
+  "pad": 0.0
+ },
+ {
+  "id": "journee",
+  "who": "N",
+  "mood": "excited",
+  "text": "Elle arrive à cinq heures. Elle pétrit. Elle cuit. Elle décore. Et elle gagne... *trois euros*.",
+  "pad": 0.2
+ },
+ {
+  "id": "c1",
+  "who": "C",
+  "mood": "deadpan",
+  "text": "Tu es lente, Fraise. Et tes gâteaux sont moches.",
+  "pad": 0.2
+ },
+ {
+  "id": "triste",
+  "who": "N",
+  "mood": "sad",
+  "text": "Fraise ne répond rien. Elle baisse les yeux.",
+  "pad": 0.1
+ },
+ {
+  "id": "nuit",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Mais la nuit, en secret, Fraise imagine un gâteau. *Le plus beau du monde*.",
+  "pad": 0.2
+ },
+ {
+  "id": "decouvre",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Un soir, Madame Citron le découvre.",
+  "pad": 0.0
+ },
+ {
+  "id": "c2",
+  "who": "C",
+  "mood": "normal",
+  "text": "Ce gâteau-là, c'est *moi* qui l'ai fait. Compris ?",
+  "pad": 0.2
+ },
+ {
+  "id": "concours",
+  "who": "N",
+  "mood": "excited",
+  "text": "Le lendemain, c'est le grand concours. Le juge ? *Monsieur Kiwi*. Le plus sévère du pays.",
+  "pad": 0.1
+ },
+ {
+  "id": "presente",
+  "who": "N",
+  "mood": "normal",
+  "text": "Madame Citron présente le gâteau de Fraise. Comme si c'était le sien.",
+  "pad": 0.1
+ },
+ {
+  "id": "k1",
+  "who": "K",
+  "mood": "normal",
+  "text": "Magnifique. Quel est l'ingrédient secret ?",
+  "pad": 0.1
+ },
+ {
+  "id": "pale",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Madame Citron devient toute pâle.",
+  "pad": 0.0
+ },
+ {
+  "id": "c3",
+  "who": "C",
+  "mood": "sad",
+  "text": "Euh... du sucre ?",
+  "pad": 0.2
+ },
+ {
+  "id": "k2",
+  "who": "K",
+  "mood": "deadpan",
+  "text": "Mauvaise réponse.",
+  "pad": 0.3
+ },
+ {
+  "id": "voix",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Alors, du fond de la salle, une petite voix répond.",
+  "pad": 0.0
+ },
+ {
+  "id": "f1",
+  "who": "F",
+  "mood": "normal",
+  "text": "De la fleur d'oranger. Et une pincée de cannelle.",
+  "pad": 0.2
+ },
+ {
+  "id": "k3",
+  "who": "K",
+  "mood": "excited",
+  "text": "Exact. Alors c'est *toi*, la vraie pâtissière.",
+  "pad": 0.3
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "mood": "excited",
+  "text": "Ce jour-là, Fraise a gagné le concours. Et Madame Citron ? Elle fait la vaisselle... *chez Fraise*.",
+  "pad": 1.0
+ }
+]

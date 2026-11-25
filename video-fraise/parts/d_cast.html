@@ -1,0 +1,9 @@
+// cast (fruit heads on block bodies)
+const fraise = character('fraise', { fruit: 'fraise', skin: '#f6c7a8', shirt: '#ffffff', pants: '#e0303a', shoes: '#e0303a', apron: true, face: { eyes: 'n', mouth: 'smile', blush: true } });
+const citron = character('citron', { fruit: 'citron', skin: '#f6d38a', shirt: '#ffffff', pants: '#2a2a3a', shoes: '#222', face: { eyes: 'n', mouth: 'flat', brow: .6 } });
+for (let i = 0; i < 4; i++) box(.06, .06, .02, '#2a2a3a', .12, .95 + i * .14, .22, .01, citron.body);
+const kiwi = character('kiwi', { fruit: 'kiwi', skin: '#c9a77a', shirt: '#1e1a22', pants: '#1e1a22', shoes: '#111', face: { eyes: 'n', mouth: 'flat', round: true, brow: .5 } });
+box(.3, .12, .06, '#c0392b', 0, 1.36, .23, .02, kiwi.body); box(.12, .5, .02, '#ffffff', 0, 1.15, .215, .01, kiwi.body);
+const FR = ['pomme', 'orange', 'raisin', 'myrtille', 'pomme', 'orange', 'myrtille', 'raisin', 'orange', 'pomme', 'raisin', 'myrtille'];
+const crowd = FR.map((f, i) => character('c' + i, { fruit: f, skin: '#f1c9a5', shirt: ['#3b6fd8', '#4fbf68', '#f5c400', '#9a6be0', '#ff8a3d', '#5de0ff'][i % 6], pants: ['#2a2a3a', '#3b4a6b'][i % 2], face: { eyes: 'n', mouth: 'smile', blush: i % 3 === 0 } }));
+
