@@ -1,0 +1,275 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), s = lerp(1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .62); ctx.scale(s, s); text2(best.w, 0, 0, 62, best.e ? '#ffd23f' : '#ffffff', { lw: 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const hop = (t, period, h) => h * Math.abs(Math.sin(Math.PI * t / period));
+const W1 = (id, re, n = 0) => { const ws = L[id].words.filter(w => re.test(w.w)); return ws.length ? ws[Math.min(n, ws.length - 1)].t : S(id); };
+const UP = [[2.6, 0], [2.6, 0]], FWD = [[.15, -1.5], [.15, -1.5]], CROSS = [[.9, -1.25], [.9, -1.25]], SHOULDER = [[0, 0], [2.9, -.2]];
+const PAx = PA.x, PAz = PA.z, PBx = PB.x, PBz = PB.z;
+let T_NOW = 0;
+function shots() {
+  const A = (x, y, z) => [PAx + x, y, PAz + z], B = (x, y, z) => [PBx + x, y, PBz + z], C = (x, y, z) => [PC.x + x, y, PC.z + z];
+  return [
+    [0, [-21, 2.4, .6], [-16.5, 2.2, .4], [0, 1.6, -1.6], [0, 1.6, -1.6], 56],
+    [S('vol') - .1, [-29.0, 1.8, 6.8], [-29.3, 1.75, 6.2], [-31.1, 1.7, 2.8], [-31.1, 1.7, 2.8], 50],
+    [S('confiance') - .1, [-6.4, 1.6, -.2], [-6.6, 1.55, -.6], [-7, 1.35, -3.4], [-7, 1.35, -3.4], 46],
+    [W1('confiance', /^confiance/) - .15, [.5, 1.05, -.6], [.48, 1.02, -.9], [.4, .95, -2.6], [.4, .95, -2.6], 44],
+    [S('pizza') - .1, A(2.6, 2.2, 4.5), A(2.0, 2.0, 3.5), A(-1, 1.0, -1.5), A(-1, 1.0, -1.5), 55],
+    [S('chat') - .1, [-15, 1.0, 1.4], [7, 1.0, 1.4], [-15, .4, -3.2], [7, .4, -3.2], 50],
+    [S('nuit') - .1, [-20, 6, 9], [-14, 5, 8], [2, 1.5, -2], [2, 1.5, -2], 55],
+    [S('blanc') - .1, [6.8, 1.6, .6], [6.9, 1.55, .9], [7, 1.35, 3.4], [7, 1.35, 3.4], 46],
+    [S('souhaits') - .1, [12, 2.6, .5], [9, 2.4, .2], [-6, 1.3, 0], [-6, 1.3, 0], 58],
+    [S('moi') - .1, A(5.2, 1.6, 1.2), A(5.0, 1.5, .8), A(3.6, .8, -1.4), A(3.6, .8, -1.4), 46],
+    [S('peur') - .1, A(3.2, 1.2, -.6), A(3.0, 1.2, -.9), A(-3, 1.3, -3.5), A(-3, 1.3, -3.5), 40],
+    [S('rideau') - .1, A(-1.2, 1.8, 1.2), A(-1.6, 1.7, .4), A(-3, 1.7, -3.3), A(-3, 1.7, -3.3), 50],
+    [S('couverture') - .1, A(-2.6, .7, -1.4), A(-2.8, .65, -1.9), A(-3, .45, -3.3), A(-3, .45, -3.3), 44],
+    [S('tinte') - .1, A(-2.0, 1.2, -1.0), A(-2.1, 1.2, -1.2), A(-3, .9, -3.3), A(-3, .9, -3.3), 46],
+    [S('malpoli') - .1, A(-.4, 1.7, 1.2), A(-.5, 1.65, .8), A(-1.2, 1.45, -2), A(-1.2, 1.45, -2), 46],
+    [S('ecole') - .1, [21.4, 1.6, -1.2], [21.9, 1.5, -.8], [24, 1.2, 4.4], [24, 1.2, 4.4], 52],
+    [S('inconnu') - .1, [-28, 1.6, 7.5], [-28.4, 1.6, 7.0], [-31.5, 1.4, 1.5], [-31.5, 1.4, 1.5], 52],
+    [S('premier') - .1, [-24.6, 1.65, 1.8], [-24.9, 1.6, 1.4], [-27, 1.5, .5], [-27, 1.5, .5], 44],
+    [S('chaussons') - .1, [-22.6, .45, 1.8], [-22.8, .5, 1.6], [-25.5, .35, .3], [-25.3, .9, .3], 50],
+    [S('maisons') - .1, [-11.5, 1.6, 2.2], [-11.8, 1.6, 2.0], [-14, 1.2, -3.6], [-14, 1.2, -3.6], 50],
+    [S('liste') - .1, [-12.6, 1.4, .6], [-12.7, 1.4, .5], [-14, 1.1, -3.6], [-14, 1.1, -3.6], 50],
+    [W1('liste', /^caisse/) - .2, [-20.4, 1.5, .8], [-20.6, 1.5, .6], [-22.2, 1.2, -3.6], [-22.2, 1.2, -3.6], 50],
+    [W1('liste', /^coupe/) - .2, [-22.6, 1.5, .4], [-22.8, 1.5, .5], [-24, 1.4, 4.0], [-24, 1.4, 4.0], 50],
+    [S('chez') - .1, [1.8, 1.5, 1.6], [1.6, 1.5, 1.4], [0, 1.3, -3.8], [0, 1.3, -3.8], 48],
+    [S('cling1') - .1, A(-1.4, 1.6, .5), A(-1.6, 1.6, .2), A(-3, 1.4, -3.3), A(-3, 1.4, -3.3), 48],
+    [S('reveil') - .1, A(5.0, 1.5, .6), A(4.9, 1.45, .3), A(3.6, 1.2, -1.6), A(3.6, 1.2, -1.6), 46],
+    [S('lune') - .1, A(1.6, 1.4, 1.4), A(1.0, 1.3, .6), A(-.6, 1.1, -1.4), A(-.6, 1.1, -1.4), 50],
+    [W1('lune', /^glisser/) - .1, A(.3, 1.3, -.1), A(.25, 1.25, -.3), A(-.3, 1.0, -1.3), A(-.4, 1.05, -1.6), 42],
+    [S('couru') - .1, B(2.6, 1.6, 3.2), B(2.4, 1.6, 2.8), B(0, .9, -.6), B(0, .9, -.6), 52],
+    [S('papa1') - .1, B(2.8, 1.6, 1.6), B(2.6, 1.55, 1.3), B(.3, 1.0, -1.2), B(.3, 1.0, -1.2), 50],
+    [S('yeux') - .1, B(-.4, 2.0, -1.2), B(-.4, 1.9, -1.35), B(-.45, .9, -2.0), B(-.45, .9, -2.0), 42],
+    [S('disparu') - .1, A(2.4, 1.6, 1.4), A(2.0, 1.55, 1.0), A(-2, 1.3, -3.2), A(-2, 1.3, -3.2), 52],
+    [S('aussi') - .1, [0, 1.4, 3], [3, 1.4, 2.5], [8, .8, 0], [11, .8, 0], 52],
+    [S('cling2') - .1, [9.0, .45, 1.1], [9.3, .45, 1.0], [10.6, .05, 0], [10.9, .05, 0], 44],
+    [S('suivi') - .1, [4.2, 1.1, 2.2], [6.4, 1.1, 2.0], [8, .9, 0], [10, .9, 0], 50],
+    [S('chemin') - .1, [22.5, 1.5, -2.6], [22.8, 1.5, -2.4], [23.5, 1.4, 2.5], [23.8, 1.4, 2.5], 58],
+    [W1('chemin', /^moulin/) - .2, [27.5, 1.3, 3.2], [27.7, 1.3, 3.0], [28.5, 2.5, -6], [28.5, 2.6, -6], 58],
+    [W1('chemin', /^grange/) - .2, [28, 1.6, 2.2], [29, 1.6, 2.0], [36, 1.8, 0], [36, 1.8, 0], 52],
+    [S('dedans') - .1, C(4.5, 2.0, 5.5), C(3.5, 2.2, 4.5), C(.5, 1.4, -2), C(.5, 1.4, -2), 55],
+    [S('butin') - .1, C(1.2, 1.2, 2.8), C(1.0, 2.8, 1.8), C(.5, 1.0, -2), C(.5, 2.9, -2), 50],
+    [S('charrette') - .1, C(-.4, 1.9, 3.7), C(-.6, 1.8, 3.4), C(-3.2, .8, .6), C(-3.2, .8, .6), 55],
+    [S('arreter') - .1, [30.6, 1.2, 3.4], [30.9, 1.2, 3.1], [34, 1.6, 0], [34, 1.6, 0], 52],
+    [S('besoin') - .1, [34.6, 1.3, .9], [34.8, 1.35, .7], [10, 1.8, 0], [10, 1.8, 0], 52],
+    [S('tonneau') - .1, [31, 1.6, 4.6], [31.4, 1.8, 5.2], [33.6, 1.6, 2.2], [33.6, 1.8, 2.2], 50],
+    [S('auvoleur') - .1, [32.3, .9, 3.9], [32.2, .85, 4.1], [33.6, 2.1, 2.2], [33.6, 2.1, 2.2], 56],
+    [S('mot') - .1, [20, 14, 14], [10, 12, 12], [5, 0, 0], [5, 0, 0], 55],
+    [S('lumieres') - .1, [-12, 2.4, 0], [-8, 2.4, 0], [6, 2, 0], [6, 2, 0], 60],
+    [S('pyjamas') - .1, [12, 1.7, 1.2], [13, 1.7, 1.0], [2, 1.3, 0], [2, 1.3, 0], 52],
+    [S('cercle') - .1, [31, 16, 15], [32.5, 15, 13.5], [38, 0, 0], [38, 0, 0], 55],
+    [S('regarde') - .1, [32, 1.6, .4], [32.4, 1.6, .3], [35, 1.5, 0], [35, 1.5, 0], 46],
+    [S('quoi') - .1, [33.3, 1.55, .35], [33.4, 1.55, .3], [35, 1.5, 0], [35, 1.5, 0], 42],
+    [S('repondu') - .1, [32.0, 1.9, 4.2], [32.1, 1.9, 4.0], [33.6, 1.9, 2.2], [33.6, 1.9, 2.2], 46],
+    [S('fin') - .1, [20, 9, 16], [10, 7, 14], [12, 1, -1], [12, 1, -1], 55],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, look[1] + 18, look[2] + 12); sun.target.position.set(look[0], look[1], look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => { pose(c, Object.assign({ visible: true }, p)); c.root.rotation.x = p.lie || 0; };
+const hideAll = () => { for (const c of Object.values(CH)) { c.root.visible = false; c.root.rotation.x = 0; } ALL_PROPS.forEach(p => p.visible = false); TRAIL.visible = false; TRAIL_SPOONS.forEach(s => s.visible = false); };
+function at(pr, x, y, z, ry = 0, s = 1) { pr.visible = true; pr.position.set(x, y, z); pr.rotation.set(0, ry, 0); pr.scale.setScalar(s); }
+function inHand(pr, c, x, z, ry, s, dy = 1.15, dz = .5) { at(pr, x + Math.sin(ry) * dz * s, dy * s, z + Math.cos(ry) * dz * s, ry); }
+function onBack(c, x, z, ry, s, y = 0) { at(SACK, x - Math.sin(ry) * .45 * s + Math.cos(ry) * .2 * s, y + 1.55 * s, z - Math.cos(ry) * .45 * s - Math.sin(ry) * .2 * s, ry, s); }
+const isDay = t => t < S('nuit') - .1 || (t > S('ecole') - .1 && t < S('inconnu') - .1);
+
+function lights(t, where) {
+  const day = isDay(t);
+  scene.background = day ? SKY_DAY : SKY_NIGHT; scene.fog.color.set(day ? '#bfe4ff' : '#141d4a'); scene.fog.far = day ? 110 : 80;
+  hemi.color.set(day ? '#dff1ff' : '#8f9cff'); hemi.groundColor.set(day ? '#5d8a3a' : '#1a2340'); hemi.intensity = day ? 1.25 : (where === 'barn' ? .6 : .85);
+  sun.color.set(day ? '#fff4e0' : '#a9bcff'); sun.intensity = day ? 2.2 : (where === 'barn' ? .15 : 1.0);
+  MOON.visible = !day; LAMPS.forEach(l => { l.material.emissive.set(day ? '#000000' : '#ffcf6a'); l.material.emissiveIntensity = day ? 0 : 1.6; });
+  const lit = t > S('lumieres') - .1 ? prog(t, S('lumieres'), E('lumieres') + .6) : 0, sou = t > S('souhaits') && t < E('souhaits') + .4;
+  WINDOWS.forEach(w => w.m.material = day ? WIN_DAY : (w.k < lit || (sou && w.k < .45) ? WIN_LIT : WIN_DARK));
+  BARN_GLOW.visible = !day && t > S('inconnu');
+  CANDLE_LIGHT.intensity = where === 'barn' ? 6 + Math.sin(t * 23) * .6 + Math.sin(t * 37) * .4 : 0; FLAME.scale.setScalar(1 + Math.sin(t * 29) * .12); BARN_FILL.intensity = where === 'barn' ? 2.2 : 0;
+  ROOM_LIGHT.intensity = where === 'roomA' || where === 'roomB' ? (day ? 1.4 : .9) : 0; ROOM_LIGHT.color.set(day ? '#fff1d6' : '#9fb4ff');
+  ROOM_LIGHT.position.set(where === 'roomB' ? PBx : PAx, 3.6, (where === 'roomB' ? PBz : PAz) + 1);
+  MOONBEAM.visible = !day && where === 'roomA';
+}
+function update(t) {
+  T_NOW = t; hideAll();
+  const inL = (id, a = -.1, b = .1) => t > S(id) + a && t < E(id) + b;
+  const cam = SH.reduce((acc, s) => t >= s[0] ? s : acc, SH[0]); const cz = cam[3][2];
+  const where = cz < -50 ? (cam[3][0] > 35 ? 'barn' : cam[3][0] > 10 ? 'roomB' : 'roomA') : 'street';
+  lights(t, where);
+  BLADES.rotation.z = t * .6;
+  const curtainUp = t > S('rideau') + .8 && t < S('disparu') - .1;
+  CURTAIN.visible = curtainUp; swayCurtain((inL('tinte', .3, .5) ? .8 : 0) + (inL('cling1', -.2, .6) ? 1 : 0) + .05, t);
+
+  // --- day street: no doors, neighbours with crossed arms, the cat
+  if (t < S('nuit') - .1) {
+    if (t < S('pizza') - .1) {
+      P(vieux, { x: -7, z: -3.3, ry: 0, s: .85, arms: CROSS, face: { eyes: 'n', mouth: 'flat', brow: 1 } });
+      [[-14, -3.3, 0], [-6, 3.3, Math.PI], [7, -3.3, 0]].forEach(([x, z, ry], i) => P(gens[i], { x, z, ry, s: .8, arms: CROSS, face: { eyes: 'n', mouth: 'flat', brow: .6 } }));
+      P(rideauJ, { x: .4, z: -2.6, ry: 0, s: .6, face: { eyes: 'n', mouth: t > W1('confiance', /^confiance/) - .2 ? 'sad' : 'smile', brow: t > W1('confiance', /^confiance/) - .2 ? -.5 : 0, blush: true } });
+    }
+    if (inL('pizza', -.15, .1)) {
+      P(papa, { x: PAx - 1.3, z: PAz - 2.3, s: .85, face: { eyes: 'happy', mouth: 'grin', mustache: true } });
+      P(maman, { x: PAx + .9, z: PAz - 2.3, s: .8, face: { eyes: 'happy', mouth: 'grin', blush: true } });
+      P(rideauJ, { x: PAx - .2, z: PAz - 2.4, s: .6, arms: UP, face: { eyes: 'happy', mouth: 'open', blush: true } });
+      const k = prog(t, S('pizza'), S('pizza') + 1.4), lx = lerp(PAx - 3, PAx - 1.9, k), lz = lerp(PAz - 3.2, PAz - .4, k), ry = k < 1 ? Math.atan2(PAx - 1.9 - (PAx - 3), PAz - .4 - (PAz - 3.2)) : 2.6;
+      P(livreur, { x: lx, z: lz, ry, s: .82, walk: k < 1 ? t * 9 : 0, arms: FWD, face: { eyes: 'happy', mouth: 'grin' } });
+      if (k < 1) inHand(pizzaBox, livreur, lx, lz, ry, .82, 1.2, .55); else at(pizzaBox, PAx - .3, .99, PAz - 1.2, .3);
+    }
+    if (inL('chat', -.15, .2)) {
+      const k = ease(prog(t, S('chat') - .1, S('nuit') - .1)), x = lerp(-15, 7, k); const nearest = [-14, -7, 0, 7].reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a);
+      const z = -2.4 - Math.max(0, .9 - Math.abs(x - nearest)) * 1.0; at(CAT, x, Math.abs(Math.sin(t * 12)) * .04, z, -Math.PI / 2 + (Math.abs(x - nearest) < .9 ? -.5 : 0) + Math.PI, 1);
+      CAT.rotation.y = 0; [-14, -7, 0, 7].forEach((bx, i) => { if (i === 0) at(BOWL, bx + .5, 0, -3.3); });
+    }
+  }
+  // --- night street
+  if (inL('blanc', -.1, .1)) P(blanc, { x: 7, z: 3.3, ry: Math.PI, s: .82, arms: t > W1('blanc', /^éternue/) - .3 && t < W1('blanc', /^éternue/) + .5 ? [[.4, -1.6], [.4, -1.6]] : [0, 0],
+    headX: t > W1('blanc', /^éternue/) && t < W1('blanc', /^éternue/) + .4 ? .45 : 0, face: { eyes: t > W1('blanc', /^éternue/) - .1 && t < W1('blanc', /^éternue/) + .5 ? 'closed' : 'n', mouth: 'open', mustache: true, round: true } });
+  if (inL('souhaits', -.1, .3)) {
+    P(blanc, { x: 7, z: 3.3, ry: Math.PI, s: .82, arms: [0, 0], face: { eyes: 'wide', mouth: 'smile', mustache: true, round: true } });
+    [[-14, -3.4, 0], [-7, -3.4, 0], [7, -3.4, 0], [14, -3.4, 0], [-14, 3.4, Math.PI], [-7, 3.4, Math.PI], [0, 3.4, Math.PI]].forEach(([x, z, ry], i) =>
+      P(gens[i], { x, z, ry, s: .8, arms: [0, [2.4 + Math.sin(t * 9 + i) * .2, 0]], talk: lt('souhaits', t), face: { eyes: 'happy', mouth: 'smile' } }));
+  }
+  // --- room A: my bed, the fear, the curtain
+  if (inL('moi', -.1, 0) || inL('peur', -.1, 0) || (t > S('reveil') - .1 && t < S('lune') - .1)) {
+    const up = t > S('reveil') + .2 ? prog(t, S('reveil') + .2, S('reveil') + .7) : 0;
+    P(rideauN, { x: PAx + 3.6, y: .66 + up * .1, z: PAz - .45 - up * .5, s: .6, lie: lerp(-Math.PI / 2, -.3, up), face: { eyes: up > .2 ? 'wide' : 'n', mouth: up > .2 ? 'o' : 'flat', blush: true, brow: -.4 } });
+  }
+  if (inL('rideau', -.1, .1)) { at(STOOL, PAx - 3, 0, PAz - 2.8); P(rideauN, { x: PAx - 3, y: .54, z: PAz - 2.8, ry: Math.PI, s: .6, arms: UP, face: { eyes: 'n', mouth: 'smile' } }); }
+  if (inL('couverture', -.1, .1) || inL('tinte', -.1, .1)) P(rideauN, { x: PAx - 2.3, z: PAz - 2.6, ry: -2.6, s: .6, arms: inL('tinte', .2, .1) ? [0, [.2, -1.5]] : [0, 0], face: { eyes: 'n', mouth: 'smile' } });
+  if (inL('malpoli', -.1, .1)) { P(maman, { x: PAx - 1.2, z: PAz - 2.0, ry: .2, s: .82, arms: CROSS, talk: 0, face: { eyes: 'n', mouth: 'flat', brow: 1, blush: true } }); P(rideauN, { x: PAx - 2.4, z: PAz - 2.6, ry: .6, s: .6, face: { eyes: 'n', mouth: 'sad', brow: -.5 } }); }
+  // --- school (day): everybody calls me "Rideau"
+  if (inL('ecole', -.1, .1)) {
+    P(rideauJ, { x: 24, z: 4.2, ry: Math.PI, s: .6, face: { eyes: 'n', mouth: 'sad', brow: -.6, blush: true } });
+    [[22.6, 3.6], [25.4, 3.6], [24.2, 2.6]].forEach(([x, z], i) => P(eleves[i], { x, z, s: .6, ry: Math.atan2(24 - x, 4.2 - z), y: hop(t + i * .1, .25, .05), arms: [0, [1.6, -.6]], face: { eyes: 'happy', mouth: 'open' } }));
+  }
+  // --- the thief
+  const thief = (x, z, ry, extra = {}) => { const p = Object.assign({ x, z, ry, s: .85, arms: SHOULDER, face: { eyes: 'n', mouth: 'grin', mustache: true, mask: true } }, extra); P(voleur, p); if (p.sack !== false) onBack(voleur, x, z, ry, .85); return p; };
+  const walk = (a, b, t0, t1, z0, z1) => { const k = prog(t, t0, t1); return [lerp(a, b, k), lerp(z0, z1, k), k]; };
+  if (inL('inconnu', -.1, 0)) { const [x, z, k] = walk(-34.5, -27.5, S('inconnu'), E('inconnu') + .2, 3.8, 3.8); thief(x, z, Math.PI / 2, { walk: t * 7, walkAmp: .4 }); }
+  if (inL('premier', -.1, 0)) { const [x] = walk(-27.6, -26.6, S('premier'), E('premier'), 0, 0); thief(x, .5, 1.3, { walk: t * 7, walkAmp: .35 }); }
+  if (inL('chaussons', -.1, 0)) { const [x] = walk(-27, -25.2, S('chaussons'), E('chaussons'), 0, 0); thief(x, .3, Math.PI / 2, { walk: t * 7, walkAmp: .45 }); }
+  if (inL('maisons', -.1, 0)) { const [x, z] = walk(-12, -14, S('maisons'), E('maisons') + .1, -.5, -3.9); thief(x, z, Math.atan2(-2, -3.4) + Math.PI * 0, { walk: t * 7, walkAmp: .35 }); }
+  if (t > S('liste') - .1 && t < S('chez') - .1) {
+    const tc = W1('liste', /^caisse/) - .2, tg = W1('liste', /^coupe/) - .2;
+    if (t < tc) { const [x, z] = walk(-14, -13.4, S('liste'), tc, -3.9, -2.4); thief(x, z, .3, { arms: FWD, walk: t * 7, walkAmp: .3 }); inHand(TVP, voleur, x, z, .3, .85, 1.0, .55); }
+    else if (t < tg) { const [x, z] = walk(-22.2, -21.6, tc, tg, -3.9, -2.4); thief(x, z, .3, { arms: FWD, walk: t * 7, walkAmp: .3 }); inHand(REGP, voleur, x, z, .3, .85, 1.1, .55); }
+    else { const [x, z] = walk(-24, -23.6, tg, S('chez'), 4.3, 2.8); thief(x, z, Math.PI - .3, { arms: [0, [2.6, -.3]], walk: t * 7, walkAmp: .3 }); at(CUPP, x - .3, 2.35 * .85, z - .1, 0, 1.2); }
+  }
+  if (inL('chez', -.1, 0)) { const [x, z] = walk(2.2, 0, S('chez'), E('chez') + .1, -1.2, -4.0); thief(x, z, Math.atan2(-2.2, -2.8), { walk: t * 6, walkAmp: .3 }); }
+  if (inL('cling1', -.1, .1)) { const [x, z] = walk(PAx - 3, PAx - 2.4, S('cling1'), E('cling1'), PAz - 3.9, PAz - 2.6); thief(x, z, .4, { walk: t * 5, walkAmp: .3 }); }
+  if (inL('lune', -.1, .1)) {
+    const tg = W1('lune', /^glisser/); thief(PAx - 1.0, PAz - 2.0, .45, { arms: t > tg - .6 ? [[.2, -1.3], [0, 0]] : [[.2, -1.0], [0, 0]], face: { eyes: 'n', mouth: 'grin', mustache: true, mask: true } });
+    const k = prog(t, tg - .2, tg + .7); if (k < 1) at(RINGP, lerp(PAx - .2, PAx - 1.0, k), lerp(1.04, 1.5, Math.sin(k * Math.PI)) - k * .2, lerp(PAz - 1.2, PAz - 2.3, k), t * 2, 1.2);
+  }
+  else if (t < W1('lune', /^glisser/)) at(RINGP, PAx - .2, 1.04, PAz - 1.2, t * .5, 1.2);
+  // --- room B: papa won't wake up
+  if (inL('couru', -.1, .1)) { const [x, z] = walk(PBx + 3, PBx + 1.5, S('couru'), E('couru'), PBz + 2.2, PBz - .2); P(rideauN, { x, z, s: .6, ry: Math.atan2(-1.5, -2.4), walk: t * 12, walkAmp: .8, face: { eyes: 'wide', mouth: 'open' } }); }
+  if (t > S('couru') - .1 && t < S('disparu') - .1) {
+    P(papa, { x: PBx - .45, y: .72, z: PBz - .1, s: .85, lie: -Math.PI / 2, talk: talk('P', t) * .7, face: { eyes: 'closed', mouth: 'smile', mustache: true } });
+    P(maman, { x: PBx + .55, y: .72, z: PBz - .1, s: .8, lie: -Math.PI / 2, face: { eyes: 'closed', mouth: 'smile', blush: true } });
+    if (t > S('papa1') - .1) P(rideauN, { x: PBx + 1.6 + Math.sin(t * 20) * .03, z: PBz - .6, s: .6, ry: -1.9, arms: [[.2, -1.5 + Math.sin(t * 20) * .2], [.2, -1.5 - Math.sin(t * 20) * .2]], talk: lt('papa1', t), face: { eyes: 'wide', mouth: 'open' } });
+  }
+  if (inL('disparu', -.1, .1)) P(rideauN, { x: PAx + 1.2, z: PAz - .4, ry: -2.4, s: .6, face: { eyes: 'wide', mouth: 'o' } });
+  // --- the curtain dragged in the street, I follow the spoons
+  const tx = (t0, t1, a, b) => lerp(a, b, prog(t, t0, t1));
+  if (t > S('aussi') - .1 && t < E('cling2') + .2) {
+    const x = tx(S('aussi'), E('cling2'), 4, 18); thief(x, 0, Math.PI / 2, { walk: t * 6, walkAmp: .35 });
+    TRAIL.visible = true; TRAIL.position.set(x - 3.7, .03, 0); TRAIL.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
+    TRAIL_SPOONS.forEach((s, i) => { s.visible = true; s.position.set(x - 6.6 + Math.sin(t * 9 + i) * .05, .04, -.55 + i * .22); s.rotation.y = Math.sin(t * 11 + i) * .3; });
+  }
+  if (inL('suivi', -.1, .1)) { const x = tx(S('suivi'), E('suivi'), 6, 10); P(rideauN, { x, z: 0, ry: Math.PI / 2, s: .6, walk: t * 9, walkAmp: .6, face: { eyes: 'n', mouth: 'flat', brow: .5 } }); }
+  if (inL('chemin', -.1, .1)) { const x = tx(S('chemin'), E('chemin'), 22.6, 31.5); P(rideauN, { x, z: .3, ry: Math.PI / 2, s: .6, walk: t * 9, walkAmp: .6, face: { eyes: 'n', mouth: 'flat', brow: .5 } }); }
+  // --- inside the barn
+  if (t > S('dedans') - .1 && t < S('arreter') - .1) { P(voleur, { x: PC.x + 1.8, z: PC.z + 1.6, ry: -2.4, s: .85, arms: [[.3, -1.2], [.3, -1.2]], face: { eyes: 'happy', mouth: 'grin', mustache: true, mask: true } }); at(SACK, PC.x + 2.5, .5, PC.z + 1.9, .4, .85); }
+  // --- outside the barn: the barrel, the shout
+  if (t > S('arreter') - .1 && t < S('fin') - .1) {
+    const climb = prog(t, W1('tonneau', /^monté/) - .2, W1('tonneau', /^monté/) + .4), onTop = t > S('repondu') - .1 || climb > 0;
+    const shout = inL('auvoleur', -.1, .4), talkRep = inL('entend', -.1, .2);
+    P(rideauN, { x: onTop ? 33.6 : 32.4, y: onTop ? 1.05 * climb + (t > S('repondu') - .1 ? 1.05 * (1 - climb) : 0) : 0, z: onTop ? 2.2 : .8, s: .6,
+      ry: inL('besoin', -.1, .1) ? -Math.PI / 2 : onTop ? -.4 : Math.PI / 2, arms: shout ? UP : talkRep ? [0, [1.6, -.6]] : [0, 0], talk: lt('auvoleur', t) + lt('entend', t),
+      face: { eyes: shout ? 'closed' : 'n', mouth: shout ? 'open' : inL('arreter', -.1, .1) ? 'sad' : 'flat', brow: inL('arreter', -.1, .1) ? -.6 : .6 } });
+  }
+  // --- the whole town comes out
+  if (t > S('pyjamas') - .1 && t < S('fin') + 2) {
+    const k = prog(t, S('pyjamas'), S('cercle') - .2);
+    gens.forEach((c, i) => {
+      const sx = [-14, -7, 0, 7, 14, -14, -7, 7][i], sz = i < 5 ? -3.4 : 3.4; const a = i / 8 * Math.PI * 2 + 2.2, cx = 38.8 + Math.cos(a) * 7.6, cz = Math.sin(a) * 7.6;
+      const inCircle = t > S('cercle') - .2; const x = inCircle ? cx : lerp(sx, sx + 9, k), z = inCircle ? cz : lerp(sz, sz * .3, k);
+      const ry = inCircle ? Math.atan2(38.5 - cx, 0 - cz) : Math.PI / 2;
+      P(c, { x, z, ry, s: .8, walk: inCircle ? 0 : t * 8 + i, walkAmp: .5, arms: [0, [2.2, -.6]], face: { eyes: 'n', mouth: 'flat', brow: .9, mustache: i === 3 } });
+      const pr = i < 5 ? BROOMS[i] : PINS[i - 5]; const hx = x + Math.cos(ry) * .45 * .8 + Math.sin(ry) * .2, hz = z - Math.sin(ry) * .45 * .8 + Math.cos(ry) * .2;
+      if (i < 5) { at(pr, hx, 1.75 * .8, hz, ry); pr.rotation.z = .3; } else at(pr, hx, 1.9 * .8, hz, ry);
+    });
+    P(papa, { x: t > S('cercle') - .2 ? 34.8 : lerp(0, 9, k), z: t > S('cercle') - .2 ? 4.4 : -1.2, ry: t > S('cercle') - .2 ? -1.0 : Math.PI / 2, s: .85, walk: t > S('cercle') - .2 ? 0 : t * 8, walkAmp: .5, face: { eyes: 'n', mouth: 'flat', mustache: true, brow: .9 } });
+  }
+  if (t > S('regarde') - .1 && t < S('repondu') - .1 || t > S('fin') - .1) P(voleur, { x: 35.0, z: 0, ry: -Math.PI / 2, s: .85, arms: [[.6, 0], [.6, 0]], talk: talk('V', t), face: { eyes: 'wide', mouth: inL('quoi', -.1, .1) ? 'open' : 'o', mustache: true, mask: true } });
+  if (t > S('fin') - .1) P(rideauN, { x: 33.6, y: 1.05, z: 2.2, s: .6, ry: -.4, arms: [0, 0], face: { eyes: 'happy', mouth: 'grin' } });
+}
+const lt = (id, t) => (t >= S(id) && t <= E(id)) ? (L[id].env[Math.floor((t - S(id)) * FPS)] || 0) : 0;
+
+// ---------- overlay ----------
+function tagAt(str, v, k, bg = '#d0302a', fg = '#ffffff', size = 40) {
+  if (k <= 0) return; const [x, y, z] = proj(v); if (z > 1) return; ctx.save(); ctx.translate(clamp(x, 150, W - 150), clamp(y, 90, H - 200)); const s = back(clamp(k)); ctx.scale(s, s);
+  ctx.font = `800 ${size}px Baloo`; const w = ctx.measureText(str).width + 40, h = size * 1.35;
+  ctx.fillStyle = bg; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5; ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, h / 2); ctx.fill(); ctx.stroke(); text2(str, 0, 2, size, fg); ctx.restore();
+}
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const win = (t, a, b) => t > a && t < b ? prog(t, a, a + .25) : 0;
+function clings(t) {
+  const times = [W1('tinte', /^cling/), ...L['cling1'].words.map(w => w.t), ...L['cling2'].words.map(w => w.t)];
+  times.forEach((t0, i) => { const k = (t - t0) / .8; if (k < 0 || k > 1) return; ctx.save(); ctx.globalAlpha = 1 - k * k; ctx.translate(W * (.3 + (i % 3) * .2), H * (.32 - (i % 2) * .06) - k * 60); ctx.scale(back(clamp(k * 4)), back(clamp(k * 4))); ctx.rotate(-.08 + (i % 3) * .08); text2('CLING !', 0, 0, 74, '#ffd23f', { lw: 12 }); ctx.restore(); });
+}
+function eyes(t) {
+  if (!(t > S('peur') && t < E('peur') + .2)) return; const [x, y, z] = proj(V3(PAx - 3, 1.45, PAz - 3.6)); if (z > 1) return;
+  const blink = Math.sin(t * 3) > .93 ? .15 : 1; ctx.fillStyle = '#ffe34a'; ctx.shadowColor = '#ffe34a'; ctx.shadowBlur = 18;
+  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(x + s * 16, y, 8, 8 * blink, 0, 0, 7); ctx.fill(); } ctx.shadowBlur = 0;
+}
+function catCount(t) {
+  if (!(t > S('chat') && t < E('chat') + .3)) return; const k = ease(prog(t, S('chat') - .1, S('nuit') - .1)), x = lerp(-15, 7, k);
+  [-14, -7, 0, 7].forEach((bx, i) => { if (x < bx) return; const kk = (x - bx) / 3; if (kk > 1) return; const [px, py, pz] = proj(V3(bx, 1.4, -3.4)); if (pz > 1) return; ctx.globalAlpha = 1 - kk; text2(String(i + 1), px, py - kk * 40, 60, '#ffd23f', { lw: 10 }); ctx.globalAlpha = 1; });
+  if (t > W1('chat', /^maisons/) - .2) tagAt('6 MAISONS', V3(0, 2.6, -3.4), prog(t, W1('chat', /^maisons/) - .2, W1('chat', /^maisons/) + .1), '#ffd23f', '#1e1a22', 40);
+}
+function shout(t) {
+  const t0 = S('auvoleur'); if (t > t0 - .05 && t < S('mot') + 1.5) {
+    if (t < S('mot') - .1) { const k = prog(t, t0, t0 + .25); ctx.save(); ctx.translate(W / 2, H * .3); ctx.scale(back(k) * (1 + Math.sin(t * 30) * .02), back(k) * (1 + Math.sin(t * 30) * .02)); ctx.rotate(-.05); text2('AU VOLEUR !', 0, 0, 104, '#ff4a3d', { lw: 18 }); ctx.restore(); }
+    const [x, y, z] = proj(V3(33.6, 1.9, 2.2)); if (z < 1) for (let r = 0; r < 4; r++) { const k = ((t - t0) * .9 + r / 4) % 1; ctx.strokeStyle = `rgba(255,224,90,${(1 - k) * .9})`; ctx.lineWidth = 8 * (1 - k) + 2; ctx.beginPath(); ctx.arc(x, y, 30 + k * (t > S('mot') - .1 ? 700 : 300), 0, 7); ctx.stroke(); }
+  }
+}
+function overlay(t) {
+  const bub = (c, id, str, dy = 1.0) => bubbleOn(c, str || L[id].text.replace(/\*/g, ''), t > S(id) - .2 && t < E(id) + .4 ? prog(t, S(id) - .1, S(id) + .1) : 0, dy);
+  tagAt('AUCUNE PORTE', V3(-7, 2.5, -3.9), win(t, W1('porte', /^porte/) - .1, E('porte') + .3));
+  if (t > W1('blanc', /^éternue/) - .1 && t < E('blanc') + .2) bubbleOn(blanc, 'ATCHOUM !', prog(t, W1('blanc', /^éternue/) - .1, W1('blanc', /^éternue/) + .1), 1.0);
+  if (inLine(t, 'souhaits', -.1, .4)) [0, 2, 4, 6].forEach((i, j) => { if (gens[i].root.visible) bubbleOn(gens[i], 'À vos souhaits !', prog(t, S('souhaits') + j * .17, S('souhaits') + j * .17 + .15), .9); });
+  tagAt('MOI', V3(PAx + 3.6, 1.6, PAz - 1.5), win(t, S('moi') + .1, E('moi') + .1), '#ffffff', '#1e1a22', 46);
+  tagAt('VOLEUR', V3(voleur.root.position.x, 2.6, voleur.root.position.z), win(t, W1('premier', /^voleur/) - .1, E('premier') + .2), '#d0302a', '#ffffff', 48);
+  tagAt("L'ALLIANCE", V3(PC.x + .5, 3.6, PC.z - 2), win(t, W1('butin', /alliance/) - .2, E('butin') + .3), '#ffd23f', '#1e1a22', 46);
+  bub(rideauN, 'papa1'); bub(papa, 'papa2', 'Il n’y a pas de voleur ici. Rendors-toi, Rideau.', .8); bub(voleur, 'quoi'); bub(rideauN, 'entend', 'C’est une ville où tout le monde t’entend.');
+  if (t > S('ecole') && t < E('ecole') + .2) eleves.forEach((c, i) => { const [x, y, z] = proj(headTop(c, .9)); if (z < 1) text2(['RIDEAU !', 'HA HA !', 'RIDEAU !'][i], x, y - hop(t + i, .3, 12), 34, '#ffffff', { lw: 8 }); });
+  clings(t); eyes(t); catCount(t); shout(t); caption(t);
+}
+const inLine = (t, id, a, b) => t > S(id) + a && t < E(id) + b;
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .6) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .6, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SH = shots();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.DBG = (t) => { render(t); const rc = new THREE.Raycaster(); rc.setFromCamera(new THREE.Vector2(0, 0), camera); const h = rc.intersectObjects(scene.children, true).slice(0, 3);
+  const name = o => { let n = []; while (o) { n.push(o.type + (o.material && o.material.color ? '#' + o.material.color.getHexString() : '')); o = o.parent; } return n.slice(0, 3).join('<'); };
+  return { cam: camera.position.toArray().map(v => +v.toFixed(2)), hits: h.map(x => [+x.distance.toFixed(2), name(x.object)]), cat: [CAT.visible, CAT.position.toArray().map(v => +v.toFixed(2)), CAT.scale.x], voleur: [voleur.root.visible, voleur.root.position.toArray().map(v => +v.toFixed(2))] }; };
+window.ready = true;
+</script></body></html>

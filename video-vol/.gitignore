@@ -1,0 +1,8 @@
+node_modules
+build/
+models/
+__pycache__/
+index.html
+*.mp4
+!ville_sans_porte.mp4
+!recadre_tiktok.mp4

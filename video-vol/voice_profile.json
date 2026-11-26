@@ -1,0 +1,145 @@
+{
+ "_reference": "Voix mesurée sur la vidéo : narrateur 164 Hz médian (7,5 demi-tons), papa 148 Hz, voleur 130 Hz, 8,1 pics/s, 8 % de silence",
+ "start_s": 0.35,
+ "gap_s": 0.06,
+ "pad_scale": 0.35,
+ "voices": {
+  "N": {
+   "name": "narrateur (Rideau)",
+   "mix": {
+    "ff_siwis": 0.55,
+    "am_puck": 0.45
+   },
+   "speed": 1.08,
+   "intonation": {
+    "target_median": 164,
+    "down": 1.6,
+    "up": 1.75,
+    "formant": 1.0
+   }
+  },
+  "P": {
+   "name": "papa",
+   "mix": {
+    "ff_siwis": 0.3,
+    "bm_george": 0.3,
+    "am_onyx": 0.4
+   },
+   "speed": 0.92,
+   "intonation": null
+  },
+  "V": {
+   "name": "le voleur",
+   "mix": {
+    "ff_siwis": 0.25,
+    "am_onyx": 0.6,
+    "bm_lewis": 0.15
+   },
+   "speed": 0.9,
+   "intonation": null
+  },
+  "M": {
+   "name": "voisine",
+   "mix": {
+    "ff_siwis": 1.0
+   },
+   "speed": 1.0,
+   "intonation": null
+  }
+ },
+ "moods": {
+  "normal": 1.0,
+  "excited": 1.04,
+  "hype": 1.02,
+  "sad": 0.93,
+  "deadpan": 0.97,
+  "suspense": 0.95
+ },
+ "huss": {
+  "ipa": "hˈœs !",
+  "offsets": [
+   0.0,
+   0.23,
+   0.415
+  ],
+  "every": 0.97,
+  "first_dur": 0.11,
+  "other_dur": 0.08,
+  "pitch_hz": 350,
+  "hiss": 0.3
+ },
+ "ipa_fixes": [
+  [
+   "(en)kˈəʊtʃ(fr)",
+   "kˈotʃ"
+  ],
+  [
+   "(en)fˈʊt(fr)",
+   "fˈut"
+  ],
+  [
+   "(en)bˈɔɪŋ(fr)",
+   "bwˈɛ̃ɡ"
+  ],
+  [
+   "ɡˈeɪməz",
+   "ɡˈɛmœʁ"
+  ],
+  [
+   "nˈəʊʌ",
+   "nˈoa"
+  ],
+  [
+   "kjwˈi",
+   "kiwˈi"
+  ],
+  [
+   "ɡanjˈe",
+   "ɡaɲˈe"
+  ],
+  [
+   "ɡanj",
+   "ɡaɲ"
+  ],
+  [
+   "nyˈi",
+   "nɥˈi"
+  ],
+  [
+   "syˈi",
+   "sɥˈi"
+  ],
+  [
+   "pyˈi",
+   "pɥˈi"
+  ],
+  [
+   "pyˌi",
+   "pɥˌi"
+  ],
+  [
+   "lyˈi",
+   "lɥˈi"
+  ],
+  [
+   "pizzˈa",
+   "pidzˈa"
+  ],
+  [
+   "pizza",
+   "pidza"
+  ],
+  [
+   "plyˈi",
+   "plɥˈi"
+  ],
+  [
+   "plˈyi",
+   "plɥˈi"
+  ],
+  [
+   "plyi",
+   "plɥi"
+  ]
+ ]
+}

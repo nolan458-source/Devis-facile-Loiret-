@@ -1,0 +1,14 @@
+{
+  "name": "kit-video-tiktok",
+  "private": true,
+  "description": "Vid\u00e9o TikTok 3D en blocs : voix fran\u00e7aises, sous-titres mot par mot, HUSS rythm\u00e9s",
+  "scripts": {
+    "build": "bash build.sh"
+  },
+  "dependencies": {
+    "three": "0.160.0",
+    "playwright": "1.49.1",
+    "@fontsource/baloo-2": "5.3.0",
+    "@fontsource/nunito": "5.3.0"
+  }
+}

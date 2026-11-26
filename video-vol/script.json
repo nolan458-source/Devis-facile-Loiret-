@@ -1,0 +1,354 @@
+[
+ {
+  "id": "porte",
+  "who": "N",
+  "mood": "normal",
+  "text": "Dans cette ville, aucune maison n'a de *porte*.",
+  "pad": 0.1
+ },
+ {
+  "id": "vol",
+  "who": "N",
+  "mood": "normal",
+  "text": "Personne n'a rien volé ici depuis *300 ans*.",
+  "pad": 0.2,
+  "say": "Personne n'a rien volé ici depuis trois cents ans."
+ },
+ {
+  "id": "confiance",
+  "who": "N",
+  "mood": "normal",
+  "text": "Mettre une porte, c'est dire à tes voisins que tu ne leur fais pas *confiance*.",
+  "pad": 0.2
+ },
+ {
+  "id": "pizza",
+  "who": "N",
+  "mood": "excited",
+  "text": "Le livreur pose la pizza directement sur ta *table*.",
+  "pad": 0.1
+ },
+ {
+  "id": "chat",
+  "who": "N",
+  "mood": "normal",
+  "text": "Le chat des Morel dîne dans *six maisons* par soir.",
+  "pad": 0.2
+ },
+ {
+  "id": "nuit",
+  "who": "N",
+  "mood": "normal",
+  "text": "Et la nuit, on entend tout, *vraiment tout*.",
+  "pad": 0.2
+ },
+ {
+  "id": "blanc",
+  "who": "N",
+  "mood": "normal",
+  "text": "Quand le vieux monsieur Blanc éternue, toute la rue répond :",
+  "pad": 0.05
+ },
+ {
+  "id": "souhaits",
+  "who": "N",
+  "mood": "excited",
+  "text": "*À vos souhaits !*",
+  "pad": 0.3,
+  "chorus": [
+   "N",
+   "P",
+   "V",
+   "M"
+  ]
+ },
+ {
+  "id": "moi",
+  "who": "N",
+  "mood": "sad",
+  "text": "Mais moi, je n'arrive pas à dormir sans porte.",
+  "pad": 0.1
+ },
+ {
+  "id": "peur",
+  "who": "N",
+  "mood": "suspense",
+  "text": "J'ai toujours peur que quelqu'un *entre*.",
+  "pad": 0.3
+ },
+ {
+  "id": "rideau",
+  "who": "N",
+  "mood": "normal",
+  "text": "Alors chaque soir, j'accroche un rideau dans l'entrée.",
+  "pad": 0.1
+ },
+ {
+  "id": "couverture",
+  "who": "N",
+  "mood": "normal",
+  "text": "Une vieille couverture, avec les petites cuillères de mamie cousues en bas.",
+  "pad": 0.1
+ },
+ {
+  "id": "tinte",
+  "who": "N",
+  "mood": "excited",
+  "text": "Si quelqu'un y touche, ça fait *cling*.",
+  "pad": 0.2
+ },
+ {
+  "id": "malpoli",
+  "who": "N",
+  "mood": "deadpan",
+  "text": "Maman dit que c'est malpoli.",
+  "pad": 0.1
+ },
+ {
+  "id": "ecole",
+  "who": "N",
+  "mood": "sad",
+  "text": "Et à l'école, tout le monde m'appelle *Rideau*.",
+  "pad": 0.4
+ },
+ {
+  "id": "inconnu",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Et puis une nuit, un inconnu est entré dans la ville.",
+  "pad": 0.1
+ },
+ {
+  "id": "premier",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Le premier *voleur* depuis *300 ans*.",
+  "pad": 0.2,
+  "say": "Le premier voleur depuis trois cents ans."
+ },
+ {
+  "id": "chaussons",
+  "who": "N",
+  "mood": "normal",
+  "text": "En chaussons, un grand sac sur l'épaule.",
+  "pad": 0.1
+ },
+ {
+  "id": "maisons",
+  "who": "N",
+  "mood": "normal",
+  "text": "Il est passé de maison en maison.",
+  "pad": 0.1
+ },
+ {
+  "id": "liste",
+  "who": "N",
+  "mood": "excited",
+  "text": "La télé des Morel. La caisse de la boulangerie. La coupe en or de l'église.",
+  "pad": 0.2
+ },
+ {
+  "id": "chez",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Et puis, il est entré *chez nous*.",
+  "pad": 0.2
+ },
+ {
+  "id": "cling1",
+  "who": "N",
+  "mood": "excited",
+  "text": "*Cling ! Cling ! Cling !*",
+  "pad": 0.2
+ },
+ {
+  "id": "reveil",
+  "who": "N",
+  "mood": "normal",
+  "text": "Le bruit des cuillères m'a réveillé.",
+  "pad": 0.1
+ },
+ {
+  "id": "lune",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Au clair de lune, j'ai vu un homme en chapeau noir glisser l'*alliance* de maman dans son sac.",
+  "pad": 0.2
+ },
+ {
+  "id": "couru",
+  "who": "N",
+  "mood": "excited",
+  "text": "J'ai couru secouer papa.",
+  "pad": 0.05
+ },
+ {
+  "id": "papa1",
+  "who": "N",
+  "mood": "excited",
+  "text": "Papa, il y a un voleur dans la cuisine !",
+  "pad": 0.2
+ },
+ {
+  "id": "yeux",
+  "who": "N",
+  "mood": "deadpan",
+  "text": "Il n'a même pas ouvert les yeux.",
+  "pad": 0.1
+ },
+ {
+  "id": "papa2",
+  "who": "P",
+  "mood": "normal",
+  "text": "Il n'y a pas de voleur ici. Rendors-toi, Rideau.",
+  "pad": 0.3
+ },
+ {
+  "id": "disparu",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Quand je suis revenu, l'homme avait *disparu*.",
+  "pad": 0.1
+ },
+ {
+  "id": "aussi",
+  "who": "N",
+  "mood": "normal",
+  "text": "Mon rideau aussi. Il s'était accroché à son sac. Et il le traînait dans la rue.",
+  "pad": 0.1
+ },
+ {
+  "id": "cling2",
+  "who": "N",
+  "mood": "excited",
+  "text": "*Cling ! Cling ! Cling !*",
+  "pad": 0.2
+ },
+ {
+  "id": "suivi",
+  "who": "N",
+  "mood": "normal",
+  "text": "Alors, j'ai suivi les cuillères.",
+  "pad": 0.1
+ },
+ {
+  "id": "chemin",
+  "who": "N",
+  "mood": "normal",
+  "text": "Devant l'école. Devant le moulin. Jusqu'à la vieille grange, tout au bout.",
+  "pad": 0.2
+ },
+ {
+  "id": "dedans",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Dedans, à la lueur d'une bougie, il y avait une *montagne*.",
+  "pad": 0.1
+ },
+ {
+  "id": "butin",
+  "who": "N",
+  "mood": "excited",
+  "text": "Des vélos. Des télés. Et tout en haut, l'*alliance* de maman.",
+  "pad": 0.1
+ },
+ {
+  "id": "charrette",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Et une charrette, prête pour le *départ*.",
+  "pad": 0.3
+ },
+ {
+  "id": "arreter",
+  "who": "N",
+  "mood": "sad",
+  "text": "Je ne pouvais pas l'arrêter. J'étais juste un enfant en pyjama.",
+  "pad": 0.2
+ },
+ {
+  "id": "besoin",
+  "who": "N",
+  "mood": "normal",
+  "text": "Mais dans une ville sans porte, je n'en avais pas *besoin*.",
+  "pad": 0.2
+ },
+ {
+  "id": "tonneau",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Je suis monté sur le tonneau et j'ai crié le seul mot que personne ici n'avait entendu depuis *300 ans*.",
+  "pad": 0.2,
+  "say": "Je suis monté sur le tonneau et j'ai crié le seul mot que personne ici n'avait entendu depuis trois cents ans."
+ },
+ {
+  "id": "auvoleur",
+  "who": "N",
+  "mood": "hype",
+  "text": "*Au voleur !*",
+  "pad": 0.4
+ },
+ {
+  "id": "mot",
+  "who": "N",
+  "mood": "excited",
+  "text": "Le mot est entré dans *toutes* les maisons.",
+  "pad": 0.1
+ },
+ {
+  "id": "lumieres",
+  "who": "N",
+  "mood": "normal",
+  "text": "Les lumières se sont allumées.",
+  "pad": 0.1
+ },
+ {
+  "id": "pyjamas",
+  "who": "N",
+  "mood": "excited",
+  "text": "Et les gens sont sortis en pyjama, avec des *balais* et des *rouleaux à pâtisserie*.",
+  "pad": 0.1
+ },
+ {
+  "id": "cercle",
+  "who": "N",
+  "mood": "normal",
+  "text": "Un grand cercle autour de la grange.",
+  "pad": 0.2
+ },
+ {
+  "id": "regarde",
+  "who": "N",
+  "mood": "suspense",
+  "text": "Le voleur les a regardés.",
+  "pad": 0.1
+ },
+ {
+  "id": "quoi",
+  "who": "V",
+  "mood": "normal",
+  "text": "C'est quoi, cette ville sans porte ?",
+  "pad": 0.2
+ },
+ {
+  "id": "repondu",
+  "who": "N",
+  "mood": "normal",
+  "text": "J'ai répondu :",
+  "pad": 0.05
+ },
+ {
+  "id": "entend",
+  "who": "N",
+  "mood": "excited",
+  "text": "C'est une ville où tout le monde t'*entend*.",
+  "pad": 0.4
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "mood": "normal",
+  "text": "Dans cette ville, aucune maison n'a de *porte*.",
+  "pad": 0.6
+ }
+]
