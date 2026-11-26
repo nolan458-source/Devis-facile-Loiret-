@@ -30,7 +30,7 @@
  {
   "id": "fier",
   "who": "C",
-  "text": "Dans ma ville, chacun garde *sa* couleur !",
+  "text": "Ici, chacun garde *sa* couleur !",
   "pad": 0.3,
   "mood": "excited"
  },
@@ -65,14 +65,14 @@
  {
   "id": "atch",
   "who": "N",
-  "text": "A… a… *atchoum* !",
+  "text": "*Atchoum* !",
   "pad": 0.2,
   "mood": "hype"
  },
  {
   "id": "bleu",
   "who": "N",
-  "text": "Je deviens tout *bleu*.",
+  "text": "Je deviens *bleu*. Tout bleu.",
   "pad": 0.3,
   "mood": "deadpan"
  },
@@ -107,7 +107,7 @@
  {
   "id": "viral",
   "who": "N",
-  "text": "Trop tard. Ma mère l'a postée. *Dix millions* de vues.",
+  "text": "Trop tard ! Ma mère l'a postée. *Dix millions* de vues.",
   "pad": 0.2,
   "mood": "excited"
  },
@@ -128,9 +128,9 @@
  {
   "id": "idee",
   "who": "N",
-  "text": "Et le maire a eu une *idée*.",
+  "text": "Et là, monsieur le maire a une *idée*.",
   "pad": 0.2,
-  "mood": "suspense"
+  "mood": "excited"
  },
  {
   "id": "poivre",
@@ -142,14 +142,14 @@
  {
   "id": "fin",
   "who": "N",
-  "text": "Lui, il a éternué une seule fois.",
+  "text": "Lui, il n'a éternué qu'une seule fois.",
   "pad": 0.2,
   "mood": "normal"
  },
  {
   "id": "rose",
   "who": "N",
-  "text": "Depuis, il est *rose fluo*.",
+  "text": "Depuis, il est tout *rose*. Rose fluo.",
   "pad": 0.3,
   "mood": "deadpan"
  },

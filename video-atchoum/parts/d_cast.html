@@ -1,0 +1,21 @@
+// cast
+const tom = character('tom', { skin: '#f3cfb3', shirt: '#ff8a3d', pants: '#2a3a6b', hair: 'short', hairCol: '#7a4a2c', face: { eyes: 'n', mouth: 'smile', freckles: true, blush: true } });
+const maire = character('maire', { skin: '#a9abb0', shirt: '#6e717c', pants: '#55575f', shoes: '#222', hair: 'bald', hairCol: '#8a8c92', face: { eyes: 'n', mouth: 'flat', mustache: true, brow: .4 } });
+['#2f5fb0', '#ffffff', '#e0302a'].forEach((c, k) => { const b = box(.16, .9, .05, c, -.12 + k * .12, 1.08, .23, .02, maire.body); b.rotation.z = .55; });   // tricolour sash
+const photographe = character('photographe', { skin: '#c98a5a', shirt: '#3b6fd8', pants: '#2a2a3a', hair: 'pony', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'grin' } });
+const maitresse = character('maitresse', { skin: '#f1c9a5', shirt: '#9a6be0', pants: '#3a3a4a', hair: 'bun', hairCol: '#7a4a2c', face: { eyes: 'n', mouth: 'smile', round: true } });
+const KID = { skins: ['#8d5a3b', '#f1c9a5', '#c98a5a', '#f3cfb3', '#6b3f28', '#f0c39c'], shirts: ['#4fbf68', '#e8473f', '#5de0ff', '#f5c400', '#ff7fb0', '#7a3cc0'], hair: ['spiky', 'pigtails', 'short', 'pony', 'short', 'bun'], hc: ['#1e1410', '#e8b23a', '#2a1c14', '#7a4a2c', '#1e1410', '#2a1c14'] };
+const kids = [0, 1, 2, 3, 4, 5].map(i => character('kid' + i, { skin: KID.skins[i], shirt: KID.shirts[i], pants: i % 2 ? '#2a3a6b' : '#3a3a4a', hair: KID.hair[i], hairCol: KID.hc[i], face: { eyes: 'n', mouth: 'smile', blush: i % 2 === 0 } }));
+const passants = [0, 1].map(i => character('passant' + i, { skin: ['#f1c9a5', '#f0c39c'][i], shirt: ['#3fa35b', '#c9a6f0'][i], pants: '#3a3a4a', hair: ['cap', 'bun'][i], capCol: '#e0533d', hairCol: ['#2a1c14', '#dddddd'][i], face: { eyes: 'n', mouth: 'smile', round: i === 1 } }));
+const touristes = [0, 1, 2, 3, 4, 5, 6, 7].map(i => character('touriste' + i, { skin: ['#f1c9a5', '#8d5a3b', '#f3cfb3', '#c98a5a', '#6b3f28', '#f0c39c', '#e9b98f', '#8d5a3b'][i],
+  shirt: ['#ff8a3d', '#5de0ff', '#ffd23f', '#e8473f', '#ff7fb0', '#4fbf68', '#9a6be0', '#ffffff'][i], pants: ['#2a3a6b', '#f2e3c6', '#3a3a4a'][i % 3],
+  hair: ['cap', 'short', 'pony', 'cap', 'bun', 'spiky', 'cap', 'short'][i], capCol: ['#ffd23f', '#e8473f', '#3b6fd8', '#ffffff'][i % 4], hairCol: ['#2a1c14', '#1e1410', '#e8b23a', '#7a4a2c'][i % 4], face: { eyes: 'happy', mouth: 'grin', shades: i % 3 === 0 } }));
+// --- colour system: every character gets its own skin materials, so a sneeze can recolour it
+function skinOf(c) {
+  if (c.skinMeshes) return c.skinMeshes; const base = new THREE.Color(c.o.skin).getHex(); c.skinMeshes = [];
+  c.root.traverse(m => { if (m.isMesh && m !== c.face && m.material.color && m.material.color.getHex() === base) { m.material = m.material.clone(); c.skinMeshes.push(m); } });
+  return c.skinMeshes;
+}
+const tint = (c, col) => skinOf(c).forEach(m => m.material.color.set(col || c.o.skin));
+Object.values(CH).forEach(skinOf);
+const PALETTE = ['#4f8cff', '#4fd16a', '#b05cff', '#ffd23f', '#ff5da8', '#ff8a3d', '#2fd6c9', '#e8473f', '#a0e84f'];

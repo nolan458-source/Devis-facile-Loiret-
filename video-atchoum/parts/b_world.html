@@ -1,0 +1,67 @@
+// ---------- world : la ville où chaque éternuement te change de couleur ----------
+scene.background = SKY_DAY;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(700, 300), M('#63b84a')); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const road = new THREE.Mesh(new THREE.PlaneGeometry(160, 4.5), M('#5b5f6b')); road.rotation.x = -Math.PI / 2; road.position.set(10, .01, 5.2); road.receiveShadow = true; scene.add(road);
+for (let x = -60; x < 80; x += 4) { const d = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .16), M('#f2f2f2')); d.rotation.x = -Math.PI / 2; d.position.set(x, .02, 5.2); scene.add(d); }
+box(160, .12, 2.4, '#e3e0da', 10, .06, 1.9, .02);
+const HOUSE_COLS = ['#f2b38a', '#9fd9b0', '#f4a6b8', '#f7d774', '#a9c7f5', '#c9a6f0'];
+const ROOF_COLS = ['#7a5cd6', '#e0533d', '#3fa35b', '#3b6fd8'];
+function house(x, z, i, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  box(5, 3.4, 4, HOUSE_COLS[i % 6], 0, 1.7, 0, .1, g);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.9, 2, 4), M(ROOF_COLS[i % 4])); roof.rotation.y = Math.PI / 4; roof.position.y = 4.4; roof.castShadow = true; g.add(roof);
+  for (const wx of [-1.4, 1.4]) { box(1.1, 1.1, .1, '#ffffff', wx, 2.1, 2.02, .03, g); box(.9, .9, .12, '#2f5fb0', wx, 2.1, 2.03, .02, g); }
+  box(.95, 1.7, .1, '#7a4a2c', 0, .85, 2.02, .03, g); box(.12, .12, .12, '#f5c400', .3, .85, 2.1, .03, g);
+  return g;
+}
+function tree(x, z, s = 1) { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); box(.4, 1.6, .4, '#7a5236', 0, .8, 0, .05, g); box(1.8, 1.4, 1.8, '#3fa35b', 0, 2.2, 0, .3, g); box(1.2, 1, 1.2, '#4fbf68', 0, 3.1, 0, .25, g); }
+function signTex(draw, w = 256, h = 256) { return textTex(w, h, draw); }
+const ltxt = (x, txt, size, col, y) => { x.fillStyle = col; x.font = FONT(size); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, 256, y); };
+// --- the street
+[-9, -3, 3, 9].forEach((x, i) => house(x, -9, i)); [-6, 0, 6].forEach(x => tree(x, -5.6, .85));
+function banSign(x, z, drawIcon) {
+  const t = signTex(c => { c.fillStyle = '#ffffff'; c.beginPath(); c.arc(128, 128, 124, 0, 7); c.fill(); drawIcon(c); c.strokeStyle = '#e0302a'; c.lineWidth = 26; c.beginPath(); c.arc(128, 128, 110, 0, 7); c.stroke(); c.beginPath(); c.moveTo(50, 50); c.lineTo(206, 206); c.stroke(); });
+  box(.12, 2.0, .12, '#9aa3b5', x, 1.0, z - .05, .03);
+  const m = new THREE.Mesh(new THREE.CircleGeometry(.6, 40), new THREE.MeshStandardMaterial({ map: t, roughness: .6 })); m.position.set(x, 2.15, z); scene.add(m);
+}
+banSign(-1.4, .4, c => { c.fillStyle = '#3a2a22'; c.beginPath(); c.roundRect(98, 70, 60, 120, 14); c.fill(); c.fillStyle = '#7a5a40'; c.fillRect(110, 48, 36, 26); c.fillStyle = '#1e1a22'; c.fillRect(120, 36, 16, 14); for (let k = 0; k < 6; k++) { c.beginPath(); c.arc(80 + k * 18, 210 - (k % 2) * 6, 4, 0, 7); c.fill(); } });
+banSign(3.4, .4, c => { c.fillStyle = '#3fa35b'; c.fillRect(124, 130, 8, 80); c.fillStyle = '#ff5da8'; for (let k = 0; k < 6; k++) { const a = k / 6 * 6.28; c.beginPath(); c.arc(128 + Math.cos(a) * 30, 110 + Math.sin(a) * 30, 22, 0, 7); c.fill(); } c.fillStyle = '#ffd23f'; c.beginPath(); c.arc(128, 110, 20, 0, 7); c.fill(); });
+// --- the town hall
+const MX = -16, MZ = -7;
+box(9, 4.6, 5, '#e6e1d6', MX, 2.3, MZ, .06); box(9.8, .5, 5.8, '#8a8f9c', MX, 4.85, MZ, .05);
+const pedi = new THREE.Mesh(new THREE.CylinderGeometry(0, 5.2, 1.4, 4, 1), M('#8a8f9c')); pedi.rotation.y = Math.PI / 4; pedi.scale.set(1, 1, .55); pedi.position.set(MX, 5.8, MZ); scene.add(pedi);
+for (let k = 0; k < 4; k++) box(.5, 3.9, .5, '#ffffff', MX - 3 + k * 2, 2.55, MZ + 2.7, .08);
+box(7.4, .3, 1.4, '#cfc9bd', MX, .15, MZ + 3.6, .03); box(7.4, .3, 1.0, '#d9d3c7', MX, .45, MZ + 3.2, .03);
+const mairieTex = signTex(c => { c.fillStyle = '#2b2f86'; c.fillRect(0, 0, 512, 128);ltxt(c, 'MAIRIE', 84, '#ffffff', 66); }, 512, 128);
+panel(3.2, .8, mairieTex, MX, 4.25, MZ + 2.53);
+box(.08, 3, .08, '#9aa3b5', MX + 3.4, 6.5, MZ, .02); ['#2f5fb0', '#ffffff', '#e0302a'].forEach((c, k) => box(.4, .8, .03, c, MX + 3.65 + k * .4, 7.5, MZ, .01));
+// --- the school + the class photo set
+const SX = 18;
+box(11, 4, 5, '#f2b38a', SX, 2, -11, .08); box(11.6, .4, 5.6, '#c0392b', SX, 4.2, -11, .05);
+for (const wx of [-3.5, -1.2, 1.2, 3.5]) { box(1.4, 1.2, .1, '#ffffff', SX + wx, 2.4, -8.47, .03); box(1.2, 1.0, .12, '#2f5fb0', SX + wx, 2.4, -8.46, .02); }
+const ecoleTex = signTex(c => { c.fillStyle = '#ffffff'; c.fillRect(0, 0, 512, 128);ltxt(c, 'ÉCOLE', 84, '#c0392b', 66); }, 512, 128);
+panel(2.6, .65, ecoleTex, SX, 3.6, -8.44);
+box(5.2, .9, .9, '#8a5a2c', SX, .45, -5.2, .05);                   // back bench (back row stands on it)
+const tripod = new THREE.Group(); tripod.position.set(SX, 0, .5); scene.add(tripod);
+for (const a of [0, 2.1, 4.2]) { const l = box(.05, 1.3, .05, '#2a2a3a', Math.cos(a) * .22, .62, Math.sin(a) * .22, .01, tripod); l.rotation.set(Math.sin(a) * .18, 0, -Math.cos(a) * .18); }
+box(.42, .3, .26, '#1e1a22', 0, 1.36, 0, .05, tripod); const lens = new THREE.Mesh(new THREE.CylinderGeometry(.09, .1, .18, 16), M('#3a3a4a')); lens.rotation.x = Math.PI / 2; lens.position.set(0, 1.36, -.2); tripod.add(lens);
+// --- the town entrance + the pepper stand
+const EX = 40;
+for (const z of [-.6, 6.8]) box(.4, 4.6, .4, '#ffffff', EX, 2.3, z, .06);
+const archTex = signTex((c, rainbow = false) => { c.fillStyle = '#ffffff'; c.fillRect(0, 0, 1024, 160);
+  if (rainbow) { const cols = ['#e8473f', '#ff8a3d', '#ffd23f', '#4fbf68', '#3b6fd8', '#9a6be0']; c.font = FONT(78); c.textAlign = 'center'; c.textBaseline = 'middle'; const s = 'VILLE ARC-EN-CIEL'; let x = 512 - c.measureText(s).width / 2;
+    c.textAlign = 'left'; [...s].forEach((ch, k) => { c.fillStyle = cols[k % 6]; c.fillText(ch, x, 84); x += c.measureText(ch).width; }); }
+  else { c.fillStyle = '#2b2f86'; c.font = FONT(78); c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('BIENVENUE', 512, 84); } }, 1024, 160);
+box(.25, 1.25, 8.1, '#2b2f86', EX, 4.9, 3.1, .05); const arch = panel(7.6, 1.1, archTex, EX - .14, 4.9, 3.1); arch.rotation.y = -Math.PI / 2;
+const STAND = new THREE.Group(); STAND.position.set(EX - 2.5, 0, 1.6); scene.add(STAND);
+box(2.6, 1.0, .9, '#c0392b', 0, .5, 0, .06, STAND); box(2.8, .1, 1.1, '#f2e3c6', 0, 1.05, 0, .02, STAND);
+for (let k = 0; k < 6; k++) box(.22, .3, .08, '#ffffff', -1 + k * .4, 1.25, .1, .02, STAND);
+for (const sx of [-1.25, 1.25]) box(.08, 2.4, .08, '#ffffff', sx, 1.2, -.4, .02, STAND);
+const poivreTex = signTex(c => { c.fillStyle = '#1e1a22'; c.fillRect(0, 0, 512, 200);ltxt(c, 'POIVRE', 76, '#ffd23f', 66);ltxt(c, '10 € LE SACHET', 52, '#ffffff', 148); }, 512, 200);
+box(2.6, 1.05, .08, '#ffd23f', 0, 2.55, -.45, .03, STAND); panel(2.5, .97, poivreTex, 0, 2.55, -.4, STAND);
+STAND.visible = false;
+[44, 48, 52].forEach((x, i) => house(x, -6, i + 1)); [46, 50].forEach(x => tree(x, -2.6));
+// --- props
+const prop = (build) => { const g = new THREE.Group(); scene.add(g); build(g); g.visible = false; return g; };
+const CAMS = Array.from({ length: 8 }, () => prop(g => { box(.3, .2, .14, '#1e1a22', 0, 0, 0, .04, g); box(.1, .1, .1, '#3a3a4a', 0, 0, .1, .03, g); }));
+const sachet = prop(g => box(.22, .3, .08, '#ffffff', 0, 0, 0, .02, g));

@@ -1,4 +1,4 @@
-# Soundtrack: voice + upbeat procedural score + SFX (flies, shower, machine, thunder and rain, HUSS thumps).
+# Soundtrack: voice + upbeat procedural score + SFX (sneezes, colour pops, camera shutters, phone pings, HUSS thumps).
 import json, wave, re, numpy as np, subprocess
 SR = 44100; tl = json.load(open("build/timeline.json")); T = tl["total"]; N = int(T * SR)
 L = {l["id"]: l for l in tl["lines"]}; S = lambda i: L[i]["start"]; E = lambda i: L[i]["start"] + L[i]["dur"]
@@ -29,7 +29,7 @@ def hat():
     t = np.arange(int(.04 * SR)) / SR; return np.diff(rng.standard_normal(len(t)), prepend=0) * np.exp(-t * 100) * .05
 music = np.zeros(N, np.float32); beat = 60 / 120
 chords = [[60, 64, 67], [67, 71, 74], [69, 72, 76], [65, 69, 72]]; roots = [36, 43, 45, 41]
-tense = (S("rien") - .1, S("b3"))
+tense = (S("nez") - .1, S("atch") + .2)
 t0 = 0; n = 0
 while t0 < T - .8:
     b = n // 8; ch = chords[b % 4]
@@ -75,20 +75,30 @@ def chime(f0=1320, g=.12):
 def cricket(d=1.2, g=.07):
     t = np.arange(int(d * SR)) / SR; return np.sin(2 * np.pi * 4300 * t) * (np.sin(2 * np.pi * 30 * t) > .6) * ((t * 2.2) % 1 < .45) * g
 def blip(f=880, g=.1): t = np.arange(int(.09 * SR)) / SR; return np.sin(2 * np.pi * f * t) * np.exp(-t * 30) * g
-tA = WT("jourj", r"allume")
-put(sfx, buzz(S("mousse") - S("sale"), .035), S("sale")); put(sfx, buzz(E("mouches") - S("mouches") + .3, .07), S("mouches") - .1)
-put(sfx, water(E("vanille") - S("douche") + .3, .05), S("douche") + .1); put(sfx, water(E("fin") - S("fin") + .4, .04), S("fin") + .2)
-put(sfx, chime(1568), WT("mousse", r"^madame")); put(sfx, chime(1760, .08), WT("mousse", r"^madame") + .12)
-put(sfx, blip(990), WT("moi", r"^dix"))
-for t in hits("b2"): put(sfx, clank(.22), t)
-put(sfx, blip(300, .2), tA); put(sfx, hum(S("pluie") - tA, .05), tA + .05)
-put(sfx, cricket(), S("rien") + .1)
-put(sfx, whoosh(S("pluie") - S("puis"), .06), S("puis"))
-put(sfx, thunder(), S("pluie") - .2); put(sfx, water(S("fin") - S("pluie"), .06), S("pluie"))
+def sneeze(g=.25):
+    n = int(.42 * SR); t = np.arange(n) / SR; x = rng.standard_normal(n)
+    inh = np.where(t < .22, np.sin(2 * np.pi * (500 + 900 * t) * t) * .25 + x * .15, 0) * np.minimum(1, t * 12)
+    burst = np.where(t >= .22, x * np.exp(-(t - .22) * 22), 0)
+    return (inh + burst) * g
+def shutter(g=.25):
+    t = np.arange(int(.12 * SR)) / SR; x = rng.standard_normal(len(t)); return x * (np.exp(-t * 90) + np.exp(-np.maximum(0, t - .05) * 90) * (t > .05)) * g
+def pop(f=700, g=.12):
+    t = np.arange(int(.12 * SR)) / SR; return np.sin(2 * np.pi * (f + 900 * t) * t) * np.exp(-t * 25) * g
+def crowd(d=3, g=.25):
+    x = lowpass(noise(d), .09); t = np.arange(len(x)) / SR; return x * np.minimum(1, t * 3) * np.minimum(1, (d - t) * 1.5) * g * 4
+L_ids = [l["id"] for l in tl["lines"]]
+SNZ = [WT("intro", r"^éternues"), WT("chaine", r"^éternue"), WT("chaine", r"^maîtresse"), WT("chaine", r"^classe"), *hits("b2"), *hits("b3"), WT("poivre", r"^sachet")]
+for k, t in enumerate(SNZ): put(sfx, sneeze(.12 + .06 * (k % 3)), t - .25); put(sfx, pop(600 + (k % 5) * 120), t)
+put(sfx, pop(520, .2), S("atch") + .22); put(sfx, sneeze(.35), WT("fin", r"^seule") - .25); put(sfx, pop(900, .25), WT("fin", r"^seule"))
+put(sfx, shutter(.35), E("ouistiti") - .05); put(sfx, shutter(.35), S("feutres") + .02)
+for k in range(8): put(sfx, shutter(.12), S("b3") + .15 + k * .29)
+for k in range(9): put(sfx, chime(1760 + (k % 3) * 200, .05 + .01 * k), S("viral") + .3 + k * .2)
+put(sfx, crowd(E("b3") - S("touristes") + .5, .18), S("touristes"))
+put(sfx, chime(1320, .16), S("idee") + .05); put(sfx, chime(1975, .1), S("idee") + .15)
+put(sfx, clank(.15), WT("poivre", r"^sachet") - .1); put(sfx, chime(2093, .14), WT("poivre", r"^sachet"))
 for i in ("b1", "b2", "b3", "b4"):
     for t in hits(i): put(sfx, thump(.18), t)
     for t in G3(i): put(sfx, swish(), t - .05)
-put(sfx, chime(1046, .14), WT("twist", r"^million") if any(w["w"].startswith("million") for w in L["twist"]["words"]) else E("twist") - 1); put(sfx, chime(1568, .1), E("twist") - .9)
 write("build/sfx.wav", sfx)
 subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", "build/voice.wav", "-i", "build/music.wav", "-i", "build/sfx.wav", "-filter_complex",
   "[1:a]volume=0.4[m];[0:a]asplit[v][vk];[m][vk]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=300[md];"

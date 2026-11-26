@@ -1,0 +1,206 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), huss = /^huss/i.test(best.w), s = lerp(huss ? 1.8 : 1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (huss) ctx.rotate(Math.sin(t * 30) * .05);
+  text2(huss ? 'HUSS !' : best.w, 0, 0, huss ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: huss ? 16 : 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const jumpY = (t, t0, d, h) => h * Math.sin(Math.PI * clamp((t - t0) / d));
+const hop = (t, period, h) => h * Math.abs(Math.sin(Math.PI * t / period));
+const G3 = id => L[id].words.filter((w, i) => i % 3 === 0).map(w => w.t);
+const hits = id => L[id].words.map(w => w.t);
+const UP = [[2.6, 0], [2.6, 0]], CAMHOLD = [[.2, -1.9], [.2, -1.9]], HIPS = [[.6, .5], [.6, .5]];
+const hitJump = (t, id, d = .22, h = .3) => Math.max(0, ...hits(id).map(t0 => jumpY(t, t0, d, h)));
+const KIDPOS = [[SX - 1.1, 0, -3.9], [SX + 1.1, 0, -3.9], [SX - 1.65, .9, -5.2], [SX - .55, .9, -5.2], [SX + .55, .9, -5.2], [SX + 1.65, .9, -5.2]];
+// --- sneezes: [character, time, new colour]
+let SNZ = [];
+function sneezes() {
+  const s = (c, t0, col) => SNZ.push({ c, t: t0, col });
+  s(passants[1], -1, '#b05cff'); s(passants[0], WT('intro', /^éternues/), '#4fd16a');
+  s(tom, S('atch') + .22, '#4f8cff');
+  s(kids[1], WT('chaine', /^éternue/), '#4fd16a'); s(maitresse, WT('chaine', /^maîtresse/), '#b05cff');
+  [0, 2, 3, 4, 5].forEach((k, j) => s(kids[k], WT('chaine', /^classe/) + j * .07, PALETTE[(k * 2 + 3) % 9]));
+  hits('b2').forEach((t0, h) => { s(kids[(h * 2) % 6], t0, PALETTE[(h * 3) % 9]); s(kids[(h * 2 + 3) % 6], t0 + .03, PALETTE[(h * 3 + 4) % 9]); if (h % 3 === 0) s(tom, t0, PALETTE[(h + 2) % 9]); });
+  s(tom, hits('b2')[8] + .05, '#4f8cff'); s(maitresse, hits('b2')[4], '#ff5da8'); s(photographe, hits('b2')[8], '#ffd23f');
+  [1, 4, 6].forEach((k, j) => s(touristes[k], -1, ['#2fd6c9', '#ff5da8', '#a0e84f'][j]));
+  hits('b3').forEach((t0, h) => s(touristes[h % 8], t0, PALETTE[(h * 2 + 1) % 9]));
+  s(touristes[2], WT('poivre', /^sachet/), '#ff8a3d');
+  s(maire, WT('fin', /^seule/), '#ff4fd8');
+  SNZ.sort((a, b) => a.t - b.t);
+}
+const colourAt = (c, t) => { let col = null; for (const e of SNZ) { if (e.t > t) break; if (e.c === c) col = e.col; } return col; };
+function sneezeHead(c, t) {   // head goes back… then ATCHOUM forward
+  let v = 0; for (const e of SNZ) { if (e.c !== c || e.t < 0) continue; const d = t - e.t;
+    if (d > -.4 && d < 0) v = Math.min(v, -.3 * prog(t, e.t - .4, e.t)); else if (d >= 0 && d < .5) v = Math.max(v, .55 * Math.exp(-d * 8)); }
+  return v;
+}
+function shots() {
+  return [
+    [0, [1.4, 2.3, 8.2], [1.1, 1.9, 6.8], [.9, 1.2, 1.2], [.9, 1.2, 1.2], 55],
+    [S('b1') - .15, [.6, 1.25, 5.6], [.55, 1.2, 5.0], [.3, 1.0, 2.4], [.3, 1.0, 2.4], 45],
+    [S('regle') - .1, [-3, 1.9, 4.6], [4.6, 1.9, 4.6], [-1.6, 1.8, .4], [3.4, 1.8, .4], 50],
+    [S('maire') - .1, [-12, 2.6, 6], [-13.6, 2.2, 3.4], [-16, 2.4, -5], [-16, 1.7, -4], 52],
+    [S('fier') - .1, [-15.6, 1.85, -1.1], [-15.65, 1.8, -1.4], [-16, 1.75, -3.9], [-16, 1.75, -3.9], 44],
+    [S('moi') - .1, [.5, 1.15, 5.0], [.45, 1.12, 4.6], [.3, .95, 2.4], [.3, .95, 2.4], 44],
+    [S('photo') - .1, [SX, 3.2, 9], [SX, 2.6, 7], [SX, 1.4, -4.5], [SX, 1.4, -4.5], 55],
+    [S('ouistiti') - .1, [SX + 1.6, 1.65, -1.1], [SX + 1.5, 1.62, -.9], [SX, 1.45, 1.25], [SX, 1.45, 1.25], 46],
+    [S('nez') - .1, [SX, 1.1, -1.5], [SX, 1.06, -2.1], [SX, .98, -3.9], [SX, .98, -3.9], 42],
+    [S('chaine') - .1, [SX - 3.5, 2.2, 3.2], [SX - 3, 2.0, 2.4], [SX + .5, 1.3, -4.4], [SX + .5, 1.3, -4.4], 50],
+    [S('b2') - .15, [SX - 3.4, 2.0, 2.8], [SX - 2.6, 1.9, 2.0], [SX + .4, 1.3, -4.4], [SX + .4, 1.3, -4.4], 52],
+    [S('feutres') - .1, [SX, 1.36, -.1], [SX, 1.36, -.1], [SX + .3, 1.3, -4.4], [SX + .3, 1.3, -4.4], 42],
+    [S('colere') - .1, [-16.7, 1.65, -1.5], [-16.65, 1.65, -1.7], [-16, 1.75, -3.9], [-16, 1.75, -3.9], 42],
+    [S('viral') - .1, [SX, 1.36, -.1], [SX, 1.36, -.1], [SX + .3, 1.3, -4.4], [SX + .3, 1.3, -4.4], 42],
+    [S('touristes') - .1, [33.5, 2.4, 9.5], [34.5, 2.6, 8.5], [41, 2.4, 1], [41, 2.8, 1], 58],
+    [S('b3') - .15, [37, 1.8, 7.8], [36, 1.9, 8.8], [42, 1.3, 2.8], [42, 1.3, 2.8], 55],
+    [S('idee') - .1, [37.2, 1.75, 3.8], [37.25, 1.72, 3.5], [37.5, 1.65, .75], [37.5, 1.65, .75], 44],
+    [S('poivre') - .1, [33.8, 2.6, 9], [34.6, 2.4, 8], [38, 1.7, 1.4], [38, 1.7, 1.4], 56],
+    [S('fin') - .1, [37.4, 1.65, 5.6], [37.45, 1.62, 5.2], [37.5, 1.55, 2.6], [37.5, 1.55, 2.6], 44],
+    [S('rose') - .1, [38.0, 1.6, 5.2], [37.95, 1.58, 4.9], [37.5, 1.55, 2.6], [37.5, 1.55, 2.6], 42],
+    [S('b4') - .1, [35.4, 1.35, 7.4], [35.5, 1.3, 6.9], [35.8, 1.15, 4.0], [35.8, 1.15, 4.0], 50],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  const shake = (t > S('b2') - .15 && t < S('feutres') - .1) || (t > S('b3') - .15 && t < S('idee') - .1) ? .035 : 0;
+  camera.position.set(pos[0] + Math.sin(t * 47) * shake, pos[1] + Math.sin(t * 61) * shake, pos[2]); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, look[1] + 18, look[2] + 12); sun.target.position.set(look[0], look[1], look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => { tint(c, colourAt(c, T_NOW)); const sh = sneezeHead(c, T_NOW); if (sh) { p.headX = (p.headX || 0) + sh; p.bend = (p.bend || 0) + sh * .4; if (sh > .2) p.face = Object.assign({}, p.face, { eyes: 'closed', mouth: 'open' }); } return pose(c, Object.assign({ visible: true }, p)); };
+const hideAll = () => { for (const c of Object.values(CH)) c.root.visible = false; CAMS.forEach(p => p.visible = false); sachet.visible = false; };
+let T_NOW = 0, ARCH_KEY = '';
+function holdCam(pr, c, x, y, z, ry, s) { pr.visible = true; pr.position.set(x + Math.sin(ry) * .42 * s, y + 1.55 * s, z + Math.cos(ry) * .42 * s); pr.rotation.set(0, ry, 0); pr.scale.setScalar(s * 1.2); }
+
+function update(t) {
+  T_NOW = t; hideAll();
+  const inL = (id, a = -.1, b = .1) => t > S(id) + a && t < E(id) + b;
+  const ak = t > S('touristes') - .1 ? 'rainbow' : 'plain'; if (ak !== ARCH_KEY) { archTex.redraw(ak === 'rainbow'); ARCH_KEY = ak; }
+  STAND.visible = t > S('poivre') - .15;
+  // --- street (intro, rules, Tom)
+  const street = t < S('maire') - .1 || inL('moi', -.1, .1);
+  if (street) {
+    P(passants[0], { x: 2.4, z: 1.6, ry: -.35, s: .85, arms: [0, 0], face: { eyes: 'n', mouth: 'smile' } });
+    P(passants[1], { x: -3.1, z: 1.7, ry: .45, s: .8, arms: [0, [2.4 + Math.sin(t * 10) * .2, 0]], face: { eyes: 'happy', mouth: 'grin', round: true } });
+    const tf = { eyes: 'happy', mouth: 'grin', freckles: true, blush: true };
+    const tp = { x: .3, z: 2.4, ry: 0, s: .62, arms: [0, 0], face: tf };
+    if (t < S('regle')) { tp.y = hitJump(t, 'b1', .22, .35); if (inL('b1')) { tp.arms = UP; tp.face = Object.assign({}, tf, { mouth: 'open' }); } }
+    if (inL('moi', -.1, .1)) { tp.face = { eyes: 'n', mouth: 'wavy', freckles: true, blush: true }; tp.arms = [0, [.4, -2.3]]; }
+    P(tom, tp);
+  }
+  // --- town hall: the grey mayor
+  if (t > S('maire') - .1 && t < S('moi') - .1 || inL('colere', -.1, .2)) {
+    const angry = inL('colere', -.1, .2), proud = inL('fier', -.1, .2);
+    P(maire, { x: MX, y: .6, z: MZ + 3.1, ry: 0, s: .9, talk: talk('C', t), arms: angry ? [[2.5 + Math.sin(t * 14) * .25, -.2], [2.5 - Math.sin(t * 14) * .25, -.2]] : proud ? [0, [2.5, 0]] : HIPS,
+      face: { eyes: angry ? 'wide' : 'n', mouth: angry ? 'open' : 'smile', mustache: true, brow: angry ? 1 : .2 } });
+  }
+  // --- school: the class photo
+  if (t > S('photo') - .1 && t < S('touristes') - .1) {
+    kids.forEach((c, i) => { const [x, y, z] = KIDPOS[i]; const flashing = t > S('b2') - .15 && t < S('feutres') - .1;
+      P(c, { x, y: y + (flashing ? hop(t + i * .11, .45, .15) : 0), z, ry: 0, s: .6, arms: flashing ? UP : [0, 0], face: { eyes: inL('ouistiti') ? 'happy' : 'n', mouth: inL('ouistiti') ? 'grin' : 'smile', blush: i % 2 === 0 } }); });
+    const tf = { eyes: 'n', mouth: 'smile', freckles: true, blush: true }, tp = { x: SX, z: -3.9, ry: 0, s: .6, arms: [0, 0], face: tf };
+    if (inL('nez', -.05, .05)) { tp.face = { eyes: 'closed', mouth: 'o', freckles: true, blush: true }; tp.headX = -.25 * prog(t, S('nez'), E('nez')); }
+    if (t > S('atch') + .3 && t < S('chaine')) { tp.face = { eyes: 'wide', mouth: 'o', freckles: true }; tp.arms = [[.5, 0], [.5, 0]]; }
+    if (t > S('b2') - .15 && t < S('feutres') - .1) { tp.y = hitJump(t, 'b2'); tp.arms = UP; tp.face = { eyes: 'happy', mouth: 'open', freckles: true }; }
+    if (t >= S('feutres') - .1) { tp.face = { eyes: 'happy', mouth: 'grin', freckles: true }; tp.arms = [[.3, 0], [.3, 0]]; }
+    P(tom, tp);
+    P(maitresse, { x: SX + 2.9, z: -4.4, ry: -.35, s: .82, arms: t > S('b2') - .15 && t < S('feutres') - .1 ? UP : [0, 0], face: { eyes: 'n', mouth: 'smile', round: true } });
+    P(photographe, { x: SX, z: 1.3, ry: Math.PI, s: .82, talk: talk('M', t), arms: inL('ouistiti', -.1, .3) ? [0, [2.6, 0]] : [[.2, -1.5], [.2, -1.5]], face: { eyes: 'happy', mouth: 'grin' } });
+  }
+  // --- town entrance: tourists, then the pepper stand
+  if (t > S('touristes') - .1) {
+    touristes.forEach((c, i) => {
+      const k = prog(t, S('touristes') - .1 + i * .12, S('b3') - .3), x0 = 46.5 + (i % 4) * 1.4, z0 = 1.6 + Math.floor(i / 4) * 1.6 + (i % 2) * .5;
+      const qx = 39.4 + (i % 4) * 1.25, qz = 2.4 + Math.floor(i / 4) * 1.7 + (i % 2) * .4;
+      let x = lerp(x0, qx, k), z = lerp(z0, qz, k), ry = -Math.PI / 2;
+      const p = { x, z, ry, s: .78, walk: k < 1 ? t * 9 + i : 0, walkAmp: .5, arms: k < 1 ? [0, 0] : CAMHOLD, face: { eyes: 'happy', mouth: 'grin', shades: i % 3 === 0 } };
+      if (k >= 1) { p.ry = -Math.PI / 2 + Math.sin(t * .7 + i) * .5; if (t > S('b3') - .15 && t < S('idee') - .1) p.y = hop(t + i * .1, .5, .18); }
+      if (t > S('poivre') - .15 && t < S('fin') - .1) { const q = [[36.6, 2.9], [37.4, 3.6], [38.2, 2.8], [39.0, 3.5]][i % 4]; if (i < 4) { p.x = q[0]; p.z = q[1]; p.ry = Math.PI; p.arms = [0, [.2, -1.4]]; } }
+      if (t >= S('fin') - .1 && i < 4) { const q = [[35.3, 2.3], [35.6, 3.5], [39.7, 2.3], [39.4, 3.5]][i]; p.x = q[0]; p.z = q[1]; p.ry = Math.atan2(37.5 - q[0], 2.6 - q[1]); p.arms = CAMHOLD; }
+      P(c, p); if (p.arms === CAMHOLD) holdCam(CAMS[i], c, p.x, p.y || 0, p.z, p.ry, p.s);
+    });
+    if (t > S('idee') - .1) {
+      const pink = t > WT('fin', /^seule/);
+      P(maire, { x: EX - 2.5, z: t > S('fin') - .1 ? 2.6 : .75, ry: 0, s: .9, talk: talk('C', t), arms: inL('idee', -.1, .1) ? [0, [2.5, -.3]] : t > S('poivre') - .15 && t < S('fin') ? [0, [.3, -1.5]] : pink ? [[.5, 0], [.5, 0]] : HIPS,
+        face: { eyes: pink ? 'wide' : inL('idee', -.1, .1) ? 'happy' : 'n', mouth: pink ? 'flat' : 'grin', mustache: true, brow: pink ? .6 : 0 } });
+      if (t > S('poivre') - .15 && t < S('fin')) { sachet.visible = true; sachet.position.set(EX - 2.5 + .1, 1.35, 1.25); }
+    }
+    if (t > S('b4') - .2) P(tom, { x: 35.4, z: 4.2, ry: .2, s: .62, y: hitJump(t, 'b4', .22, .3), arms: t > S('b4') - .1 ? UP : [0, [2.4, 0]], face: { eyes: t > S('b4') - .1 ? 'wink' : 'happy', mouth: 'grin', freckles: true } });
+  }
+}
+
+// ---------- overlay ----------
+let FLASH = [];
+function flashes(t) {
+  let a = 0; for (const f of FLASH) { const d = t - f; if (d >= 0 && d < .35) a = Math.max(a, 1 - d / .35); }
+  if (a > 0) { ctx.fillStyle = `rgba(255,255,255,${a * .85})`; ctx.fillRect(0, 0, W, H); }
+}
+function polaroid(t) {
+  if (t < S('feutres') + .05 || t > E('feutres') + .3) return;
+  ctx.fillStyle = '#fbfaf6'; ctx.fillRect(0, 0, W, 70); ctx.fillRect(0, 0, 50, H); ctx.fillRect(W - 50, 0, 50, H); ctx.fillRect(0, H - 260, W, 260);
+  text2('PHOTO DE CLASSE', W / 2, H - 150, 54, '#2b2f86'); text2('2026', W / 2, H - 92, 40, '#e0533d');
+}
+function phone(t) {
+  if (t < S('viral') - .1 || t > S('touristes') - .1) return;
+  const pw = 470, ph = 860, px = (W - pw) / 2, py = 150, sx = px + 24, sy = py + 90, sw = pw - 48, sh = ph - 190;
+  const img = document.createElement('canvas'); img.width = W; img.height = H; img.getContext('2d').drawImage(out, 0, 0);
+  ctx.fillStyle = '#26202e'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#0f0d12'; ctx.beginPath(); ctx.roundRect(px, py, pw, ph, 46); ctx.fill(); ctx.strokeStyle = '#4a4458'; ctx.lineWidth = 6; ctx.stroke();
+  ctx.save(); ctx.beginPath(); ctx.roundRect(sx, sy, sw, sh, 16); ctx.clip(); const sc = Math.max(sw / W, sh / H); ctx.drawImage(img, sx + (sw - W * sc) / 2, sy + (sh - H * sc) / 2, W * sc, H * sc); ctx.restore();
+  text2('Photo de classe…', px + pw / 2, py + 50, 30, '#ffffff', { font: 'Nun' });
+  const v = Math.floor(1e7 * ease(prog(t, S('viral') + .3, WT('viral', /^vues/)))), vs = v.toLocaleString('fr-FR').replace(/ | /g, ' ');
+  text2(vs + ' vues', px + pw / 2, py + ph - 62, 44, '#ffd23f', { lw: 8 });
+  for (let k = 0; k < 9; k++) { const ph2 = ((t - S('viral')) * .7 + k / 9) % 1, hx = px + pw - 60 - Math.sin(k * 2.3 + ph2 * 6) * 26, hy = py + ph - 140 - ph2 * 420; ctx.globalAlpha = 1 - ph2; heart(hx, hy, 18 + (k % 3) * 6); } ctx.globalAlpha = 1;
+}
+function heart(x, y, r) { ctx.fillStyle = '#ff4f7a'; ctx.beginPath(); ctx.moveTo(x, y + r * .9); ctx.bezierCurveTo(x - r * 1.6, y - r * .2, x - r * .6, y - r * 1.4, x, y - r * .5); ctx.bezierCurveTo(x + r * .6, y - r * 1.4, x + r * 1.6, y - r * .2, x, y + r * .9); ctx.fill(); }
+function bulb(t) {
+  if (!(t > S('idee') - .05 && t < E('idee') + .3) || !maire.root.visible) return; const [x, y, z] = proj(headTop(maire, .95)); if (z > 1) return;
+  const k = back(prog(t, S('idee'), S('idee') + .3)); ctx.save(); ctx.translate(x, y - 40); ctx.scale(k, k);
+  ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 6; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 58, Math.sin(a) * 58); ctx.lineTo(Math.cos(a) * 78, Math.sin(a) * 78); ctx.stroke(); }
+  ctx.fillStyle = '#fff3a0'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(0, -6, 40, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#9aa3b5'; ctx.fillRect(-18, 32, 36, 24); ctx.strokeRect(-18, 32, 36, 24);
+  ctx.restore();
+}
+function camFlashes(t) {
+  if (!(t > S('b3') - .2 && t < S('fin'))) return;
+  CAMS.forEach((cm, i) => { if (!cm.visible) return; const ph = (t * 1.1 + rnd(i) ) % 1; if (ph > .12) return; const [x, y, z] = proj(cm.position); if (z > 1) return;
+    ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 1 - ph / .12; ctx.beginPath(); ctx.arc(x, y, 26, 0, 7); ctx.fill(); ctx.globalAlpha = 1; });
+}
+function hussBurst(t) {
+  const who = { b1: tom, b2: tom, b3: touristes[1], b4: tom };
+  for (const [id, c] of Object.entries(who)) for (const t0 of G3(id)) { const k = (t - t0) / .7; if (k < 0 || k > 1 || !c.root.visible) continue;
+    const [x, y] = proj(headTop(c, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
+    for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }
+    ctx.restore(); ctx.globalAlpha = 1; }
+}
+function setupPops() {
+  POPS.length = 0; FLASH = [E('ouistiti') - .05, S('feutres') + .02];
+  for (const e of SNZ) { if (e.t < 0) continue; const big = e.c === tom && e.t < S('chaine') || e.c === maire;
+    if (e.c === tom && e.t > S('chaine')) continue;
+    POPS.push({ t: e.t, c: e.c, txt: big ? 'ATCHOUM !' : 'atchoum !', col: e.col, dy: 1.05, size: big ? 1.6 : .8 }); }
+}
+function overlay(t) {
+  const bub = (c, id, dy = 1.0) => bubbleOn(c, L[id].text.replace(/\*/g, ''), t > S(id) - .2 && t < E(id) + .4 ? prog(t, S(id) - .1, S(id) + .1) : 0, dy);
+  if (t < S('viral') - .1 || t > S('touristes') - .1) { bub(maire, 'fier'); bub(photographe, 'ouistiti'); bub(maire, 'colere'); }
+  if (t > S('moi') + .1 && t < E('moi') + .1) label(tom, 'TOM', '#7dd3ff', 1.05, 52);
+  if (t > WT('maire', /^maire/) - .1 && t < E('maire') + .1) label(maire, 'LE MAIRE', '#d0d2d8', 1.1, 48);
+  if (t > S('rose') + .1 && t < E('rose') + .3) label(maire, 'ROSE FLUO', '#ff4fd8', 1.15, 52);
+  pops(t); camFlashes(t); bulb(t); hussBurst(t);
+  polaroid(t); phone(t); flashes(t); caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); sneezes(); SH = shots(); setupPops();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.window_ready = true; window.ready = true;
+</script></body></html>
