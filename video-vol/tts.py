@@ -15,7 +15,7 @@ Script line format (script.json):
   - huss  : true -> the line is "*Huss ! Huss !*": one burst of HUSS per "Huss" word
   - chorus: optional list of voice keys -> the line is said by all of them together (a crowd)
 """
-import json, os, re, subprocess, sys, wave
+import json, os, re, subprocess, sys, wave, zlib
 import numpy as np
 from kokoro_onnx import Kokoro
 
@@ -24,6 +24,15 @@ PROFILE = json.load(open("voice_profile.json"))
 K = Kokoro(f"{KD}/kokoro-v1.0.onnx", f"{KD}/voices-v1.0.bin")
 VOICES = {who: dict(cfg, vec=sum(w * K.voices[n] for n, w in cfg["mix"].items())) for who, cfg in PROFILE["voices"].items()}
 MOODS, HUSS, FIXES = PROFILE["moods"], PROFILE["huss"], [tuple(x) for x in PROFILE["ipa_fixes"]]
+HUM = PROFILE.get("humanize", {})   # {"jitter": 0.03, "breath": true, "room": true}
+
+
+def breath(sr, seed):
+    """A soft inhale (band-limited noise, ~0.3 s) placed before long sentences."""
+    n = int(sr * (.26 + (seed % 5) * .015)); x = np.random.default_rng(seed).standard_normal(n)
+    lo = np.convolve(x, np.ones(9) / 9, "same"); band = lo - np.convolve(lo, np.ones(60) / 60, "same")
+    u = np.linspace(0, 1, n); env = np.sin(np.pi * u) ** 1.5 * (1 - .35 * u)
+    return (band / (np.abs(band).max() + 1e-6) * env * .07).astype(np.float32)
 OUT = "build/audio"; os.makedirs(OUT, exist_ok=True)
 SR, FPS = 44100, 25
 
@@ -110,7 +119,8 @@ for ln in lines:
     if ln.get("huss"):
         a, sr = huss_line(VOICES["N"], text.lower().count("huss"))
     else:
-        a, sr = K.create(ipa(ln.get("say", text)), voice=V["vec"], speed=V["speed"] * MOODS.get(mood, 1.0), is_phonemes=True)
+        jit = 1 + ((zlib.crc32(ln["id"].encode()) % 7) - 3) / 3 * HUM.get("jitter", 0)   # a human never reads two sentences at the same speed
+        a, sr = K.create(ipa(ln.get("say", text)), voice=V["vec"], speed=V["speed"] * MOODS.get(mood, 1.0) * jit, is_phonemes=True)
         a = a / (np.abs(a).max() + 1e-6) * .9
         if V.get("intonation"): a = remap(a, sr, **V["intonation"])
         if ln.get("chorus"):   # several voices saying the same line together (a crowd)
@@ -120,8 +130,12 @@ for ln in lines:
                 b2, _ = K.create(ipa(ln.get("say", text)), voice=VOICES[w2]["vec"], speed=VOICES[w2]["speed"] * MOODS.get(mood, 1.0), is_phonemes=True)
                 parts.append(np.concatenate([np.zeros(int(sr * .17 * (k + 1)), np.float32), b2 / (np.abs(b2).max() + 1e-6) * (.6 - .08 * k)]))
             n = max(len(x) for x in parts); a = sum(np.pad(x, (0, n - len(x))) for x in parts); a = a / (np.abs(a).max() + 1e-6) * .9
+    lead = 0.0
+    if HUM.get("breath") and not ln.get("huss") and not ln.get("chorus") and len(text) > 62:
+        b = breath(sr, zlib.crc32(ln["id"].encode())); lead = len(b) / sr; a = np.concatenate([b, a])
     save(a, sr, raw)
-    af = ("aresample=44100,highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,deesser=i=0.3,"
+    room = "aecho=0.85:0.6:23|41:0.09|0.05," if HUM.get("room") else ""
+    af = ("aresample=44100,highpass=f=70,equalizer=f=200:t=q:w=1.2:g=1.5,equalizer=f=3200:t=q:w=1.2:g=1.5,deesser=i=0.3," + room +
           "acompressor=threshold=-20dB:ratio=2.5:attack=5:release=90:makeup=2,"
           "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
           "loudnorm=I=-16:TP=-1.5")
@@ -140,7 +154,7 @@ for ln in lines:
             for off in HUSS["offsets"]: wt.append({"w": s, "t": round(t + .01 + HUSS["every"] * hb + off, 3), "e": True})
             hb += 1
         elif s:
-            wt.append({"w": s, "t": round(t + dur * acc / tot, 3), "e": e})
+            wt.append({"w": s, "t": round(t + lead + (dur - lead) * acc / tot, 3), "e": e})
         acc += kk
     out.append({**ln, "text": text, "start": round(t, 3), "dur": round(dur, 3), "words": wt, "env": env})
     print(f"{ln['id']:10} {t:6.2f}s  {dur:5.2f}s  {text[:60]}")

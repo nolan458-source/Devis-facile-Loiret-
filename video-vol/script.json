@@ -32,7 +32,7 @@
   "id": "chat",
   "who": "N",
   "mood": "normal",
-  "text": "Le chat des Morel dîne dans *six maisons* par soir.",
+  "text": "Le chat des Morel mange dans *six maisons* par soir.",
   "pad": 0.2
  },
  {
@@ -101,7 +101,7 @@
   "id": "malpoli",
   "who": "N",
   "mood": "deadpan",
-  "text": "Maman dit que c'est malpoli.",
+  "text": "Maman dit que ça ne se fait pas.",
   "pad": 0.1
  },
  {
@@ -284,8 +284,8 @@
  {
   "id": "auvoleur",
   "who": "N",
-  "mood": "hype",
-  "text": "*Au voleur !*",
+  "mood": "excited",
+  "text": "*Au voleur !* Au voleur dans la grange !",
   "pad": 0.4
  },
  {

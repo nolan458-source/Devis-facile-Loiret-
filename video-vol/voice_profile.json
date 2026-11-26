@@ -1,31 +1,27 @@
 {
  "_reference": "Voix mesurée sur la vidéo : narrateur 164 Hz médian (7,5 demi-tons), papa 148 Hz, voleur 130 Hz, 8,1 pics/s, 8 % de silence",
  "start_s": 0.35,
- "gap_s": 0.06,
- "pad_scale": 0.35,
+ "gap_s": 0.03,
+ "pad_scale": 0.22,
  "voices": {
   "N": {
-   "name": "narrateur (Rideau)",
-   "mix": {
-    "ff_siwis": 0.55,
-    "am_puck": 0.45
-   },
-   "speed": 1.08,
-   "intonation": {
-    "target_median": 164,
-    "down": 1.6,
-    "up": 1.75,
-    "formant": 1.0
-   }
-  },
-  "P": {
-   "name": "papa",
+   "name": "narrateur (voix d'homme naturelle)",
    "mix": {
     "ff_siwis": 0.3,
     "bm_george": 0.3,
     "am_onyx": 0.4
    },
-   "speed": 0.92,
+   "speed": 1.16,
+   "intonation": null
+  },
+  "P": {
+   "name": "papa",
+   "mix": {
+    "ff_siwis": 0.3,
+    "am_adam": 0.4,
+    "bm_george": 0.3
+   },
+   "speed": 0.98,
    "intonation": null
   },
   "V": {
@@ -33,9 +29,9 @@
    "mix": {
     "ff_siwis": 0.25,
     "am_onyx": 0.6,
-    "bm_lewis": 0.15
+    "bm_fable": 0.15
    },
-   "speed": 0.9,
+   "speed": 0.95,
    "intonation": null
   },
   "M": {
@@ -141,5 +137,10 @@
    "plyi",
    "plɥi"
   ]
- ]
+ ],
+ "humanize": {
+  "jitter": 0.03,
+  "breath": true,
+  "room": true
+ }
 }
