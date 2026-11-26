@@ -1,0 +1,116 @@
+{
+ "_reference": "Voix mesurée sur la vidéo de référence : 164 Hz médian, 104 à 247 Hz, 5,8 demi-tons d'intonation, 8,7 syllabes/s, 5 % de silence",
+ "start_s": 0.35,
+ "gap_s": 0.05,
+ "pad_scale": 0.3,
+ "voices": {
+  "N": {
+   "name": "narrateur",
+   "mix": {
+    "ff_siwis": 0.55,
+    "am_puck": 0.45
+   },
+   "speed": 1.12,
+   "intonation": {
+    "target_median": 164,
+    "down": 1.55,
+    "up": 1.65,
+    "formant": 1.0
+   }
+  },
+  "C": {
+   "name": "coach",
+   "mix": {
+    "ff_siwis": 0.35,
+    "bm_george": 0.35,
+    "am_onyx": 0.3
+   },
+   "speed": 1.06,
+   "intonation": null
+  },
+  "V": {
+   "name": "voisin",
+   "mix": {
+    "ff_siwis": 0.4,
+    "am_onyx": 0.6
+   },
+   "speed": 1.04,
+   "intonation": null
+  }
+ },
+ "moods": {
+  "normal": 1.0,
+  "excited": 1.04,
+  "hype": 1.02,
+  "sad": 0.93,
+  "deadpan": 0.97,
+  "suspense": 0.95
+ },
+ "huss": {
+  "ipa": "hˈœs !",
+  "offsets": [
+   0.0,
+   0.23,
+   0.415
+  ],
+  "every": 0.97,
+  "first_dur": 0.11,
+  "other_dur": 0.08,
+  "pitch_hz": 350,
+  "hiss": 0.3
+ },
+ "ipa_fixes": [
+  [
+   "(en)kˈəʊtʃ(fr)",
+   "kˈotʃ"
+  ],
+  [
+   "(en)fˈʊt(fr)",
+   "fˈut"
+  ],
+  [
+   "(en)bˈɔɪŋ(fr)",
+   "bwˈɛ̃ɡ"
+  ],
+  [
+   "ɡˈeɪməz",
+   "ɡˈɛmœʁ"
+  ],
+  [
+   "nˈəʊʌ",
+   "nˈoa"
+  ],
+  [
+   "kjwˈi",
+   "kiwˈi"
+  ],
+  [
+   "ɡanjˈe",
+   "ɡaɲˈe"
+  ],
+  [
+   "ɡanj",
+   "ɡaɲ"
+  ],
+  [
+   "nyˈi",
+   "nɥˈi"
+  ],
+  [
+   "syˈi",
+   "sɥˈi"
+  ],
+  [
+   "pyˈi",
+   "pɥˈi"
+  ],
+  [
+   "pyˌi",
+   "pɥˌi"
+  ],
+  [
+   "lyˈi",
+   "lɥˈi"
+  ]
+ ]
+}

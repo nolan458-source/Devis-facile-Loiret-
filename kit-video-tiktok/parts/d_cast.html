@@ -1,0 +1,15 @@
+// cast
+const timeo = character('timeo', { skin: '#f1c9a5', shirt: '#ff8a3d', pants: '#2a3a6b', hair: 'spiky', hairCol: '#e8b23a', face: { eyes: 'n', mouth: 'grin', freckles: true, blush: true } });
+const voisin = character('voisin', { skin: '#f0c39c', shirt: '#7d7d8c', pants: '#3a3a4a', shoes: '#222', hair: 'bald', hairCol: '#bbbbbb', face: { eyes: 'n', mouth: 'flat', mustache: true } });
+const coachC = character('coach', { skin: '#c98a5a', shirt: '#c0392b', pants: '#2a2a3a', hair: 'cap', capCol: '#c0392b', hairCol: '#2a1c14', face: { eyes: 'n', mouth: 'smile', mustache: true } });
+const gardien = character('gardien', { skin: '#8d5a3b', shirt: '#f5c400', pants: '#2a2a3a', hair: 'short', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'flat' } });
+const cast_ = box(.36, .7, .38, '#ffffff', 0, -.33, 0, .08, gardien.legs[1]);
+const BLUE = ['#2f8ae0', '#2f8ae0', '#2f8ae0', '#2f8ae0', '#2f8ae0'];
+const team = [0, 1, 2, 3, 4].map(i => character('team' + i, { skin: ['#f1c9a5', '#8d5a3b', '#c98a5a', '#f3cfb3', '#6b3f28'][i], shirt: BLUE[i], pants: '#ffffff',
+  hair: ['short', 'pony', 'spiky', 'bun', 'cap'][i], hairCol: ['#2a1c14', '#1e1410', '#7a4a2c', '#e8b23a', '#2a1c14'][i], capCol: '#2f5fb0', face: { eyes: 'n', mouth: 'smile', blush: i % 2 === 0 } }));
+const rivals = [0, 1, 2, 3].map(i => character('rival' + i, { skin: ['#c98a5a', '#f1c9a5', '#6b3f28', '#f3cfb3'][i], shirt: '#7a3cc0', pants: '#1e1a22',
+  hair: ['short', 'spiky', 'short', 'pony'][i], hairCol: ['#1e1410', '#2a1c14', '#1e1410', '#7a4a2c'][i], face: { eyes: 'n', mouth: 'grin', brow: .6 } }));
+const giant = character('giant', { skin: '#c98a5a', shirt: '#7a3cc0', pants: '#1e1a22', hair: 'short', hairCol: '#1e1410', shoes: '#ffd23f', face: { eyes: 'n', mouth: 'grin', brow: 1 } });
+const maireG = character('maireG', { skin: '#f3cfb3', shirt: '#2b2f86', pants: '#2a2a3a', hair: 'bald', hairCol: '#999999', apron: false, face: { eyes: 'n', mouth: 'flat', round: true, mustache: true } });
+box(.12, .8, .44, '#c0392b', 0, 1.1, .02, .02, maireG.body).rotation.z = .6;
+
