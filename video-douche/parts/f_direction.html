@@ -1,0 +1,208 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), huss = /^huss/i.test(best.w), s = lerp(huss ? 1.8 : 1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (huss) ctx.rotate(Math.sin(t * 30) * .05);
+  text2(huss ? 'HUSS !' : best.w, 0, 0, huss ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: huss ? 16 : 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const jumpY = (t, t0, d, h) => h * Math.sin(Math.PI * clamp((t - t0) / d));
+const hop = (t, period, h) => h * Math.abs(Math.sin(Math.PI * t / period));
+const G3 = id => L[id].words.filter((w, i) => i % 3 === 0).map(w => w.t);
+const hits = id => L[id].words.map(w => w.t);
+const faceTo = (x, z, tx, tz) => Math.atan2(tx - x, tz - z);
+const UP = [[2.6, 0], [2.6, 0]], FWD = [[.15, -1.6], [.15, -1.6]], NOSE = [0, [.35, -2.6]], BELLY = [[.3, -.8], [.3, -.8]];
+const hitJump = (t, id, d = .22, h = .3) => Math.max(0, ...hits(id).map(t0 => jumpY(t, t0, d, h)));
+const SA = [-1.6, 1.8];                                    // Sacha's spot on the square
+const MSPOTS = [[3.0, -5.8], [2.9, -3.6], [3.3, -1.3], [4.2, -.9], [9.6, 1.4], [4.6, -4.8], [2.4, 1.6], [9.2, 2.9]];   // crowd around the machine
+function shots() {
+  const tA = WT('jourj', /allume/);
+  return [
+    [0, [0, 7, 17], [0, 5.5, 14], [0, 2, -5], [0, 2, -5], 55],
+    [S('b1') - .15, [-1.2, 1.3, 5.2], [-1.3, 1.2, 4.6], [-1.6, 1.0, 1.8], [-1.6, 1.0, 1.8], 45],
+    [S('sale') - .1, [-5, 2.6, 4.2], [-3.4, 2.4, 3.4], [0, 1.1, -3], [0, 1.1, -3], 55],
+    [S('mouches') - .1, [-2.3, 2.25, 5.0], [-2.25, 2.25, 4.8], [-3, 2.5, 3], [-3, 2.5, 3], 42],
+    [S('boulanger') - .1, [-6.6, 2.0, .9], [-7.2, 1.85, -.2], [-9.4, 1.4, -4.9], [-9.4, 1.4, -4.9], 45],
+    [S('mousse') - .1, [-6, 1.9, 4], [-3.5, 1.8, 2.2], [-6.5, 1.1, 0], [-1, 1.1, -3.5], 52],
+    [S('douche') - .1, [0, 3.2, 6.5], [0, 3.0, 5], [0, 2.2, -6], [0, 2.2, -6], 55],
+    [S('vanille') - .1, [0, 1.9, -2.6], [0, 1.85, -3.0], [0, 1.55, -6], [0, 1.55, -6], 48],
+    [S('moi') - .1, [-1.4, 1.2, 4.6], [-1.5, 1.15, 4.1], [-1.6, .95, 1.8], [-1.6, .95, 1.8], 44],
+    [S('plan') - .1, [-1.3, .5, 4.4], [-1.4, .45, 4.1], [-2, 5, -8], [-2, 7, -8], 60],
+    [S('probleme') - .1, [-1.5, 1.05, 3.7], [-1.55, 1.05, 3.35], [-1.6, .98, 1.8], [-1.6, .98, 1.8], 40],
+    [S('machine') - .1, [3.4, 2.4, 6], [3.2, 2.8, 7.2], [6.8, 1.6, -2.2], [7, 2.4, -2.4], 55],
+    [S('b2') - .15, [2.2, 4, 10], [1.9, 4.4, 11], [7.2, 3.9, -3], [7.2, 3.9, -3], 60],
+    [S('rire') - .1, [6.3, 1.6, 2.9], [6.0, 1.6, 2.5], [3.6, 1.35, .6], [3.6, 1.35, .6], 48],
+    [S('jourj') - .1, [-1, 3.5, 8.5], [0, 3.2, 7.5], [6.2, 2.4, -2.4], [6.2, 2.4, -2.4], 55],
+    [tA - .1, [4.6, 1.3, .8], [4.7, 1.3, .5], [6.2, 1.0, -2.4], [6.2, 1.0, -2.4], 48],
+    [S('rien') - .05, [1.0, 1.6, 4.2], [1.0, 1.6, 3.9], [3.2, 1.25, -2.2], [3.2, 1.25, -2.2], 50],
+    [S('puis') - .1, [5, 1.2, 5], [5, 1.2, 5], [24, 13, -22], [6, 15, -14], 64],
+    [S('b3') - .15, [2.2, 3, 8.5], [1.6, 4.5, 10.5], [7.5, 5, -3], [7.5, 6.5, -3], 62],
+    [S('pluie') - .15, [0, 6, 16], [0, 4.5, 12], [2, 2, -4], [2, 2, -4], 58],
+    [S('danse') - .1, [1.6, 2.2, 6.5], [3.2, 2.2, 7], [4.4, 1.2, -1.4], [4.4, 1.2, -1.4], 55],
+    [S('madouche') - .1, [2.1, 1.5, -.6], [2.0, 1.45, -1.0], [1.6, 1.3, -3.8], [1.6, 1.3, -3.8], 46],
+    [S('fin') - .1, [3.4, 1.9, -2.6], [2.6, 2.6, .8], [2.9, 1.75, -4.94], [.4, 1.6, -6], 48],
+    [S('twist') - .1, [5.4, 1.7, 4.6], [5.45, 1.55, 4.0], [5.45, 1.55, .35], [5.45, 1.45, .35], 64],
+    [S('b4') - .1, [4.7, 1.25, 3.2], [4.75, 1.2, 2.8], [4.9, 1.0, .4], [4.9, 1.0, .4], 44],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k)), look = s[3].map((v, j) => lerp(v, s[4][j], k));
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, look[1] + 18, look[2] + 12); sun.target.position.set(look[0], look[1], look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const PROPS = [baguette, pince, billet, savon, chain, BALLOONS, priceSign2];
+const hideAll = () => { for (const c of Object.values(CH)) c.root.visible = false; PROPS.forEach(p => p.visible = false); FLIES.forEach(f => f.visible = false); HERO_FLY.visible = false; };
+function hold(pr, x, y, z, ry, s, dy = 1.0, dz = .45) { pr.visible = true; pr.position.set(x + Math.sin(ry) * dz * s, y + dy * s, z + Math.cos(ry) * dz * s); pr.rotation.set(0, ry, 0); }
+const onFace = (c, pr, lx, ly, lz) => { c.root.updateMatrixWorld(true); pr.visible = true; pr.position.copy(c.head.localToWorld(new THREE.Vector3(lx, ly, lz))); pr.rotation.set(0, c.root.rotation.y, 0); pr.scale.setScalar(c.root.scale.x); };
+let PRICE_KEY = '';
+
+function update(t) {
+  hideAll();
+  const raining = t > S('pluie') - .15 && t < S('fin') - .1, clearSky = t > S('fin') - .1, dirty = t < S('pluie') - .1;
+  const inL = (id, a = -.1, b = .1) => t > S(id) + a && t < E(id) + b;
+  const pk = clearSky ? 'free' : 'paid'; if (pk !== PRICE_KEY) { priceTex.redraw(pk === 'free' ? 'GRATUIT' : '1 000 000 €', pk === 'free' ? '#7dff7a' : '#ffd23f'); PRICE_KEY = pk; }
+  // --- sky, clouds, rain
+  const tN = WT('puis', /^nuage/), tD = WT('puis', /^dix/), tMi = WT('puis', /^mille/);
+  CLOUDS.forEach((c, i) => { const [a, b] = i === 0 ? [S('puis') - .4, tN + .8] : i < 10 ? [tD - .3, tD + 1.1] : [tMi - .2, S('b3') + 1.8 + (i % 5) * .15];
+    const k = clearSky ? 0 : ease(prog(t, a, b)); c.position.lerpVectors(c.userData.from, c.userData.to, k); c.visible = k > 0; });
+  const g = clearSky ? 0 : prog(t, tD, S('b3') + 1.2);
+  scene.background = g > .45 ? SKY_GREY : SKY_DAY; scene.fog.color.set(g > .45 ? '#aeb8c4' : '#bfe4ff');
+  hemi.intensity = lerp(1.25, .8, g); sun.intensity = lerp(2.2, .55, g);
+  setRain(raining, t);
+  setDrops((t > S('douche') + .2 && t < E('vanille') + .4) || (t > S('fin') + .3), t);
+  const sucking = t > S('puis') - .2 && t < S('pluie') - .2, FUN = new THREE.Vector3(8, 8.4, -3);
+  PUFFS.forEach((p, i) => { p.visible = sucking; if (!sucking) return; const k = (t * .9 + i / PUFFS.length) % 1, a = rnd(i) * 6.28;
+    p.position.lerpVectors(new THREE.Vector3(8 + Math.cos(a) * 9, 15 + rnd(i + 3) * 4, -3 + Math.sin(a) * 9), FUN, k * k); p.scale.setScalar(1 - k * .7); });
+  // --- the machine: one part per HUSS of the building montage
+  const bh = hits('b2');
+  MPARTS.forEach((p, i) => { const t0 = bh[Math.min(i, bh.length - 1)]; p.visible = t > t0 - .02; p.scale.setScalar(Math.max(.001, back(prog(t, t0 - .02, t0 + .3)))); });
+  const on = t > WT('jourj', /allume/) + .15 && t < S('fin') - .1;
+  MACHINE.position.set(8 + (on && t < S('pluie') ? Math.sin(t * 70) * .03 : 0), 0, -3);
+  BLADE.rotation.x = on ? t * 30 : 0; LEVER.rotation.z = t > WT('jourj', /allume/) + .1 ? .7 : 0;
+  if (t > S('twist') - .2) { priceSign2.visible = true; priceSign2.position.set(6.0, 1.75, .3); priceSign2.rotation.y = -.15; priceSign2.scale.setScalar(Math.max(.001, .62 * back(prog(t, WT('twist', /^nuages/), WT('twist', /^nuages/) + .35)))); }
+
+  // --- Sacha
+  let sv = null; const sf = (o) => Object.assign({ freckles: true }, o);
+  if (t < S('sale')) { sv = { x: SA[0], z: SA[1], ry: .15, face: sf({ eyes: 'happy', mouth: 'grin' }), arms: [0, 0] }; sv.y = hitJump(t, 'b1', .22, .35); if (inL('b1')) { sv.arms = UP; sv.face.mouth = 'open'; } }
+  else if (t > S('moi') - .1 && t < S('machine') - .1) {
+    sv = { x: SA[0], z: SA[1], ry: 0, face: sf({ eyes: 'n', mouth: 'smile' }), arms: [0, 0] };
+    if (t < S('plan') - .1) { sv.arms = [0, [.15, -1.7]]; hold(billet, SA[0] + .18, 0, SA[1], 0, .62, 1.25, .55); sv.face = sf({ eyes: 'happy', mouth: 'grin' }); }
+    else if (t < S('probleme') - .1) { sv.headX = -.45; sv.arms = [0, [2.7, 0]]; sv.face = sf({ eyes: 'wide', mouth: 'grin' }); }
+    else { sv.face = sf({ eyes: 'n', mouth: 'flat', brow: .4 }); }
+  }
+  else if (t >= S('machine') - .1 && t < S('pluie') - .15) {
+    sv = { x: 5.0, z: -.2, ry: .5, face: sf({ eyes: 'n', mouth: 'grin' }), arms: [0, 0] };
+    if (t > S('b2') - .2 && t < S('rire')) { sv.y = hitJump(t, 'b2'); sv.arms = UP; sv.face = sf({ eyes: 'happy', mouth: 'open' }); }
+    if (t >= S('rire') && t < S('jourj')) { sv.arms = [[.5, -1.0], [.5, -1.0]]; sv.face = sf({ eyes: 'n', mouth: 'flat', brow: .8 }); }
+    if (t >= S('jourj')) { sv.x = 5.8; sv.z = -2.6; sv.ry = 1.19; sv.arms = t > WT('jourj', /allume/) - .3 ? [0, [2.2, -.6]] : [0, 0]; sv.face = sf({ eyes: 'n', mouth: 'grin' }); }
+    if (t >= S('rien') - .05) { sv.ry = .6; sv.arms = [0, 0]; sv.face = sf({ eyes: 'n', mouth: 'flat' }); }
+    if (t >= S('puis') - .1) { sv.ry = .6; sv.headX = -.4; sv.face = sf({ eyes: 'wide', mouth: 'o' }); }
+    if (t >= S('b3') - .15) { sv.y = hitJump(t, 'b3'); sv.arms = UP; sv.headX = 0; sv.face = sf({ eyes: 'happy', mouth: 'open' }); }
+  }
+  else if (t >= S('pluie') - .15 && t < S('madouche') - .1) { sv = { x: 5.0, z: -.2, ry: Math.sin(t * 4) * .6, y: hop(t, .5, .25), arms: CHEER(t), face: sf({ eyes: 'happy', mouth: 'open' }) }; }
+  else if (t >= S('twist') - .1) {
+    sv = { x: 4.9, z: .4, ry: -.1, face: sf({ eyes: 'n', mouth: 'grin', shades: true }), arms: [[.4, 0], [2.3, 0]] };
+    if (t > E('twist') - .2) { sv.face = sf({ eyes: 'wink', mouth: 'grin' }); sv.y = hitJump(t, 'b4', .22, .3); }
+    BALLOONS.visible = true; BALLOONS.position.set(4.9 + .55, .62 * 1.9 + .6, .4); BALLOONS.rotation.y = Math.sin(t * 1.5) * .15; BALLOONS.scale.setScalar(.8);
+  }
+  if (sv) { P(sacha, Object.assign({ s: .62, y: 0 }, sv)); if (t >= S('twist') - .1) onFace(sacha, chain, 0, -.12, .3); }
+  // --- Madame Mousse
+  if (t > S('mousse') - .2 && t < S('moi') - .1) {
+    if (t < S('douche') - .1) { const k = prog(t, S('mousse') - .2, E('mousse')), x = lerp(-7, -.5, k), z = lerp(.4, -3.6, k);
+      P(mousse, { x, z, s: .8, ry: faceTo(-7, .4, -.5, -3.6), walk: k < 1 ? t * 9 : 0, walkAmp: .5, arms: [0, 0], face: { eyes: 'happy', mouth: 'smile', blush: true } }); }
+    else { const sw = Math.sin(t * 6) * .35; P(mousse, { x: 0, y: .3, z: -6, s: .8, ry: 0, arms: inL('vanille', -.1, .4) ? [[2.4 + sw, -.2], [2.4 - sw, -.2]] : [[1.9 + sw, -.6], [1.9 - sw, -.6]], talk: talk('M', t), headX: -.15,
+      face: { eyes: inL('vanille', -.1, .4) ? 'closed' : 'happy', mouth: 'smile', blush: true } }); }
+  }
+  if (t > S('madouche') - .2 && t < S('fin') - .1) P(mousse, { x: 1.6, z: -3.8, s: .8, ry: .2, arms: [[.8, 0], [.8, 0]], talk: talk('M', t), face: { eyes: 'n', mouth: 'sad', tear: true, blush: true, brow: -.6 } });
+  // --- the baker, clothes-peg on the nose
+  if (t < S('pluie')) { const bx = -9.45, bz = -4.9, br = .45;
+    P(boulanger, { x: bx, z: bz, ry: br, s: .85, arms: inL('boulanger', -.1, .2) ? [0, [.15, -1.5]] : [0, 0], face: { eyes: 'n', mouth: 'flat', mustache: true, brow: .5 } });
+    onFace(boulanger, pince, 0, .3, .36); if (inL('boulanger', -.1, .2)) hold(baguette, bx + .2, 0, bz, br, .85, 1.25, .6); }
+  // --- the neighbour who laughs
+  if (t > S('rire') - .1 && t < S('fin') - .1) { const laugh = inL('rire', -.1, .3);
+    P(voisin, { x: 3.6, z: .6, s: .85, ry: raining ? Math.sin(t * 4 + 1) * .6 : .9, y: laugh ? hop(t, .18, .06) : raining ? hop(t + .2, .5, .22) : 0, arms: laugh ? BELLY : raining ? CHEER(t + .3) : [0, 0], talk: talk('C', t),
+      face: { eyes: laugh || raining ? 'happy' : 'n', mouth: laugh || raining ? 'open' : 'flat' } }); }
+  // --- the crowd
+  crowd.forEach((c, i) => {
+    const p = { s: .78, arms: [0, 0], face: { eyes: 'n', mouth: 'flat', blush: i % 3 === 0, mustache: i === 5 } };
+    if (t < S('rire') - .1) {
+      [p.x, p.z] = CROWD_SPOTS[i]; p.ry = faceTo(p.x, p.z, 0, -6);
+      if (i % 3 === 1) p.arms = NOSE;
+      if (t > S('douche') - .1) { p.face.eyes = 'wide'; p.face.mouth = 'o'; p.arms = [0, 0]; }
+      if (t > S('moi') - .1) { p.face.eyes = 'n'; p.face.mouth = 'flat'; if (i % 3 === 1) p.arms = NOSE; }
+    } else if (t < S('fin') - .1) {
+      [p.x, p.z] = MSPOTS[i]; p.ry = faceTo(p.x, p.z, 8, -3);
+      if (inL('rire', -.1, .3)) { p.face.eyes = 'happy'; p.face.mouth = 'open'; p.arms = BELLY; p.y = hop(t + i * .05, .2, .05); }
+      if (t > S('puis') - .1) { p.headX = -.45; p.face.eyes = 'wide'; p.face.mouth = 'o'; }
+      if (raining) { p.headX = 0; p.ry += Math.sin(t * 4 + i) * .7; p.y = hop(t + i * .13, .5, .22); p.arms = i % 2 ? CHEER(t + i) : UP; p.face.eyes = 'happy'; p.face.mouth = i % 2 ? 'open' : 'grin'; }
+    } else {
+      [p.x, p.z] = CROWD_SPOTS[i]; p.ry = faceTo(p.x, p.z, 0, -6); p.face.eyes = 'happy'; p.face.mouth = 'grin';
+      if (i === 2) { p.x = 0; p.y = .3; p.z = -6; p.ry = 0; p.arms = [[2.4 + Math.sin(t * 6) * .3, -.2], [2.4 - Math.sin(t * 6) * .3, -.2]]; p.face.eyes = 'closed'; p.face.mouth = 'open'; }
+      if (i === 0 || i === 1 || i === 3) { p.x = 1.6 + [0, 1, 0, 2][i] * .9; p.z = -3.4 + [0, 1, 0, 2][i] * .9; p.ry = faceTo(p.x, p.z, 0, -6); }
+    }
+    P(c, p);
+  });
+  // --- flies buzzing around the dirty heads
+  if (dirty) { const hosts = [crowd[0], crowd[1], crowd[3], crowd[6], crowd[7], boulanger, sacha, crowd[4], voisin, crowd[5]];
+    FLIES.forEach((f, i) => { const h = hosts[i]; if (!h.root.visible) return; const v = headTop(h, .6), a = t * (6 + i % 3) + i * 2;
+      f.visible = true; f.position.set(v.x + Math.cos(a) * .5, v.y + Math.sin(t * 9 + i) * .15, v.z + Math.sin(a) * .5); f.rotation.y = -a; f.scale.setScalar(.9);
+      for (const s of [-1, 1]) f.getObjectByName('w' + s).rotation.z = s * Math.sin(t * 90 + i) * .6; }); }
+  if (inL('mouches', -.1, .2)) { HERO_FLY.visible = true; HERO_FLY.scale.setScalar(1.7); HERO_FLY.position.set(-3 + Math.sin(t * 3) * .04, 2.6 + Math.sin(t * 7) * .03, 3); HERO_FLY.rotation.set(-.15, .45 + Math.sin(t * 2) * .15, 0);
+    for (const s of [-1, 1]) HERO_FLY.getObjectByName('w' + s).rotation.z = s * Math.sin(t * 90) * .6; }
+}
+
+// ---------- overlay ----------
+function stink(t) {
+  if (t > S('pluie') + .4) return; const fade = 1 - prog(t, S('pluie') - .1, S('pluie') + .4);
+  for (const c of [sacha, boulanger, voisin, ...crowd]) {
+    if (!c.root.visible) continue; const v = headTop(c, .85); const [x, y, z] = proj(v); if (z > 1 || x < -60 || x > W + 60 || y < -60 || y > H + 60) continue;
+    const s = clamp(6 / camera.position.distanceTo(v), .3, 1.5);
+    ctx.save(); ctx.strokeStyle = '#86d94e'; ctx.lineWidth = 6 * s; ctx.lineCap = 'round';
+    for (let k = 0; k < 3; k++) { const ph = (t * .8 + k / 3 + rnd(x | 0) * .3) % 1; ctx.globalAlpha = .9 * fade * (1 - ph);
+      ctx.beginPath(); for (let j = 0; j <= 10; j++) { const yy = y - (14 + ph * 70 + j * 5) * s, xx = x + (k - 1) * 22 * s + Math.sin(j * .9 + t * 6 + k) * 7 * s; j ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); } ctx.stroke(); }
+    ctx.restore();
+  }
+}
+function sparkles(t) {
+  if (t < S('danse') - .1 || (t > S('madouche') - .1 && t < S('fin') - .1)) return;
+  for (const c of [sacha, voisin, ...crowd]) {
+    if (!c.root.visible) continue; const v = headTop(c, .7); const [x, y, z] = proj(v); if (z > 1) continue; const s = clamp(6 / camera.position.distanceTo(v), .3, 1.4);
+    for (let k = 0; k < 2; k++) { const ph = (t * 1.3 + k * .5 + rnd(k + (x | 0))) % 1, r = (8 + 10 * Math.sin(ph * Math.PI)) * s, cx = x + (k ? 30 : -34) * s, cy = y - (10 + k * 26) * s;
+      ctx.fillStyle = '#fff6a8'; ctx.globalAlpha = Math.sin(ph * Math.PI); ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * .3, cy - r * .3); ctx.lineTo(cx + r, cy); ctx.lineTo(cx + r * .3, cy + r * .3); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r * .3, cy + r * .3); ctx.lineTo(cx - r, cy); ctx.lineTo(cx - r * .3, cy - r * .3); ctx.closePath(); ctx.fill(); }
+    ctx.globalAlpha = 1;
+  }
+}
+function hussBurst(t) {
+  for (const t0 of ['b1', 'b2', 'b3', 'b4'].flatMap(G3)) { const k = (t - t0) / .7; if (k < 0 || k > 1 || !sacha.root.visible) continue;
+    const [x, y] = proj(headTop(sacha, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
+    for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }
+    ctx.restore(); ctx.globalAlpha = 1; }
+}
+function setupPops() { POPS.length = 0; POPS.push({ t: WT('moi', /^dix/), c: sacha, txt: '10 €', col: '#7dff7a', dy: 1.1, size: 1.4 }); }
+function overlay(t) {
+  stink(t); sparkles(t);
+  const bub = (c, id, dy = 1.0) => bubbleOn(c, L[id].text.replace(/\*/g, ''), t > S(id) - .2 && t < E(id) + .4 ? prog(t, S(id) - .1, S(id) + .1) : 0, dy);
+  bub(mousse, 'vanille'); bub(voisin, 'rire'); bub(mousse, 'madouche');
+  if (t > S('moi') + .1 && t < WT('moi', /^dix/) - .1) label(sacha, 'SACHA', '#7dd3ff', 1.05, 52);
+  if (t > WT('mousse', /^madame/) - .1 && t < E('mousse') + .1) label(mousse, 'MADAME MOUSSE', '#ff9fd0', 1.1, 46);
+  pops(t); hussBurst(t); caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); SH = shots(); setupPops();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>

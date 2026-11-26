@@ -1,0 +1,92 @@
+// ---------- world : la ville où une douche coûte un million ----------
+const SKY_GREY = skyTex('#5f6b7d', '#aeb8c4');
+scene.background = SKY_DAY;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(700, 300), M('#63b84a')); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const square = new THREE.Mesh(new THREE.PlaneGeometry(32, 22), M('#d9cbb0')); square.rotation.x = -Math.PI / 2; square.position.set(0, .015, -3); square.receiveShadow = true; scene.add(square);
+for (let x = -15; x <= 15; x += 2) { const l = new THREE.Mesh(new THREE.PlaneGeometry(.06, 22), M('#c8b896')); l.rotation.x = -Math.PI / 2; l.position.set(x, .02, -3); scene.add(l); }
+const HOUSE_COLS = ['#f2b38a', '#9fd9b0', '#f4a6b8', '#f7d774', '#a9c7f5', '#c9a6f0'];
+const ROOF_COLS = ['#7a5cd6', '#e0533d', '#3fa35b', '#3b6fd8'];
+function house(x, z, i, ry = 0) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  box(5, 3.4, 4, HOUSE_COLS[i % 6], 0, 1.7, 0, .1, g);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.9, 2, 4), M(ROOF_COLS[i % 4])); roof.rotation.y = Math.PI / 4; roof.position.y = 4.4; roof.castShadow = true; g.add(roof);
+  for (const wx of [-1.4, 1.4]) { box(1.1, 1.1, .1, '#ffffff', wx, 2.1, 2.02, .03, g); box(.9, .9, .12, '#2f5fb0', wx, 2.1, 2.03, .02, g); }
+  box(.95, 1.7, .1, '#7a4a2c', 0, .85, 2.02, .03, g); box(.12, .12, .12, '#f5c400', .3, .85, 2.1, .03, g);
+  return g;
+}
+function tree(x, z, s = 1) { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); box(.4, 1.6, .4, '#7a5236', 0, .8, 0, .05, g); box(1.8, 1.4, 1.8, '#3fa35b', 0, 2.2, 0, .3, g); box(1.2, 1, 1.2, '#4fbf68', 0, 3.1, 0, .25, g); }
+[-21, -14, -7, 0, 7, 14, 21].forEach((x, i) => house(x, -17, i));
+[-9, -2, 5].forEach((z, i) => { house(-19.5, z, i + 2, Math.PI / 2); house(19.5, z, i + 4, -Math.PI / 2); });
+[-16.5, -10.5, 10.5, 16.5].forEach(x => tree(x, -13.5, .9));
+// --- the golden shower (1 000 000 €)
+const SHOWER = new THREE.Vector3(0, 0, -6);
+const gold = '#e8b923';
+{ const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.6, .3, 32), M(gold)); base.position.set(0, .15, -6); base.castShadow = base.receiveShadow = true; scene.add(base);
+  box(.16, 4.4, .16, gold, 1.25, 2.3, -6, .05); box(1.35, .14, .14, gold, .6, 4.45, -6, .04);
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(.42, .3, .14, 20), M('#d9a516')); head.position.set(0, 4.3, -6); scene.add(head);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, .05, 8, 40), M(gold)); ring.rotation.x = Math.PI / 2; ring.position.set(0, 3.9, -6); scene.add(ring); }
+// price machine next to it: a slot box with an LED screen
+const priceTex = textTex(512, 256, (x, txt = '1 000 000 €', col = '#ffd23f') => { x.fillStyle = '#16121c'; x.fillRect(0, 0, 512, 256); x.fillStyle = col; x.font = FONT(txt.length > 9 ? 82 : 104); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, 256, 140); x.fillStyle = '#ff5d5d'; x.font = FONT(40); x.fillText('UNE DOUCHE', 256, 48); });
+box(1.6, 2.3, .9, '#b3262e', 2.9, 1.15, -5.4, .08);
+panel(1.36, .68, priceTex, 2.9, 1.75, -4.94);
+box(.5, .08, .1, '#16121c', 2.9, 1.1, -4.93, .02);
+// the bakery stall
+const bakery = new THREE.Group(); bakery.position.set(-9, 0, -4); bakery.rotation.y = .45; scene.add(bakery);
+box(3.2, 1.1, 1.2, '#b07a4a', 0, .55, 0, .06, bakery); box(3.4, .12, 1.4, '#f2e3c6', 0, 1.15, 0, .03, bakery);
+for (let k = 0; k < 6; k++) { const b = box(.16, .14, 1.1, '#d9a35a', -1.3 + k * .5, 1.28, 0, .06, bakery); b.rotation.y = .2; }
+for (const sx of [-1.5, 1.5]) box(.12, 2.6, .12, '#ffffff', sx, 1.3, -.5, .03, bakery);
+box(3.6, .5, 1.8, '#e0533d', 0, 2.75, -.1, .05, bakery);
+// --- the cloud vacuum (built piece by piece)
+const MACHINE = new THREE.Group(); MACHINE.position.set(8, 0, -3); scene.add(MACHINE);
+const MPARTS = [];
+const mpart = (build) => { const g = new THREE.Group(); MACHINE.add(g); build(g); g.visible = false; MPARTS.push(g); return g; };
+mpart(g => box(3.2, .5, 2.2, '#5a5f6b', 0, .25, 0, .06, g));
+mpart(g => { for (const [wx, wz] of [[-1.2, 1.15], [1.2, 1.15], [-1.2, -1.15], [1.2, -1.15]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, .22, 16), M('#222')); w.rotation.x = Math.PI / 2; w.position.set(wx, .35, wz); g.add(w); } });
+mpart(g => box(2.4, 1.7, 1.8, '#ffd23f', 0, 1.35, 0, .12, g));
+mpart(g => { const c = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, 5, 20), M('#9aa3b5')); c.position.set(0, 4.6, 0); c.castShadow = true; g.add(c); });
+mpart(g => { const f = new THREE.Mesh(new THREE.CylinderGeometry(1.6, .55, 1.3, 24, 1, true), new THREE.MeshStandardMaterial({ color: '#c9ced8', side: THREE.DoubleSide, roughness: .5 })); f.position.set(0, 7.7, 0); g.add(f); });
+mpart(g => { const fan = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .12, 20), M('#3b6fd8')); fan.rotation.z = Math.PI / 2; fan.position.set(1.25, 1.4, 0); g.add(fan); box(.06, 1, .12, '#ffffff', 1.33, 1.4, 0, .02, g).name = 'blade'; });
+mpart(g => { const pv = new THREE.Group(); pv.position.set(-1.45, .5, .7); pv.name = 'pivot'; g.add(pv); box(.12, .9, .12, '#e0533d', 0, .45, 0, .03, pv); const k = new THREE.Mesh(new THREE.SphereGeometry(.16, 12, 12), M('#e0533d')); k.position.set(0, .92, 0); pv.add(k); });
+mpart(g => { const d = new THREE.Mesh(new THREE.CylinderGeometry(.28, .28, .06, 20), M('#ffffff')); d.rotation.x = Math.PI / 2; d.position.set(.5, 1.6, .92); g.add(d); box(.04, .2, .02, '#e0533d', .5, 1.65, .96, .01, g); });
+const machineSign = textTex(512, 160, (x, a = 'ASPIRATEUR', b = 'À NUAGES') => { x.fillStyle = '#ffffff'; x.fillRect(0, 0, 512, 160); x.fillStyle = '#2b2f86'; x.font = FONT(56); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(a, 256, 52); x.fillStyle = '#e0533d'; x.fillText(b, 256, 112); });
+mpart(g => { box(2.5, .85, .08, '#2b2f86', 0, 2.8, .9, .03, g); panel(2.36, .74, machineSign, 0, 2.8, .95, g); });
+const LEVER = MPARTS[6].getObjectByName('pivot'), BLADE = MPARTS[5].getObjectByName('blade');
+// --- clouds: far away at first, then sucked over the town
+const CLOUDS = [], CLOUD_MAT = new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#c9d1dc', emissiveIntensity: .75, roughness: 1 });
+for (let i = 0; i < 34; i++) {
+  const g = new THREE.Group(); scene.add(g); const n = 3 + Math.floor(rnd(i + 7) * 3);
+  for (let k = 0; k < n; k++) { const m = box(2.4 + rnd(i * 3 + k) * 2.4, 1.3 + rnd(i * 5 + k) * 1, 2 + rnd(i * 7 + k) * 1.4, '#ffffff', (k - n / 2) * 1.6, rnd(i + k) * .7, rnd(i * 2 + k) * .9, .5, g); m.castShadow = false; m.material = CLOUD_MAT; }
+  g.userData.from = new THREE.Vector3(70 + rnd(i + 11) * 60, 16 + rnd(i + 13) * 12, -50 + rnd(i + 17) * 40);
+  g.userData.to = new THREE.Vector3(-22 + rnd(i + 19) * 44, 13 + rnd(i + 23) * 7, -26 + rnd(i + 29) * 30);
+  CLOUDS.push(g);
+}
+const PUFFS = []; for (let i = 0; i < 14; i++) { const p = box(.9, .6, .8, '#ffffff', 0, 0, 0, .25); p.material = CLOUD_MAT; p.castShadow = false; p.visible = false; PUFFS.push(p); }
+// --- particles: rain, shower drops, bubbles
+function instanced(geo, color, n, opacity = 1) { const m = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity }), n); m.frustumCulled = false; m.visible = false; scene.add(m); return m; }
+const RAIN = instanced(new THREE.BoxGeometry(.03, .5, .03), '#d8ecff', 1400, .7);
+const DROPS = instanced(new THREE.BoxGeometry(.04, .22, .04), '#7fc8ff', 90, .9);
+const BUBBLES = instanced(new THREE.SphereGeometry(.13, 10, 10), '#ffffff', 70, .7);
+const _m = new THREE.Matrix4();
+function setRain(on, t) { RAIN.visible = on; if (!on) return; for (let i = 0; i < RAIN.count; i++) { const y = ((rnd(i + 300) * 18 - t * 15) % 18 + 18) % 18; _m.makeTranslation(-16 + rnd(i) * 32, y, -16 + rnd(i + 900) * 26); RAIN.setMatrixAt(i, _m); } RAIN.instanceMatrix.needsUpdate = true; }
+function setDrops(on, t) { DROPS.visible = on; if (!on) return; for (let i = 0; i < DROPS.count; i++) { const k = ((rnd(i + 40) - t * 1.6) % 1 + 1) % 1, a = rnd(i) * 6.28, r = rnd(i + 70) * .45; _m.makeTranslation(Math.cos(a) * r, .3 + k * 3.9, -6 + Math.sin(a) * r); DROPS.setMatrixAt(i, _m); } DROPS.instanceMatrix.needsUpdate = true; }
+function setBubbles(on, t, spots) { BUBBLES.visible = on; if (!on) return; for (let i = 0; i < BUBBLES.count; i++) { const s = spots[i % spots.length], k = ((rnd(i + 5) + t * .35) % 1); const sc = .6 + rnd(i + 8) * .9; _m.makeScale(sc, sc, sc).setPosition(s.x + Math.sin(t * 2 + i) * .5 + (rnd(i + 2) - .5), .6 + k * 3.5, s.z + Math.cos(t * 2 + i) * .5); BUBBLES.setMatrixAt(i, _m); } BUBBLES.instanceMatrix.needsUpdate = true; }
+// --- flies (and the hero fly with its tiny mask)
+function makeFly(mask = false) {
+  const g = new THREE.Group(); scene.add(g);
+  box(.16, .12, .22, '#1e1a22', 0, 0, 0, .05, g); box(.13, .11, .11, '#1e1a22', 0, .01, .15, .05, g);
+  for (const s of [-1, 1]) { box(.07, .07, .03, '#ff5d5d', s * .05, .04, .21, .02, g); const w = box(.16, .01, .1, '#dfefff', s * .14, .08, -.02, .005, g); w.material = w.material.clone(); w.material.transparent = true; w.material.opacity = .6; w.name = 'w' + s; }
+  if (mask) { box(.15, .07, .02, '#ffffff', 0, -.025, .215, .01, g); box(.2, .015, .015, '#ffffff', 0, -.02, .2, .005, g); }
+  g.visible = false; return g;
+}
+const FLIES = Array.from({ length: 10 }, (_, i) => makeFly(i % 2 === 0));
+const HERO_FLY = makeFly(true);
+// --- props
+const prop = (build) => { const g = new THREE.Group(); scene.add(g); build(g); g.visible = false; return g; };
+const baguette = prop(g => { const b = box(.13, .13, 1.0, '#d9a35a', 0, 0, 0, .06, g); });
+const pince = prop(g => { box(.06, .16, .05, '#4fb6ff', -.035, 0, 0, .02, g); box(.06, .16, .05, '#4fb6ff', .035, 0, 0, .02, g); });
+const billet = prop(g => { box(.5, .26, .02, '#7dbf6a', 0, 0, 0, .01, g); box(.16, .12, .025, '#f2f2f2', 0, 0, 0, .01, g); });
+const savon = prop(g => { box(.26, .14, .16, '#ff9fd0', 0, 0, 0, .05, g); });
+const chain = prop(g => { for (let k = 0; k < 7; k++) { const a = Math.PI * (.15 + .7 * k / 6); box(.06, .06, .03, '#f5c400', Math.cos(a) * .3, -Math.sin(a) * .22, 0, .015, g); } });
+const BALLOONS = prop(g => { for (let k = 0; k < 3; k++) { const c = new THREE.Group(); c.position.set((k - 1) * .9, 2.2 + (k % 2) * .5, 0); g.add(c); box(.9, .55, .6, '#ffffff', 0, 0, 0, .22, c); box(.6, .45, .5, '#ffffff', .35, .15, 0, .2, c); box(.01, 1.6 + (k % 2) * .5, .01, '#ffffff', -(k - 1) * .45, -1.0 - (k % 2) * .25, 0, .002, c).rotation.z = (k - 1) * .5; } });
+const SIGN2 = textTex(512, 200, x => { x.fillStyle = '#ffd23f'; x.fillRect(0, 0, 512, 200); x.fillStyle = '#1e1a22'; x.font = FONT(58); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('NUAGES', 256, 60); x.fillStyle = '#e0533d'; x.font = FONT(64); x.fillText('1 000 000 €', 256, 140); });
+const priceSign2 = prop(g => { box(2.3, 1.0, .1, '#1e1a22', 0, 0, -.06, .03, g); panel(2.2, .86, SIGN2, 0, 0, 0, g); box(.1, 1.6, .1, '#7a5236', 0, -1.2, -.1, .02, g); });

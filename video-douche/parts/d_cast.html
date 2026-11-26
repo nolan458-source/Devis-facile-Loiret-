@@ -1,0 +1,10 @@
+// cast
+const sacha = character('sacha', { skin: '#e9b98f', shirt: '#ffd23f', pants: '#2f5fb0', hair: 'spiky', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'smile', freckles: true } });
+const mousse = character('mousse', { skin: '#f6d2b8', shirt: '#ff7fb0', pants: '#ff7fb0', shoes: '#ffffff', hair: 'bun', hairCol: '#f5d76e', face: { eyes: 'happy', mouth: 'smile', blush: true } });
+const boulanger = character('boulanger', { skin: '#f0c39c', shirt: '#f2f2f2', pants: '#2a2a3a', hair: 'chef', hairCol: '#2a1c14', apron: true, face: { eyes: 'n', mouth: 'flat', mustache: true } });
+const voisin = character('voisin', { skin: '#c98a5a', shirt: '#ff8a3d', pants: '#3a3a4a', hair: 'cap', capCol: '#3fa35b', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'grin' } });
+const CROWD_SPOTS = [[-4.6, -2.6], [-2.8, -.6], [2.6, -.4], [4.4, -2.2], [-5.6, -5.4], [5.2, -6.6], [-1.2, .6], [1.2, .9]];
+const crowd = CROWD_SPOTS.map((p, i) => character('crowd' + i, { skin: ['#f1c9a5', '#8d5a3b', '#c98a5a', '#f3cfb3', '#6b3f28', '#f0c39c', '#e9b98f', '#8d5a3b'][i],
+  shirt: ['#3b6fd8', '#9a6be0', '#4fbf68', '#e8473f', '#5de0ff', '#c0392b', '#7a3cc0', '#f5c400'][i], pants: ['#2a2a3a', '#ffffff', '#3a3a4a', '#2a3a6b'][i % 4],
+  hair: ['short', 'pony', 'spiky', 'bun', 'pigtails', 'bald', 'hood', 'short'][i], hairCol: ['#2a1c14', '#1e1410', '#7a4a2c', '#e8b23a', '#2a1c14', '#bbbbbb', '#2a1c14', '#7a4a2c'][i], hoodCol: '#7a3cc0',
+  face: { eyes: 'n', mouth: 'flat', blush: i % 3 === 0, mustache: i === 5 } }));

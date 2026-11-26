@@ -1,0 +1,170 @@
+[
+ {
+  "id": "intro",
+  "who": "N",
+  "text": "Dans ma ville, une douche coûte *un million* d'euros.",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "b1",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "sale",
+  "who": "N",
+  "text": "Alors ici, personne ne se lave. *Jamais.*",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "mouches",
+  "who": "N",
+  "text": "Même les mouches portent un *masque*.",
+  "pad": 0.3,
+  "mood": "deadpan"
+ },
+ {
+  "id": "boulanger",
+  "who": "N",
+  "mood": "normal",
+  "text": "Le boulanger vend ses baguettes avec une *pince à linge* sur le nez.",
+  "pad": 0.2
+ },
+ {
+  "id": "mousse",
+  "who": "N",
+  "text": "Une seule personne sent bon : *madame Mousse*. Elle est milliardaire.",
+  "pad": 0.1,
+  "mood": "suspense"
+ },
+ {
+  "id": "douche",
+  "who": "N",
+  "text": "Tous les matins, elle se douche sur la place… devant tout le monde.",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "vanille",
+  "who": "M",
+  "text": "Mmmh… ça sent la *vanille* !",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "moi",
+  "who": "N",
+  "text": "Moi, c'est *Sacha*. J'ai dix euros… et un *plan*.",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "plan",
+  "who": "N",
+  "text": "Si une douche coûte un million… l'eau qui tombe du ciel, elle, est *gratuite*.",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "probleme",
+  "who": "N",
+  "text": "Seul problème : ici, il n'a *jamais* plu.",
+  "pad": 0.3,
+  "mood": "deadpan"
+ },
+ {
+  "id": "machine",
+  "who": "N",
+  "text": "Alors j'ai construit un *aspirateur à nuages*.",
+  "pad": 0.1,
+  "mood": "hype"
+ },
+ {
+  "id": "b2",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "rire",
+  "who": "C",
+  "text": "Un aspirateur à nuages ? Il a trop respiré ses *chaussettes* !",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "jourj",
+  "who": "N",
+  "text": "Le grand jour, toute la ville est là. J'allume la machine…",
+  "pad": 0.2,
+  "mood": "suspense"
+ },
+ {
+  "id": "rien",
+  "who": "N",
+  "text": "Il ne se passe *rien*.",
+  "pad": 0.4,
+  "mood": "deadpan"
+ },
+ {
+  "id": "puis",
+  "who": "N",
+  "text": "D'abord un nuage. Ensuite *dix*. Ensuite *mille* !",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "b3",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "pluie",
+  "who": "N",
+  "text": "Et la pluie tombe sur toute la ville. *Gratuitement* !",
+  "pad": 0.2,
+  "mood": "hype"
+ },
+ {
+  "id": "danse",
+  "who": "N",
+  "mood": "excited",
+  "text": "Les gens dansent sous la pluie. Toute la ville sent le *savon* !",
+  "pad": 0.2
+ },
+ {
+  "id": "madouche",
+  "who": "M",
+  "text": "Et ma douche, alors ? Elle coûte *un million* !",
+  "pad": 0.3,
+  "mood": "sad"
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "text": "Depuis, plus personne ne paie pour se laver.",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "twist",
+  "who": "N",
+  "text": "Par contre, les nuages coûtent *un million*… et ils sont *tous à moi*.",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "b4",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.6,
+  "huss": true
+ }
+]
