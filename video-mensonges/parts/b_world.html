@@ -1,0 +1,66 @@
+// ---------- world : la ville où chaque mensonge fait monter la maison d'un mètre ----------
+scene.background = SKY_DAY;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(700, 300), M('#63b84a')); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const road = new THREE.Mesh(new THREE.PlaneGeometry(160, 4.5), M('#5b5f6b')); road.rotation.x = -Math.PI / 2; road.position.set(0, .01, 4.2); road.receiveShadow = true; scene.add(road);
+for (let x = -78; x < 80; x += 4) { const d = new THREE.Mesh(new THREE.PlaneGeometry(1.8, .16), M('#f2f2f2')); d.rotation.x = -Math.PI / 2; d.position.set(x, .02, 4.2); scene.add(d); }
+box(160, .12, 2.2, '#e3e0da', 0, .06, 1.0, .02);
+const HOUSE_COLS = ['#f2b38a', '#9fd9b0', '#f4a6b8', '#f7d774', '#a9c7f5', '#c9a6f0'];
+const ROOF_COLS = ['#7a5cd6', '#e0533d', '#3fa35b', '#3b6fd8'];
+// house body in a group (origin = ground level of the house)
+function houseBody(g, i, porch = false) {
+  box(5, 3.4, 4, HOUSE_COLS[i % 6], 0, 1.7, 0, .1, g);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.9, 2, 4), M(ROOF_COLS[i % 4])); roof.rotation.y = Math.PI / 4; roof.position.y = 4.4; roof.castShadow = true; g.add(roof);
+  for (const wx of [-1.4, 1.4]) { box(1.1, 1.1, .1, '#ffffff', wx, 2.1, 2.02, .03, g); box(.9, .9, .12, '#2f5fb0', wx, 2.1, 2.03, .02, g); }
+  box(.95, 1.7, .1, '#7a4a2c', 0, .85, 2.02, .03, g); box(.12, .12, .12, '#f5c400', .3, .85, 2.1, .03, g);
+  if (porch) {   // balcony in front of the door, with a railing: the characters stand on it
+    box(5.2, .2, 1.7, '#b07a4a', 0, -.1, 2.85, .04, g);
+    box(5.2, .12, .12, '#ffffff', 0, .62, 3.65, .03, g);
+    for (let k = 0; k < 9; k++) box(.1, .62, .1, '#ffffff', -2.5 + k * .625, .31, 3.65, .02, g);
+    for (const sx of [-2.55, 2.55]) box(.12, .12, 1.7, '#ffffff', sx, .62, 2.85, .03, g);
+  }
+  return g;
+}
+function house(x, z, i, s = 1) { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); return houseBody(g, i); }
+function tree(x, z, s = 1) { const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g); box(.4, 1.6, .4, '#7a5236', 0, .8, 0, .05, g); box(1.8, 1.4, 1.8, '#3fa35b', 0, 2.2, 0, .3, g); box(1.2, 1, 1.2, '#4fbf68', 0, 3.1, 0, .25, g); }
+// --- the street (houses on the ground)
+[-35, -28, -21, -14, -7, 18, 25, 32].forEach((x, i) => house(x, -6.5, i + 1)); [-24.5, -17.5, -10.5, 21.5, 28.5].forEach(x => tree(x, -2.6));
+for (let x = -38; x < 38; x += 1.2) if (Math.abs(x) > 3 && Math.abs(x - 9) > 3.4) box(.1, .7, .1, '#ffffff', x, .35, -2.2, .02);
+box(76, .1, .1, '#ffffff', 0, .62, -2.2, .02);
+// --- the pillar texture: one stripe per metre, so the height reads at a glance
+function pillarTex() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 64; const x = c.getContext('2d');
+  x.fillStyle = '#c9b79c'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#b5a285'; x.fillRect(0, 30, 64, 4); x.fillRect(30, 0, 4, 30); x.fillRect(10, 34, 4, 30); x.fillRect(48, 34, 4, 30);
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, 64, 5);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function liftHouse(x, z, i) {
+  const base = new THREE.Group(); base.position.set(x, 0, z); scene.add(base);
+  const tex = pillarTex(); const pil = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1, 2.6), new THREE.MeshStandardMaterial({ map: tex, roughness: .85 }));
+  pil.castShadow = pil.receiveShadow = true; base.add(pil);
+  const top = new THREE.Group(); base.add(top); houseBody(top, i, true);
+  const slab = box(5.4, .3, 4.4, '#9a8a74', 0, -.15, 0, .05, top);
+  return { base, top, pil, tex, set(h) { h = Math.max(0, h); top.position.y = h; pil.visible = h > .03; pil.scale.y = Math.max(h, .001); pil.position.y = h / 2; tex.repeat.set(1, Math.max(h, .001)); slab.visible = h > .03; } };
+}
+const MAISON = liftHouse(0, -6.5, 4);      // Malo's house
+const TOUR = liftHouse(9, -6.5, 5);        // monsieur Bernard's house, 40 m up
+TOUR.set(40);
+// --- clouds (around 24–34 m)
+const CLOUDS = [];
+for (let i = 0; i < 26; i++) {
+  let x = -36 + rnd(i) * 72, z = -30 + rnd(i + 50) * 34; if (Math.abs(x - 4.5) < 9 && z > -12 && z < 2) z -= 14;
+  const g = new THREE.Group(); g.position.set(x, 23 + rnd(i + 90) * 11, z); scene.add(g); CLOUDS.push(g);
+  const n = 3 + Math.floor(rnd(i + 7) * 3);
+  for (let k = 0; k < n; k++) { const m = box(2.2 + rnd(i * 3 + k) * 2.2, 1.2 + rnd(i * 5 + k) * 1, 1.8 + rnd(i * 7 + k) * 1.2, '#ffffff', (k - n / 2) * 1.5, rnd(i + k) * .6, rnd(i * 2 + k) * .8, .45, g); m.castShadow = false; }
+}
+// --- props
+const prop = (build) => { const g = new THREE.Group(); scene.add(g); build(g); g.visible = false; return g; };
+const biscuitBox = prop(g => { box(.5, .32, .16, '#3b6fd8', 0, 0, 0, .03, g); box(.36, .14, .02, '#f5c400', 0, .03, .085, .01, g); });
+const plate = prop(g => { box(.6, .05, .6, '#ffffff', 0, 0, 0, .02, g); for (let k = 0; k < 5; k++) { box(.07, .14, .07, '#6fbf4a', -.16 + (k % 3) * .16, .09, -.1 + Math.floor(k / 3) * .2, .02, g); box(.18, .14, .18, '#2f8a3a', -.16 + (k % 3) * .16, .2, -.1 + Math.floor(k / 3) * .2, .07, g); } });
+const briefcase = prop(g => { box(.5, .38, .14, '#5a3a22', 0, 0, 0, .04, g); box(.2, .06, .05, '#2a1c14', 0, .22, 0, .02, g); });
+const pizzaBox = prop(g => { box(.62, .1, .62, '#e8d3a8', 0, 0, 0, .02, g); box(.3, .02, .3, '#e0533d', 0, .055, 0, .01, g); });
+const lizard = prop(g => { box(.34, .1, .12, '#4fbf68', 0, 0, 0, .04, g); box(.12, .09, .1, '#4fbf68', .21, .02, 0, .03, g); box(.2, .05, .05, '#3fa35b', -.24, -.01, 0, .02, g); });
+const scooter = prop(g => {
+  box(1.4, .3, .5, '#e8473f', 0, .55, 0, .1, g); box(.3, .9, .3, '#e8473f', .6, .95, 0, .08, g); box(.7, .08, .08, '#222', .6, 1.42, 0, .03, g);
+  box(.6, .5, .6, '#ffffff', -.45, 1.0, 0, .05, g);
+  for (const wx of [-.55, .6]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(.28, .28, .18, 16), M('#222')); w.rotation.x = Math.PI / 2; w.position.set(wx, .28, 0); g.add(w); }
+});

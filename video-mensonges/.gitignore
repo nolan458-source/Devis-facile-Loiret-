@@ -1,0 +1,7 @@
+node_modules
+build/
+models/
+__pycache__/
+index.html
+*.mp4
+!mensonges.mp4

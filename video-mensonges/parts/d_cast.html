@@ -1,0 +1,8 @@
+// cast
+const malo = character('malo', { skin: '#f3cfb3', shirt: '#2fb6a0', pants: '#2a3a6b', hair: 'short', hairCol: '#6b3f28', face: { eyes: 'n', mouth: 'smile', blush: true } });
+const maman = character('maman', { skin: '#f1c9a5', shirt: '#e0533d', pants: '#3a3a4a', hair: 'bun', hairCol: '#7a4a2c', face: { eyes: 'n', mouth: 'smile', blush: true } });
+const papa = character('papa', { skin: '#f1c9a5', shirt: '#3b6fd8', pants: '#2a2a3a', shoes: '#222', hair: 'short', hairCol: '#4a2c1a', face: { eyes: 'n', mouth: 'smile', mustache: true } });
+const bernard = character('bernard', { skin: '#f0c39c', shirt: '#e8b23a', pants: '#5a4a3a', shoes: '#222', hair: 'bald', hairCol: '#dddddd', face: { eyes: 'n', mouth: 'grin', mustache: true, round: true } });
+const livreur = character('livreur', { skin: '#c98a5a', shirt: '#e8473f', pants: '#2a2a3a', hair: 'cap', capCol: '#e8473f', hairCol: '#1e1410', face: { eyes: 'n', mouth: 'grin' } });
+const voisins = [0, 1, 2, 3].map(i => character('voisin' + i, { skin: ['#8d5a3b', '#f1c9a5', '#c98a5a', '#f3cfb3'][i], shirt: ['#9a6be0', '#ff8a3d', '#4fbf68', '#ff7fb0'][i], pants: '#2a2a3a',
+  hair: ['short', 'pony', 'spiky', 'pigtails'][i], hairCol: ['#1e1410', '#e8b23a', '#2a1c14', '#7a4a2c'][i], face: { eyes: 'happy', mouth: 'grin', blush: i % 2 === 1 } }));

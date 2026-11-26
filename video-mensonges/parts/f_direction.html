@@ -1,0 +1,216 @@
+function caption(t) {
+  let best = null;
+  TL.lines.forEach(l => { if (t < l.start || t > l.start + l.dur + .15) return; l.words.forEach(w => { if (w.t <= t) best = w; }); });
+  if (!best) return;
+  const k = prog(t, best.t, best.t + .12), huss = /^huss/i.test(best.w), s = lerp(huss ? 1.8 : 1.28, 1, back(k));
+  ctx.save(); ctx.translate(W / 2, H * .6); ctx.scale(s, s); if (huss) ctx.rotate(Math.sin(t * 30) * .05);
+  text2(huss ? 'HUSS !' : best.w, 0, 0, huss ? 96 : 66, best.e ? '#ffd23f' : '#ffffff', { lw: huss ? 16 : 12 }); ctx.restore();
+}
+
+// ---------- direction ----------
+const jumpY = (t, t0, d, h) => h * Math.sin(Math.PI * clamp((t - t0) / d));
+const WTn = (id, re, n) => { const ws = L[id].words.filter(w => re.test(w.w)); return ws.length ? ws[Math.min(n, ws.length - 1)].t : S(id); };
+const G3 = id => L[id].words.filter((w, i) => i % 3 === 0).map(w => w.t);
+const hits = id => L[id].words.map(w => w.t);
+const lt = (id, t) => (t >= S(id) && t <= E(id)) ? (L[id].env[Math.floor((t - S(id)) * FPS)] || 0) : 0;
+const PZ = -3.65;                       // porch line (z) of both raised houses
+let HM = 0, HB = 40, MSTEPS = [], BSTEPS = [], T_LAND = 0;
+// height = sum of steps [start, delta, duration, ease]; 'back' overshoots like a spring, 'lin' is linear
+const hAt = (st, t, base = 0) => st.reduce((h, [t0, d, du, e]) => h + d * (t < t0 ? 0 : t > t0 + du ? 1 : (e === 'lin' ? (t - t0) / du : back((t - t0) / du))), base);
+function heightSteps() {
+  const b3 = hits('b3').slice(0, 8); T_LAND = b3[7];
+  MSTEPS = [
+    [E('oui'), 1, .45], [E('chat'), 1, .45],
+    [WTn('engrenage', /^autre/, 0), 1, .4], [WTn('engrenage', /^autre/, 1), 1, .4], [WT('engrenage', /^dix/), 8, 1.0],
+    ...G3('b2').map(t0 => [t0, 1, .3]),
+    [S('nuages') - .35, 15, 1.0], [S('voisin') - .5, 10, .6],
+    [S('verites') + .5, -32, E('verites') - S('verites') - .5, 'lin'],
+    ...b3.map(t0 => [t0, -1, .1, 'lin']),
+    [E('brocolis') - .05, 1, .45]];
+  BSTEPS = [[S('qeu') + .05, 1, .5], [S('moins') + .05, -1, .45]];
+}
+function shots() {
+  const lie = id => E(id) - .15;
+  return [
+    [0, [3, 3.5, 14], [3, 6, 12.5], [3.5, 4.5, -6.5], [3.5, 10, -6.5], 62],
+    [S('b1') - .15, [2.6, 1.7, 1.4], [2.1, 1.5, .6], [-.5, 1.1, PZ], [-.5, 1.1, PZ], 50, 'M'],
+    [S('sol') - .1, [-26, 2.4, 6.5], [-12, 2.4, 6.5], [-26, 1.4, -5], [-12, 1.4, -5], 55],
+    [S('bernard') - .1, [16, 3, 13], [15, 37, 14], [9, 10, -6.5], [9, 40.6, -6.5], 52],
+    [S('dino') - .1, [10.6, 1.5, 1.4], [10.4, 1.45, .9], [8.4, 1.25, PZ], [8.4, 1.25, PZ], 48, 'B'],
+    [S('qeu') - .05, [18, 44, 10], [18.5, 44.5, 11], [9, 42.5, -6.5], [9, 42.5, -6.5], 52],
+    [S('moi') - .1, [.1, 1.35, -.6], [-.1, 1.3, -1.1], [-.9, 1.15, PZ], [-.9, 1.15, PZ], 45, 'M'],
+    [S('maman') - .1, [0, 1.7, 3.2], [0, 1.6, 2.6], [0, 1.15, PZ], [0, 1.15, PZ], 50, 'M'],
+    [lie('oui'), [8, 2, 6], [8.4, 2.3, 6.6], [0, 1.8, -6.5], [0, 2.4, -6.5], 55],
+    [S('biscuits') - .1, [0, 1.7, 3.0], [0, 1.6, 2.5], [0, 1.15, PZ], [0, 1.15, PZ], 50, 'M'],
+    [lie('chat'), [8, 3, 6], [8.4, 3.3, 6.6], [0, 2.6, -6.5], [0, 3.2, -6.5], 55],
+    [S('pasdechat') - .05, [-.25, 1.45, -1.1], [-.3, 1.42, -1.3], [-.9, 1.12, PZ], [-.9, 1.12, PZ], 42, 'M'],
+    [S('engrenage') - .1, [13, 3, 16], [22, 9, 30], [0, 4, -6.5], [0, 11, -6.5], 52],
+    [S('b2') - .15, [-2.8, 2.1, -.7], [-2.3, 1.8, -1.4], [-.7, 1.1, PZ], [-.7, 1.1, PZ], 55, 'M'],
+    [S('pizza') - .1, [6.5, .9, 8.5], [6.5, .9, 8.5], [3, 2.5, 2], [1, 8, -3], 55],
+    [WT('pizza', /^lancer/) + .45, [2.2, 2.6, .4], [1.8, 2.2, -.3], [-.6, .8, PZ], [-.6, 1.0, PZ], 55, 'M'],
+    [S('nuages') - .3, [13, 3, 12], [11, 2, 9], [0, 1.5, -6.5], [0, 1.2, -6.5], 52, 'M'],
+    [S('papa') - .1, [5, 1, 8], [4.8, 1, 7.6], [1, 6, -4], [1, 7.5, -4], 62],
+    [S('voisin') - .55, [4.5, 4.5, 22], [4.5, 3.8, 20], [4.5, 1.6, -5], [4.5, 1.6, -5], 55, 'M'],
+    [S('regle') - .1, [10.4, 1.5, .9], [10.2, 1.45, .5], [8.4, 1.2, PZ], [8.4, 1.2, PZ], 48, 'B'],
+    [WT('regle', /^descendre/) - .1, [.1, 1.35, -.7], [0, 1.3, -1.0], [-.9, 1.15, PZ], [-.9, 1.15, PZ], 45, 'M'],
+    [S('verites') - .1, [13, 2.5, 13], [12, 2, 11], [2, 1.5, -6.5], [2, 1.3, -6.5], 52, 'M'],
+    [S('b3') - .15, [12, 6, 15], [9, 2.4, 10], [0, 4, -6.5], [0, 2, -6.5], 55],
+    [S('sol2') - .1, [.5, 1.7, 3.8], [.5, 1.5, 3.0], [.3, 1.1, PZ], [.3, 1.1, PZ], 50, 'M'],
+    [S('lezard') - .1, [10.4, 1.5, .9], [10.2, 1.45, .5], [8.4, 1.2, PZ], [8.4, 1.2, PZ], 46, 'B'],
+    [S('moins') - .05, [18, 44, 10], [18.5, 44.5, 11], [9, 42, -6.5], [9, 42, -6.5], 52],
+    [S('brocolis') - .1, [0, 1.7, 3.0], [0, 1.6, 2.5], [0, 1.15, PZ], [0, 1.15, PZ], 50, 'M'],
+    [lie('brocolis'), [8, 2, 6], [8.4, 2.3, 6.6], [0, 1.8, -6.5], [0, 2.4, -6.5], 55],
+    [S('b4') - .1, [-.2, 1.4, -1.2], [-.3, 1.35, -1.5], [-.9, 1.15, PZ], [-.9, 1.15, PZ], 44, 'M'],
+  ];
+}
+let SH;
+function applyCamera(t) {
+  let i = 0; SH.forEach((s, j) => { if (t >= s[0]) i = j; });
+  const s = SH[i], tEnd = i + 1 < SH.length ? SH[i + 1][0] : TL.total, k = ease(prog(t, s[0], tEnd));
+  const off = s[6] === 'M' ? HM : s[6] === 'B' ? HB : 0;
+  const pos = s[1].map((v, j) => lerp(v, s[2][j], k) + (j === 1 ? off : 0)), look = s[3].map((v, j) => lerp(v, s[4][j], k) + (j === 1 ? off : 0));
+  camera.position.set(...pos); camera.lookAt(...look); camera.fov = s[5]; camera.updateProjectionMatrix();
+  sun.position.set(look[0] + 8, look[1] + 18, look[2] + 12); sun.target.position.set(look[0], look[1], look[2]); sun.target.updateMatrixWorld();
+}
+const P = (c, p) => pose(c, Object.assign({ visible: true }, p));
+const PROPS = [biscuitBox, plate, briefcase, pizzaBox, lizard, scooter];
+const hideAll = () => { for (const c of Object.values(CH)) c.root.visible = false; PROPS.forEach(p => p.visible = false); };
+function hold(pr, x, y, z, ry, s, dy = 1.0, dz = .45) { pr.visible = true; pr.position.set(x + Math.sin(ry) * dz * s, y + dy * s, z + Math.cos(ry) * dz * s); pr.rotation.set(0, ry, 0); }
+const UP = [[2.6, 0], [2.6, 0]], FWD = [[.15, -1.6], [.15, -1.6]];
+const hitJump = (t, id, d = .22, h = .3) => Math.max(0, ...hits(id).map(t0 => jumpY(t, t0, d, h)));
+
+function update(t) {
+  hideAll();
+  HM = hAt(MSTEPS, t); HB = hAt(BSTEPS, t, 40); MAISON.set(HM); TOUR.set(HB);
+  const eve = (t > S('nuages') - .3 && t < S('voisin') - .55) || (t > S('sol2') - .25 && t < S('lezard') - .1);
+  scene.background = eve ? SKY_EVE : SKY_DAY; scene.fog.color.set(eve ? '#f0b090' : '#bfe4ff');
+  hemi.intensity = eve ? .9 : 1.25; sun.intensity = eve ? 1.5 : 2.2; sun.color.set(eve ? '#ffc48a' : '#fff4e0');
+  const inL = (id, a = -.1, b = .1) => t > S(id) + a && t < E(id) + b;
+
+  // --- Malo, on his porch
+  const m = { x: -.9, y: HM, z: PZ, ry: 0, s: .62, arms: [0, 0], face: { eyes: 'n', mouth: 'smile', blush: true } };
+  if (t < S('sol')) { m.face = { eyes: 'happy', mouth: 'grin', blush: true }; m.y += hitJump(t, 'b1', .22, .35); if (inL('b1')) { m.arms = UP; m.face.mouth = 'open'; } }
+  if (inL('moi', -.1, 0)) { m.arms = WAVE(t); m.face = { eyes: 'happy', mouth: 'grin', blush: true }; }
+  if (t > S('maman') - .1 && t < S('oui')) { m.ry = .35; m.face = { eyes: 'n', mouth: 'flat', blush: true }; }
+  if (inL('oui', -.05, .05)) { m.ry = .25; m.face = { eyes: 'happy', mouth: 'grin', blush: true }; m.talk = lt('oui', t); }
+  if (t > E('oui') + .05 && t < S('biscuits') - .1) { m.face = { eyes: 'wide', mouth: 'o' }; m.arms = [[.7, 0], [.7, 0]]; }
+  if (inL('biscuits', -.1, 0)) { m.ry = .35; m.face = { eyes: 'n', mouth: 'flat', brow: .5 }; }
+  if (inL('chat', -.05, .05)) { m.ry = .1; m.arms = [0, [1.5, -.4]]; m.face = { eyes: 'happy', mouth: 'grin', blush: true }; m.talk = lt('chat', t); }
+  if (t > E('chat') + .05 && t < S('engrenage')) { m.face = { eyes: 'wide', mouth: 'flat' }; m.arms = [[.5, 0], [.5, 0]]; }
+  if (t >= S('engrenage') && t < S('b2') - .15) { m.face = { eyes: 'wide', mouth: 'wavy' }; m.arms = [[.3, -.9], [.3, -.9]]; }
+  if (t >= S('b2') - .15 && t < S('pizza')) { m.y += hitJump(t, 'b2'); m.arms = UP; m.face = { eyes: 'happy', mouth: 'open' }; }
+  if (t >= S('pizza') && t < S('nuages') - .3) {
+    const ta = WT('pizza', /^lancer/) + 1.1; m.arms = t > ta - .5 ? FWD : [[.3, -.6], [.3, -.6]];
+    m.face = t > ta ? { eyes: 'happy', mouth: 'grin', blush: true } : { eyes: 'wide', mouth: 'o' }; if (t > ta) hold(pizzaBox, m.x, m.y, m.z, m.ry, m.s, 1.2, .6);
+  }
+  if (t >= S('nuages') - .3 && t < S('papa')) { m.face = { eyes: 'closed', mouth: 'smile', blush: true }; m.headZ = .25; m.bend = .1; }
+  if (t >= S('voisin') - .55 && t < S('verites')) { m.ry = .55; m.face = { eyes: 'wide', mouth: 'o' }; }
+  if (t >= S('verites') && t < S('b3') - .1) { m.arms = [[.6 + Math.sin(t * 9) * .4, -.6], [.6 - Math.sin(t * 9) * .4, -.6]]; m.talk = talk('N', t); m.face = { eyes: 'n', mouth: 'smile', brow: .6, blush: true }; }
+  if (t >= S('b3') - .1 && t < S('sol2') - .1) { m.y += hitJump(t, 'b3'); m.arms = UP; m.face = { eyes: 'happy', mouth: 'open' }; }
+  if (t >= S('sol2') - .1 && t < S('lezard')) { m.x = -.65; m.ry = .5; m.arms = [[.3, -1.2], [.3, -1.2]]; m.face = { eyes: 'happy', mouth: 'grin', blush: true }; }
+  if (t >= S('brocolis') - .1) { m.ry = .25; m.face = { eyes: 'wide', mouth: 'grin', blush: true }; }
+  if (t >= E('brocolis') - .15) { m.ry = 0; m.face = { eyes: 'wink', mouth: 'grin', blush: true }; m.y += hitJump(t, 'b4', .22, .3); m.arms = t > S('b4') - .1 ? UP : [0, [2.4, 0]]; }
+  P(malo, m);
+
+  // --- Maman
+  if (t > S('maman') - .3) {
+    const a = { x: .9, y: HM, z: PZ, ry: -.35, s: .78, arms: [0, 0], face: { eyes: 'n', mouth: 'smile', blush: true } };
+    if (t < S('biscuits') - .1) { a.arms = [[.5, -1.0], [.5, -1.0]]; a.face = { eyes: 'n', mouth: 'flat', brow: .5 }; a.talk = talk('M', t); }
+    if (t >= S('biscuits') - .1 && t < S('engrenage')) { a.arms = FWD; hold(biscuitBox, a.x, a.y, a.z, a.ry, a.s, 1.2, .6); a.face = { eyes: 'n', mouth: t > E('chat') ? 'flat' : 'smile', brow: t > E('chat') ? 1 : .3 }; a.talk = talk('M', t); }
+    if (t >= S('engrenage') && t < S('sol2') - .1) { a.face = { eyes: 'wide', mouth: 'o' }; a.arms = [[.3, -.9], [.3, -.9]]; }
+    if (t >= S('sol2') - .1 && t < S('lezard')) { a.x = .3; a.ry = 0; a.arms = [[.3, -1.2], [.3, -1.2]]; a.face = { eyes: 'happy', mouth: 'grin', blush: true }; }
+    if (t >= S('brocolis') - .1) { a.ry = -.3; a.arms = FWD; hold(plate, a.x, a.y, a.z, a.ry, a.s, 1.15, .6); a.face = { eyes: 'happy', mouth: 'grin', blush: true }; }
+    P(maman, a);
+  }
+  // --- Papa: stuck on the ground, then home again
+  if (inL('papa', -.2, .2)) {
+    const ry = -.5, s = .82, x = 1.4, z = 1.4; P(papa, { x, z, ry, s, headX: -.55, arms: [0, [2.6 + Math.sin(t * 14) * .3, 0]], talk: talk('C', t), face: { eyes: 'wide', mouth: 'open', mustache: true } });
+    briefcase.visible = true; briefcase.position.set(x - .5 * s * Math.cos(ry), .5 * s, z + .5 * s * Math.sin(ry)); briefcase.rotation.y = ry;
+  }
+  if (t >= S('sol2') - .1 && t < S('lezard')) P(papa, { x: 1.45, y: HM, z: PZ, ry: -.45, s: .82, arms: [[.3, -1.2], [.3, -1.2]], face: { eyes: 'happy', mouth: 'grin', mustache: true } });
+  // --- Monsieur Bernard, 40 m up
+  const b = { x: 8.4, y: HB, z: PZ, ry: -.15, s: .8, arms: [0, 0], face: { eyes: 'n', mouth: 'grin', mustache: true, round: true } };
+  if (inL('bernard', 0, 0)) b.arms = WAVE(t);
+  if (inL('dino', -.1, .1)) { b.arms = [[1.7 + Math.sin(t * 10) * .3, -.3], [1.7 - Math.sin(t * 10) * .3, -.3]]; b.talk = talk('V', t); b.face = { eyes: 'wide', mouth: 'grin', mustache: true, round: true }; }
+  if (inL('qeu', -.1, .2)) { b.arms = UP; b.face = { eyes: 'happy', mouth: 'grin', mustache: true, round: true }; }
+  if (t > S('voisin') - .55 && t < S('verites')) { b.ry = -.6; b.arms = t < E('voisin') ? WAVE(t) : [[.6 + Math.sin(t * 7) * .3, -.7], [.6, -.7]]; b.talk = talk('V', t) + (t > S('regle') ? talk('N', t) * .7 : 0); }
+  if (t >= S('lezard') - .1 && t < S('moins')) { b.arms = FWD; hold(lizard, b.x, b.y, b.z, b.ry, b.s, 1.2, .6); b.face = { eyes: 'n', mouth: 'wavy', mustache: true, round: true, blush: true }; }
+  if (t >= S('moins')) { b.face = { eyes: 'wide', mouth: 'o', mustache: true, round: true }; b.arms = [[.8, 0], [.8, 0]]; }
+  P(bernard, b);
+  // --- the pizza guy
+  if (t > S('pizza') - .2 && t < S('nuages') - .3) {
+    const tl = WT('pizza', /^lancer/), ta = tl + 1.1;
+    scooter.visible = true; scooter.position.set(4.6, 0, 3.0); scooter.rotation.y = Math.PI;
+    P(livreur, { x: 2.8, z: 2.3, ry: -.6, s: .8, headX: -.45, arms: t > tl - .1 ? UP : FWD, face: { eyes: 'happy', mouth: 'grin' } });
+    if (t < tl) hold(pizzaBox, 2.8, 0, 2.3, -.6, .8, .95, .55);
+    else if (t < ta) { const kk = prog(t, tl, ta); pizzaBox.visible = true; pizzaBox.position.set(lerp(2.6, -.7, kk), lerp(2.0, HM + .62 * 1.2, kk) + Math.sin(Math.PI * kk) * 3, lerp(2.2, PZ + .62 * .6, kk)); pizzaBox.rotation.set(0, kk * 9, 0); }
+  }
+  // --- neighbours on the ground, everybody honest
+  if (t < S('bernard')) [-28, -21, -14, -7].forEach((x, i) => P(voisins[i], { x: x + .9, z: -3.9, ry: .1, s: .75, arms: t > S('sol') ? WAVE(t + i * .3) : [0, 0], face: { eyes: 'happy', mouth: 'grin', blush: i % 2 === 1 } }));
+}
+
+// ---------- overlay ----------
+function gauge(t) {
+  const on = (t > E('oui') - .25 && t < S('sol2') + .6) || t > E('brocolis') - .25; if (!on) return;
+  const x = 66, y0 = 1010, y1 = 330, Y = v => y0 - (y0 - y1) * clamp(v / 41, 0, 1);
+  ctx.save(); ctx.globalAlpha = .92;
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 5; ctx.beginPath(); ctx.roundRect(x - 16, y1 - 20, 32, y0 - y1 + 40, 14); ctx.fill(); ctx.stroke();
+  const fill = Y(HM); ctx.fillStyle = HM > 25 ? '#ff5d5d' : HM > 10 ? '#ff9f3d' : '#7dd36a'; ctx.beginPath(); ctx.roundRect(x - 9, fill, 18, y0 - fill + 10, 8); ctx.fill();
+  ctx.strokeStyle = '#1e1a22'; ctx.lineWidth = 3;
+  for (let v = 0; v <= 40; v += 5) { ctx.beginPath(); ctx.moveTo(x + 16, Y(v)); ctx.lineTo(x + (v % 10 ? 24 : 32), Y(v)); ctx.stroke(); if (v % 10 === 0) text2(String(v), x + 50, Y(v), 22, '#ffffff', { lw: 6 }); }
+  ctx.globalAlpha = 1; ctx.fillStyle = '#ffd23f'; ctx.beginPath(); ctx.moveTo(x + 18, fill); ctx.lineTo(x + 40, fill - 14); ctx.lineTo(x + 40, fill + 14); ctx.closePath(); ctx.fill(); ctx.stroke();
+  text2(Math.round(HM) + ' m', x + 100, fill, 46, '#ffd23f', { lw: 10 });
+  ctx.restore();
+}
+const at = (x, y, z) => proj(new THREE.Vector3(x, y, z));
+function houseTag(str, col, k) { if (k <= 0) return; const [x, y, z] = at(9, HB + 6.6, -6.5); if (z > 1) return; ctx.save(); ctx.translate(x, Math.max(90, y)); const s = back(clamp(k)); ctx.scale(s, s); text2(str, 0, 0, 64, col, { lw: 12 }); ctx.restore(); }
+function hussBurst(t) {
+  for (const t0 of ['b1', 'b2', 'b3', 'b4'].flatMap(G3)) { const k = (t - t0) / .7; if (k < 0 || k > 1) continue;
+    const [x, y] = proj(headTop(malo, .6)); ctx.save(); ctx.translate(clamp(x, 160, W - 160), clamp(y - 40, 120, H * .45)); ctx.globalAlpha = 1 - k * k;
+    for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 60 * (1 + k), Math.sin(a) * 60 * (1 + k)); ctx.lineTo(Math.cos(a) * 95 * (1 + k), Math.sin(a) * 95 * (1 + k)); ctx.stroke(); }
+    ctx.restore(); ctx.globalAlpha = 1; }
+}
+function zzz(t) {
+  if (t < S('nuages') + .2 || t > S('papa') - .1) return; const [x, y] = proj(headTop(malo, .5));
+  for (let i = 0; i < 3; i++) { const k = ((t - S('nuages')) * .8 + i / 3) % 1; ctx.globalAlpha = 1 - k; text2('Z', x + 30 + k * 60, y - 20 - k * 120, 40 + i * 8, '#ffffff', { lw: 8 }); } ctx.globalAlpha = 1;
+}
+function dust(t) {
+  const k = (t - T_LAND) / .9; if (k < 0 || k > 1) return; const [x, y, z] = at(0, .2, -6.5); if (z > 1) return;
+  ctx.save(); ctx.globalAlpha = (1 - k) * .8; ctx.fillStyle = '#e8dcc8';
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 130 * (.4 + k), y + Math.sin(a) * 28 * (.4 + k), 46 * (1 - k * .4), 30 * (1 - k * .4), 0, 0, 7); ctx.fill(); }
+  ctx.restore();
+}
+function setupPops() {
+  POPS.length = 0;
+  const pop = (t0, c, txt, col = '#7dff7a', size = 1.25, ox = 0) => POPS.push({ t: t0, c, txt, col, dy: 1.15, size, ox });
+  [E('oui'), E('chat'), WTn('engrenage', /^autre/, 0), WTn('engrenage', /^autre/, 1), ...G3('b2'), E('brocolis')].forEach(t0 => pop(t0 + .05, malo, '+1 m'));
+  pop(WT('engrenage', /^dix/) + .1, malo, '+8 m', '#7dff7a', 1.6); pop(S('nuages') - .3, malo, '+15 m', '#7dff7a', 1.6); pop(S('voisin') - .5, malo, '+10 m', '#7dff7a', 1.6);
+  pop(S('qeu') + .1, bernard, '+1 m', '#7dff7a', 1.5); pop(S('moins') + .1, bernard, '−1 m', '#ff5d5d', 1.6);
+  const a = S('verites') + .5, d = E('verites') - a;
+  for (let k = 0; k < 32; k++) pop(a + d * k / 32, malo, '−1 m', '#ff5d5d', .95, (rnd(k) - .5) * 260);
+  hits('b3').slice(0, 8).forEach((t0, k) => pop(t0, malo, '−1 m', '#ff5d5d', 1.1, (rnd(k + 40) - .5) * 200));
+}
+function overlay(t) {
+  gauge(t);
+  const bub = (c, id, dy = 1.0) => bubbleOn(c, L[id].text, t > S(id) - .2 && t < E(id) + .4 ? prog(t, S(id) - .1, S(id) + .1) : 0, dy);
+  bub(bernard, 'dino'); bub(maman, 'maman'); bub(maman, 'biscuits'); bub(malo, 'oui'); bub(malo, 'chat'); bub(papa, 'papa'); bub(bernard, 'voisin');
+  if (t > S('moi') + .1 && t < E('moi') + .1) label(malo, 'MALO', '#7dd3ff', 1.1, 52);
+  if (t > WT('bernard', /^Bernard/) && t < E('bernard') + .1) label(bernard, 'M. BERNARD', '#ffd23f', 1.1, 44);
+  houseTag('40 m', '#ffffff', t > WT('bernard', /^Quarante/) - .1 && t < E('bernard') + .2 ? prog(t, WT('bernard', /^Quarante/) - .1, WT('bernard', /^Quarante/) + .15) : 0);
+  houseTag(Math.round(HB) + ' m', '#ffd23f', t > S('qeu') && t < E('qeu') + .3 ? 1 : 0);
+  houseTag(Math.round(HB) + ' m', '#ffffff', t > S('moins') + .3 && t < E('moins') + .3 ? 1 : 0);
+  pops(t); zzz(t); dust(t); hussBurst(t); caption(t);
+}
+function render(t) {
+  update(t); applyCamera(t); renderer.render(scene, camera);
+  ctx.drawImage(renderer.domElement, 0, 0); overlay(t);
+  const tl = TL.total; if (t > tl - .5) { ctx.fillStyle = `rgba(0,0,0,${prog(t, tl - .5, tl)})`; ctx.fillRect(0, 0, W, H); }
+}
+window.init = async tl => {
+  TL = tl; L = {}; tl.lines.forEach(l => L[l.id] = l); heightSteps(); SH = shots(); setupPops();
+  await document.fonts.load('800 70px Baloo'); await document.fonts.load('800 30px Nun');
+  render(0); return true;
+};
+window.frame = (t, type) => { render(t); return out.toDataURL(type, .9); };
+window.ready = true;
+</script></body></html>

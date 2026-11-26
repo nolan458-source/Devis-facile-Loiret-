@@ -1,0 +1,191 @@
+[
+ {
+  "id": "intro",
+  "who": "N",
+  "text": "Dans ma ville, chaque *mensonge* fait monter ta maison d'*un mètre*.",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "b1",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "sol",
+  "who": "N",
+  "text": "Ici, tout le monde dit la vérité. Les maisons restent toutes *en bas*.",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "bernard",
+  "who": "N",
+  "text": "Sauf celle de *monsieur Bernard*. Quarante mètres.",
+  "pad": 0.2,
+  "mood": "suspense"
+ },
+ {
+  "id": "dino",
+  "who": "V",
+  "text": "Hier, j'ai vu un *dinosaure* au supermarché !",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "qeu",
+  "who": "N",
+  "text": "Quarante et un mètres.",
+  "pad": 0.4,
+  "mood": "normal"
+ },
+ {
+  "id": "moi",
+  "who": "N",
+  "text": "Moi, c'est *Malo*. Et jusqu'à mardi, je n'avais *jamais* menti.",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "maman",
+  "who": "M",
+  "text": "Malo, tu as fait tes devoirs ?",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "oui",
+  "who": "N",
+  "text": "Oui, maman !",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "un",
+  "who": "N",
+  "text": "*Un mètre.*",
+  "pad": 0.3,
+  "mood": "normal"
+ },
+ {
+  "id": "biscuits",
+  "who": "M",
+  "text": "Et qui a mangé tous les biscuits ?",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "chat",
+  "who": "N",
+  "text": "C'est le *chat* !",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "pasdechat",
+  "who": "N",
+  "text": "On n'a *pas* de chat.",
+  "pad": 0.4,
+  "mood": "deadpan"
+ },
+ {
+  "id": "engrenage",
+  "who": "N",
+  "text": "Pour cacher un mensonge, il en faut *un autre*. Puis un autre. Puis *dix* autres.",
+  "pad": 0.1,
+  "mood": "hype"
+ },
+ {
+  "id": "b2",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "pizza",
+  "who": "N",
+  "text": "À quinze mètres, le livreur doit me *lancer* les pizzas.",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "nuages",
+  "who": "N",
+  "text": "À trente mètres, je dors *au-dessus des nuages*.",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "papa",
+  "who": "C",
+  "text": "Malo ! Je ne peux plus rentrer à la maison !",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "voisin",
+  "who": "V",
+  "text": "Bienvenue à quarante mètres, petit !",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "regle",
+  "who": "N",
+  "text": "Et là, il me donne le secret : chaque *vérité* fait *descendre* la maison d'un mètre.",
+  "pad": 0.2,
+  "mood": "suspense"
+ },
+ {
+  "id": "verites",
+  "who": "N",
+  "text": "Alors j'ai *tout* avoué. Les devoirs. Les biscuits. Le vase cassé. Le chat imaginaire.",
+  "pad": 0.1,
+  "mood": "hype"
+ },
+ {
+  "id": "b3",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "sol2",
+  "who": "N",
+  "text": "Le soir même, ma maison était revenue *tout en bas*.",
+  "pad": 0.3,
+  "mood": "normal"
+ },
+ {
+  "id": "lezard",
+  "who": "N",
+  "text": "Le lendemain, monsieur Bernard a avoué : son dinosaure, c'était un *lézard*.",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "moins",
+  "who": "N",
+  "text": "Plus que *quarante* mètres.",
+  "pad": 0.4,
+  "mood": "deadpan"
+ },
+ {
+  "id": "brocolis",
+  "who": "N",
+  "text": "Et moi ? J'ai dit à maman que j'*adorais* ses brocolis.",
+  "pad": 0.3,
+  "mood": "normal"
+ },
+ {
+  "id": "b4",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.6,
+  "huss": true
+ }
+]
