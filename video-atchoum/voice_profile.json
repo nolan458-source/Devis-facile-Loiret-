@@ -5,27 +5,23 @@
  "pad_scale": 0.3,
  "voices": {
   "N": {
-   "name": "narrateur",
+   "name": "narrateur (voix d'homme naturelle)",
    "mix": {
-    "ff_siwis": 0.55,
-    "am_puck": 0.45
+    "ff_siwis": 0.3,
+    "bm_george": 0.3,
+    "am_onyx": 0.4
    },
-   "speed": 1.12,
-   "intonation": {
-    "target_median": 176,
-    "down": 1.55,
-    "up": 1.7,
-    "formant": 1.0
-   }
+   "speed": 1.05,
+   "intonation": null
   },
   "C": {
    "name": "le maire",
    "mix": {
-    "ff_siwis": 0.35,
-    "bm_george": 0.35,
-    "am_onyx": 0.3
+    "ff_siwis": 0.3,
+    "am_onyx": 0.5,
+    "bm_lewis": 0.2
    },
-   "speed": 1.06,
+   "speed": 0.96,
    "intonation": null
   },
   "M": {

@@ -23,7 +23,7 @@
  {
   "id": "maire",
   "who": "N",
-  "text": "C'est la règle du *maire*. Lui, il est tout gris depuis *quarante ans*.",
+  "text": "C'est la règle du *maire*. Il est tout gris depuis *quarante ans*.",
   "pad": 0.1,
   "mood": "suspense"
  },
@@ -37,7 +37,7 @@
  {
   "id": "moi",
   "who": "N",
-  "text": "Moi, c'est *Tom*. Et ce matin, j'ai un gros *rhume*.",
+  "text": "Moi, c'est *Tom*. Et ce matin, je suis très *enrhumé*.",
   "pad": 0.1,
   "mood": "normal"
  },
@@ -79,7 +79,7 @@
  {
   "id": "chaine",
   "who": "N",
-  "text": "Mon voisin éternue. Puis la maîtresse. Puis *toute la classe*.",
+  "text": "Mon voisin éternue. La maîtresse aussi. Et *toute la classe* !",
   "pad": 0.1,
   "mood": "hype"
  },
@@ -93,7 +93,7 @@
  {
   "id": "feutres",
   "who": "N",
-  "text": "Sur la photo, on dirait une boîte de *feutres*.",
+  "text": "Sur la photo, on dirait une boîte de *crayons de couleur*.",
   "pad": 0.3,
   "mood": "deadpan"
  },
@@ -107,7 +107,7 @@
  {
   "id": "viral",
   "who": "N",
-  "text": "Trop tard ! Ma mère l'a postée. *Dix millions* de vues.",
+  "text": "Trop tard, ma mère l'a déjà postée. *Dix millions* de vues.",
   "pad": 0.2,
   "mood": "excited"
  },
@@ -142,16 +142,16 @@
  {
   "id": "fin",
   "who": "N",
-  "text": "Lui, il n'a éternué qu'une seule fois.",
+  "text": "Mais un jour, le maire a éternué. Une *seule* fois.",
   "pad": 0.2,
   "mood": "normal"
  },
  {
   "id": "rose",
   "who": "N",
-  "text": "Depuis, il est tout *rose*. Rose fluo.",
+  "text": "Depuis ce jour, le maire est *rose fluo*.",
   "pad": 0.3,
-  "mood": "deadpan"
+  "mood": "normal"
  },
  {
   "id": "b4",
