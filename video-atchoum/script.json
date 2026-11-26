@@ -1,0 +1,163 @@
+[
+ {
+  "id": "intro",
+  "who": "N",
+  "text": "Dans ma ville, chaque fois que tu *éternues*, tu changes de *couleur*.",
+  "pad": 0.1,
+  "mood": "excited"
+ },
+ {
+  "id": "b1",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "regle",
+  "who": "N",
+  "text": "Alors ici, le poivre est *interdit*. Les fleurs aussi.",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "maire",
+  "who": "N",
+  "text": "C'est la règle du *maire*. Lui, il est tout gris depuis *quarante ans*.",
+  "pad": 0.1,
+  "mood": "suspense"
+ },
+ {
+  "id": "fier",
+  "who": "C",
+  "text": "Dans ma ville, chacun garde *sa* couleur !",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "moi",
+  "who": "N",
+  "text": "Moi, c'est *Tom*. Et ce matin, j'ai un gros *rhume*.",
+  "pad": 0.1,
+  "mood": "normal"
+ },
+ {
+  "id": "photo",
+  "who": "N",
+  "text": "Et aujourd'hui, c'est la *photo de classe*.",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "ouistiti",
+  "who": "M",
+  "text": "Personne ne bouge ! On dit… *ouistiti* !",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "nez",
+  "who": "N",
+  "text": "Et là, mon nez commence à me *chatouiller*.",
+  "pad": 0.2,
+  "mood": "suspense"
+ },
+ {
+  "id": "atch",
+  "who": "N",
+  "text": "A… a… *atchoum* !",
+  "pad": 0.2,
+  "mood": "hype"
+ },
+ {
+  "id": "bleu",
+  "who": "N",
+  "text": "Je deviens tout *bleu*.",
+  "pad": 0.3,
+  "mood": "deadpan"
+ },
+ {
+  "id": "chaine",
+  "who": "N",
+  "text": "Mon voisin éternue. Puis la maîtresse. Puis *toute la classe*.",
+  "pad": 0.1,
+  "mood": "hype"
+ },
+ {
+  "id": "b2",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "feutres",
+  "who": "N",
+  "text": "Sur la photo, on dirait une boîte de *feutres*.",
+  "pad": 0.3,
+  "mood": "deadpan"
+ },
+ {
+  "id": "colere",
+  "who": "C",
+  "text": "Effacez-moi cette photo *tout de suite* !",
+  "pad": 0.3,
+  "mood": "excited"
+ },
+ {
+  "id": "viral",
+  "who": "N",
+  "text": "Trop tard. Ma mère l'a postée. *Dix millions* de vues.",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "touristes",
+  "who": "N",
+  "text": "Le lendemain, des milliers de touristes viennent voir la *ville arc-en-ciel*.",
+  "pad": 0.1,
+  "mood": "hype"
+ },
+ {
+  "id": "b3",
+  "who": "N",
+  "text": "*Huss ! Huss ! Huss !*",
+  "pad": 0.3,
+  "huss": true
+ },
+ {
+  "id": "idee",
+  "who": "N",
+  "text": "Et le maire a eu une *idée*.",
+  "pad": 0.2,
+  "mood": "suspense"
+ },
+ {
+  "id": "poivre",
+  "who": "N",
+  "text": "Maintenant, il vend du *poivre* à l'entrée de la ville. Dix euros le sachet.",
+  "pad": 0.2,
+  "mood": "excited"
+ },
+ {
+  "id": "fin",
+  "who": "N",
+  "text": "Lui, il a éternué une seule fois.",
+  "pad": 0.2,
+  "mood": "normal"
+ },
+ {
+  "id": "rose",
+  "who": "N",
+  "text": "Depuis, il est *rose fluo*.",
+  "pad": 0.3,
+  "mood": "deadpan"
+ },
+ {
+  "id": "b4",
+  "who": "N",
+  "text": "*Huss ! Huss !*",
+  "pad": 0.6,
+  "huss": true
+ }
+]
