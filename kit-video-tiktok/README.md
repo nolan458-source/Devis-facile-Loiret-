@@ -155,6 +155,10 @@ P(hero, { x: 0, z: 0, ry: .3, walk: t * 9, hop: jumpY(t, S('saute'), .6, 1.2), a
 | Bas de la voix (10 %) | 104 Hz | 111 Hz |
 | Haut de la voix (90 %) | 247 Hz | 246 Hz |
 | Amplitude d'intonation | 5,8 demi-tons | 5,4 demi-tons |
+| Débit (pics d'énergie par seconde de parole, mix complet) | 8,7 | 8,0 |
+| Part de silence | 5 % | 11 % |
+
+Pour un débit plus serré, baissez `gap_s` et `pad_scale`, ou montez `speed` du narrateur à 1,2. Au-delà, contrôlez la prononciation avec `check_pronunciation.py`.
 
 Pour mesurer votre propre réglage :
 

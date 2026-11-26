@@ -4,6 +4,7 @@ set -e
 cd "$(dirname "$0")"
 pip install "setuptools<81" numpy onnxruntime kokoro-onnx pyworld faster-whisper
 npm install
+mkdir -p fonts && cp node_modules/@fontsource/baloo-2/files/baloo-2-latin-800-normal.woff2 node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2 fonts/
 npx playwright install chromium
 mkdir -p models/kokoro
 for f in kokoro-v1.0.onnx voices-v1.0.bin; do
